@@ -153,9 +153,11 @@ button:active {
   width: 40px;
   height: 40px;
   font-size: 1.1rem;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   flex-shrink: 0;
 }
 
