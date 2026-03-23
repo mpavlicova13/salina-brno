@@ -1397,6 +1397,49 @@ button:active {
   color: var(--blue);
 }
 
+/* ---- Voice selector ---- */
+.voice-hint {
+  font-size: 0.8rem;
+  color: var(--gray-dark);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.voice-select-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.voice-select {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1.5px solid var(--gray-mid);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  color: var(--blue);
+  background: var(--white);
+  appearance: none;
+  cursor: pointer;
+}
+.voice-select:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+.btn-voice-test {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--blue-pale);
+  color: var(--blue);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1.5px solid var(--blue-light);
+}
+.btn-voice-test:hover { background: var(--blue-light); color: var(--white); }
+
 /* ============================================================
    SHARED COMPONENTS
    ============================================================ */

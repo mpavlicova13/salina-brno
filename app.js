@@ -17,7 +17,8 @@ const AppState = {
     enabledTypesB: [...questionTypesB],
     sessionLength: 10,        // 5, 10, 20, 0 (endless)
     ttsSpeed: 1.0,
-    ttsEnabled: true
+    ttsEnabled: true,
+    selectedVoiceName: null   // null = automatický výběr
   },
 
   // Vybrané linky (pro sekce A a B)
@@ -54,20 +55,32 @@ const AppState = {
 const TTS = {
   synth: window.speechSynthesis,
   czechVoice: null,
+  czechVoices: [],
   available: false,
 
-  /** Inicializace – najde český hlas. */
+  /** Inicializace – najde a seřadí české hlasy dle kvality. */
   init() {
     const load = () => {
       const voices = this.synth.getVoices();
-      const czech = voices.find(v => v.lang === 'cs-CZ') ||
-                    voices.find(v => v.lang.startsWith('cs'));
-      if (czech) {
-        this.czechVoice = czech;
+      const czech = voices.filter(v => v.lang === 'cs-CZ' || v.lang.startsWith('cs'));
+      this.czechVoices = czech;
+
+      if (czech.length > 0) {
+        // Preferuj kvalitnější hlasy (enhanced, neural, natural, premium, online)
+        const quality = ['enhanced', 'neural', 'natural', 'premium', 'online'];
+        const best = czech.find(v =>
+          quality.some(k => v.name.toLowerCase().includes(k))
+        ) || czech[0];
+
+        // Pokud má uživatel uloženou preferenci, použij ji
+        const savedName = AppState.settings.selectedVoiceName;
+        const saved = savedName ? czech.find(v => v.name === savedName) : null;
+        this.czechVoice = saved || best;
         this.available = true;
       } else {
         this.available = voices.length > 0;
       }
+      renderVoiceSelector();
     };
     load();
     this.synth.onvoiceschanged = load;
@@ -229,6 +242,30 @@ function renderSettings() {
   document.querySelectorAll('.type-toggle[data-section="B"]').forEach(cb => {
     cb.checked = s.enabledTypesB.includes(cb.dataset.type);
   });
+
+  renderVoiceSelector();
+}
+
+/** Naplní select hlasů dostupnými českými hlasy. */
+function renderVoiceSelector() {
+  const select = document.getElementById('voice-select');
+  if (!select) return;
+  const voices = TTS.czechVoices;
+
+  if (voices.length === 0) {
+    select.innerHTML = '<option value="">Žádný český hlas nenalezen</option>';
+    select.disabled = true;
+    return;
+  }
+
+  const currentName = TTS.czechVoice ? TTS.czechVoice.name : '';
+  select.innerHTML = voices.map(v => {
+    const quality = ['enhanced', 'neural', 'natural', 'premium', 'online'];
+    const isHQ = quality.some(k => v.name.toLowerCase().includes(k));
+    const label = v.name + (isHQ ? ' ★' : '');
+    return `<option value="${v.name}" ${v.name === currentName ? 'selected' : ''}>${label}</option>`;
+  }).join('');
+  select.disabled = false;
 }
 
 function saveSettings() {
@@ -247,6 +284,14 @@ function saveSettings() {
   document.querySelectorAll('.type-toggle[data-section="B"]:checked').forEach(cb => {
     AppState.settings.enabledTypesB.push(cb.dataset.type);
   });
+
+  // Hlas
+  const voiceSelect = document.getElementById('voice-select');
+  if (voiceSelect && voiceSelect.value) {
+    AppState.settings.selectedVoiceName = voiceSelect.value;
+    const chosen = TTS.czechVoices.find(v => v.name === voiceSelect.value);
+    if (chosen) TTS.czechVoice = chosen;
+  }
 
   showScreen('home');
 }
@@ -902,6 +947,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // === Nastavení ===
   document.getElementById('settings-save').addEventListener('click', saveSettings);
+  document.getElementById('voice-test-btn').addEventListener('click', () => {
+    const select = document.getElementById('voice-select');
+    const chosen = select ? TTS.czechVoices.find(v => v.name === select.value) : null;
+    if (chosen) TTS.czechVoice = chosen;
+    TTS.speak('Příští zastávka Náměstí Svobody. Přestupní stanice.', 1.0);
+  });
   document.getElementById('settings-back').addEventListener('click', () => showScreen('home'));
   document.querySelectorAll('.session-btn').forEach(btn => {
     btn.addEventListener('click', () => {
