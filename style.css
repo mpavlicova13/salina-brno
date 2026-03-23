@@ -1823,6 +1823,8 @@ button:active {
 .screen-with-tabs {
   flex-direction: column;
   padding-bottom: 0 !important;
+  height: 100vh;
+  overflow: hidden;
 }
 .tab-panel {
   display: none;
