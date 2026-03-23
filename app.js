@@ -1,0 +1,948 @@
+/**
+ * app.js – UI kontrolér, navigace, audio, flashkarty
+ * Řídí celou aplikaci: obrazovky, přechody, kvíz, TTS.
+ */
+
+/* ========================================================
+   GLOBÁLNÍ STAV APLIKACE
+======================================================== */
+
+const AppState = {
+  // Aktuálně zobrazená obrazovka
+  screen: 'home',
+
+  // Nastavení
+  settings: {
+    enabledTypesA: [...questionTypesA],
+    enabledTypesB: [...questionTypesB],
+    sessionLength: 10,        // 5, 10, 20, 0 (endless)
+    ttsSpeed: 1.0,
+    ttsEnabled: true
+  },
+
+  // Vybrané linky (pro sekce A a B)
+  selectedLinesA: TRAM_DATA.lines.map(l => l.number),
+  selectedLinesB: TRAM_DATA.lines.map(l => l.number),
+
+  // Procvič linku
+  practiceLineNum: null,
+  practiceMode: null,  // 'audio', 'quiz', 'audioquiz'
+
+  // Aktuální kvíz
+  quiz: null,
+
+  // Audio stav
+  audio: {
+    line: null,
+    stopIndex: 0,
+    isPlaying: false,
+    utterance: null,
+    speed: 1.0
+  },
+
+  // Streak
+  streak: 0,
+  totalScore: 0,
+  totalAnswered: 0
+};
+
+/* ========================================================
+   TTS – TEXT TO SPEECH
+======================================================== */
+
+const TTS = {
+  synth: window.speechSynthesis,
+  czechVoice: null,
+  available: false,
+
+  /** Inicializace – najde český hlas. */
+  init() {
+    const load = () => {
+      const voices = this.synth.getVoices();
+      const czech = voices.find(v => v.lang === 'cs-CZ') ||
+                    voices.find(v => v.lang.startsWith('cs'));
+      if (czech) {
+        this.czechVoice = czech;
+        this.available = true;
+      } else {
+        this.available = voices.length > 0;
+      }
+    };
+    load();
+    this.synth.onvoiceschanged = load;
+  },
+
+  /** Přečte text. Vrátí Promise, který se vyřeší po dokončení. */
+  speak(text, speed = 1.0) {
+    return new Promise((resolve, reject) => {
+      this.synth.cancel();
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = 'cs-CZ';
+      utt.rate = speed;
+      utt.pitch = 1.0;
+      if (this.czechVoice) utt.voice = this.czechVoice;
+      utt.onend = resolve;
+      utt.onerror = reject;
+      AppState.audio.utterance = utt;
+      this.synth.speak(utt);
+    });
+  },
+
+  /** Zastaví přehrávání. */
+  stop() {
+    this.synth.cancel();
+    AppState.audio.isPlaying = false;
+  },
+
+  /** Pozastaví / obnoví. */
+  pauseResume() {
+    if (this.synth.paused) {
+      this.synth.resume();
+    } else if (this.synth.speaking) {
+      this.synth.pause();
+    }
+  }
+};
+
+/* ========================================================
+   AUDIO PŘEHRÁVAČ LINEK
+======================================================== */
+
+const AudioPlayer = {
+  currentLine: null,
+  currentIdx: 0,
+  playing: false,
+  speed: 1.0,
+  cancelled: false,
+
+  /** Spustí přehrávání celé linky od začátku. */
+  async play(line, speed = 1.0) {
+    this.currentLine = line;
+    this.currentIdx = 0;
+    this.playing = true;
+    this.cancelled = false;
+    this.speed = speed;
+
+    // Oznámení linky
+    const intro = `Linka číslo ${line.number}. Trasa z ${cleanStopForTTS(line.stops[0])} do ${cleanStopForTTS(line.stops[line.stops.length - 1])}.`;
+    await this.sayWithHighlight(-1, intro);
+
+    if (this.cancelled) return;
+
+    // Čtení zastávek
+    for (let i = 0; i < line.stops.length; i++) {
+      if (this.cancelled) return;
+      this.currentIdx = i;
+      renderAudioHighlight(i);
+      const stopText = cleanStopForTTS(line.stops[i]);
+      await TTS.speak(stopText, this.speed);
+      // Pauza mezi zastávkami (zkrácená)
+      await this.pause(300);
+    }
+
+    if (!this.cancelled) {
+      this.playing = false;
+      renderAudioHighlight(-1);
+      onAudioFinished();
+    }
+  },
+
+  async sayWithHighlight(idx, text) {
+    renderAudioHighlight(idx);
+    await TTS.speak(text, this.speed);
+  },
+
+  pause(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  },
+
+  stop() {
+    this.cancelled = true;
+    this.playing = false;
+    TTS.stop();
+  },
+
+  togglePause() {
+    TTS.pauseResume();
+    this.playing = !TTS.synth.paused;
+    updateAudioPlayBtn();
+  },
+
+  setSpeed(spd) {
+    this.speed = spd;
+    AppState.settings.ttsSpeed = spd;
+  }
+};
+
+/* ========================================================
+   NAVIGACE OBRAZOVEK
+======================================================== */
+
+/** Zobrazí zadanou obrazovku, skryje ostatní. */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(`screen-${id}`);
+  if (el) {
+    el.classList.add('active');
+    AppState.screen = id;
+  }
+}
+
+/* ========================================================
+   DOMOVSKÁ OBRAZOVKA
+======================================================== */
+
+function initHome() {
+  showScreen('home');
+}
+
+/* ========================================================
+   NASTAVENÍ
+======================================================== */
+
+function openSettings() {
+  renderSettings();
+  showScreen('settings');
+}
+
+function renderSettings() {
+  const s = AppState.settings;
+
+  // Session length
+  document.querySelectorAll('.session-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.val) === s.sessionLength);
+  });
+
+  // Typy otázek A
+  document.querySelectorAll('.type-toggle[data-section="A"]').forEach(cb => {
+    cb.checked = s.enabledTypesA.includes(cb.dataset.type);
+  });
+
+  // Typy otázek B
+  document.querySelectorAll('.type-toggle[data-section="B"]').forEach(cb => {
+    cb.checked = s.enabledTypesB.includes(cb.dataset.type);
+  });
+}
+
+function saveSettings() {
+  // Session length
+  const activeLen = document.querySelector('.session-btn.active');
+  if (activeLen) AppState.settings.sessionLength = parseInt(activeLen.dataset.val);
+
+  // Typy A
+  AppState.settings.enabledTypesA = [];
+  document.querySelectorAll('.type-toggle[data-section="A"]:checked').forEach(cb => {
+    AppState.settings.enabledTypesA.push(cb.dataset.type);
+  });
+
+  // Typy B
+  AppState.settings.enabledTypesB = [];
+  document.querySelectorAll('.type-toggle[data-section="B"]:checked').forEach(cb => {
+    AppState.settings.enabledTypesB.push(cb.dataset.type);
+  });
+
+  showScreen('home');
+}
+
+/* ========================================================
+   SEKCE A – ODKUD → KAM
+======================================================== */
+
+function openSectionA() {
+  renderLineFilterA();
+  showScreen('section-a');
+}
+
+function renderLineFilterA() {
+  const container = document.getElementById('filter-a');
+  container.innerHTML = '';
+  TRAM_DATA.lines.forEach(line => {
+    const btn = document.createElement('button');
+    btn.className = 'line-filter-btn' + (AppState.selectedLinesA.includes(line.number) ? ' selected' : '');
+    btn.textContent = line.number;
+    btn.title = `${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}`;
+    btn.onclick = () => {
+      toggleLineSelection(AppState.selectedLinesA, line.number);
+      btn.classList.toggle('selected');
+    };
+    container.appendChild(btn);
+  });
+}
+
+function startFlashcards() {
+  const lines = TRAM_DATA.lines.filter(l => AppState.selectedLinesA.includes(l.number));
+  if (lines.length === 0) { alert('Vyber alespoň jednu linku!'); return; }
+  renderFlashcards(lines);
+  showScreen('flashcards');
+}
+
+function startQuizA() {
+  const count = AppState.settings.sessionLength;
+  const questions = generateSession('A', AppState.selectedLinesA, count, AppState.settings.enabledTypesA);
+  if (questions.length === 0) { alert('Nepodařilo se vygenerovat otázky.'); return; }
+  AppState.quiz = new QuizState(questions);
+  renderQuizQuestion();
+  showScreen('quiz');
+}
+
+/* Flashkarty */
+let flashcardIndex = 0;
+let flashcardLines = [];
+let flashcardFlipped = false;
+
+function renderFlashcards(lines) {
+  flashcardLines = shuffle(lines);
+  flashcardIndex = 0;
+  flashcardFlipped = false;
+  showFlashcard();
+}
+
+function showFlashcard() {
+  const line = flashcardLines[flashcardIndex];
+  const counter = document.getElementById('fc-counter');
+  const front = document.getElementById('fc-front-text');
+  const back = document.getElementById('fc-back-text');
+  const card = document.getElementById('fc-card');
+
+  counter.textContent = `${flashcardIndex + 1} / ${flashcardLines.length}`;
+  front.innerHTML = `<span class="fc-line-num">${line.number}</span><span class="fc-hint">Klikni pro otočení</span>`;
+  back.innerHTML = `
+    <div class="fc-line-num">${line.number}</div>
+    <div class="fc-route">
+      <span class="fc-from">${line.stops[0]}</span>
+      <span class="fc-arrow">↔</span>
+      <span class="fc-to">${line.stops[line.stops.length - 1]}</span>
+    </div>
+    <div class="fc-stops-count">${line.stops.length} zastávek</div>
+  `;
+
+  // Resetuj otočení
+  card.classList.remove('flipped');
+  flashcardFlipped = false;
+}
+
+function flipFlashcard() {
+  const card = document.getElementById('fc-card');
+  flashcardFlipped = !flashcardFlipped;
+  card.classList.toggle('flipped', flashcardFlipped);
+}
+
+function nextFlashcard() {
+  if (flashcardIndex < flashcardLines.length - 1) {
+    flashcardIndex++;
+    showFlashcard();
+  } else {
+    // Dokončeno
+    showScreen('section-a');
+  }
+}
+
+function prevFlashcard() {
+  if (flashcardIndex > 0) {
+    flashcardIndex--;
+    showFlashcard();
+  }
+}
+
+/* ========================================================
+   SEKCE B – ZASTÁVKY
+======================================================== */
+
+function openSectionB() {
+  renderLineFilterB();
+  showScreen('section-b');
+}
+
+function renderLineFilterB() {
+  const container = document.getElementById('filter-b');
+  container.innerHTML = '';
+  TRAM_DATA.lines.forEach(line => {
+    const btn = document.createElement('button');
+    btn.className = 'line-filter-btn' + (AppState.selectedLinesB.includes(line.number) ? ' selected' : '');
+    btn.textContent = line.number;
+    btn.title = `${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}`;
+    btn.onclick = () => {
+      toggleLineSelection(AppState.selectedLinesB, line.number);
+      btn.classList.toggle('selected');
+    };
+    container.appendChild(btn);
+  });
+}
+
+function startQuizB() {
+  const count = AppState.settings.sessionLength;
+  const questions = generateSession('B', AppState.selectedLinesB, count, AppState.settings.enabledTypesB);
+  if (questions.length === 0) { alert('Nepodařilo se vygenerovat otázky.'); return; }
+  AppState.quiz = new QuizState(questions);
+  renderQuizQuestion();
+  showScreen('quiz');
+}
+
+/* ========================================================
+   SEKCE C – PROCVIČ LINKU
+======================================================== */
+
+function openSectionC() {
+  renderLineButtons();
+  showScreen('section-c');
+}
+
+function renderLineButtons() {
+  const container = document.getElementById('line-buttons');
+  container.innerHTML = '';
+  TRAM_DATA.lines.forEach(line => {
+    const btn = document.createElement('button');
+    btn.className = 'line-big-btn';
+    btn.innerHTML = `
+      <span class="line-num">${line.number}</span>
+      <span class="line-info">${line.stops[0]}<br>↕<br>${line.stops[line.stops.length - 1]}</span>
+    `;
+    btn.onclick = () => selectPracticeLine(line.number);
+    container.appendChild(btn);
+  });
+}
+
+function selectPracticeLine(lineNum) {
+  AppState.practiceLineNum = lineNum;
+  const line = getLineByNumber(lineNum);
+  // Zobraz info o lince
+  document.getElementById('practice-line-num').textContent = `Linka ${lineNum}`;
+  document.getElementById('practice-line-from').textContent = line.stops[0];
+  document.getElementById('practice-line-to').textContent = line.stops[line.stops.length - 1];
+  document.getElementById('practice-line-stops').textContent = `${line.stops.length} zastávek`;
+  document.getElementById('practice-line-info').style.display = 'block';
+  // Označ aktivní
+  document.querySelectorAll('.line-big-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', TRAM_DATA.lines[i].number === lineNum);
+  });
+}
+
+function startPracticeMode(mode) {
+  if (!AppState.practiceLineNum) { alert('Nejprve vyber linku!'); return; }
+  AppState.practiceMode = mode;
+  const line = getLineByNumber(AppState.practiceLineNum);
+
+  if (mode === 'audio') {
+    startAudio(line);
+  } else if (mode === 'quiz') {
+    startPracticeQuiz(line);
+  } else if (mode === 'audioquiz') {
+    startAudio(line, true);
+  }
+}
+
+/* ========================================================
+   AUDIO PŘEHRÁVAČ
+======================================================== */
+
+function startAudio(line, thenQuiz = false) {
+  AppState.audio.line = line;
+  AppState.audio.thenQuiz = thenQuiz;
+  AppState.audio.speed = AppState.settings.ttsSpeed;
+
+  renderAudioScreen(line);
+  showScreen('audio');
+
+  // Začni přehrávat
+  AudioPlayer.play(line, AppState.audio.speed);
+  updateAudioPlayBtn();
+}
+
+function renderAudioScreen(line) {
+  document.getElementById('audio-line-title').textContent = `Linka ${line.number}`;
+  document.getElementById('audio-line-route').textContent = `${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}`;
+
+  const list = document.getElementById('audio-stop-list');
+  list.innerHTML = '';
+  line.stops.forEach((stop, i) => {
+    const li = document.createElement('li');
+    li.id = `audio-stop-${i}`;
+    li.className = 'audio-stop-item';
+    li.innerHTML = `<span class="stop-num">${i + 1}</span><span class="stop-name">${stop}</span>`;
+    list.appendChild(li);
+  });
+
+  // Speed buttons
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.classList.toggle('active', parseFloat(btn.dataset.speed) === AppState.audio.speed);
+  });
+
+  updateAudioProgress(0, line.stops.length);
+}
+
+function renderAudioHighlight(idx) {
+  document.querySelectorAll('.audio-stop-item').forEach(el => el.classList.remove('current'));
+  if (idx >= 0) {
+    const el = document.getElementById(`audio-stop-${idx}`);
+    if (el) {
+      el.classList.add('current');
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+    updateAudioProgress(idx + 1, AppState.audio.line.stops.length);
+  }
+}
+
+function updateAudioProgress(current, total) {
+  const el = document.getElementById('audio-progress-text');
+  if (el) el.textContent = `Zastávka ${current} / ${total}`;
+  const bar = document.getElementById('audio-progress-bar');
+  if (bar) bar.style.width = `${total > 0 ? (current / total) * 100 : 0}%`;
+}
+
+function updateAudioPlayBtn() {
+  const btn = document.getElementById('audio-play-btn');
+  if (!btn) return;
+  const isPaused = TTS.synth.paused;
+  const isSpeaking = TTS.synth.speaking;
+  if (isSpeaking && !isPaused) {
+    btn.innerHTML = '⏸ Pozastavit';
+    btn.className = 'btn-play playing';
+  } else if (isPaused) {
+    btn.innerHTML = '▶ Pokračovat';
+    btn.className = 'btn-play paused';
+  } else {
+    btn.innerHTML = '▶ Přehrát';
+    btn.className = 'btn-play';
+  }
+}
+
+function onAudioFinished() {
+  updateAudioPlayBtn();
+  const finishedBanner = document.getElementById('audio-finished-banner');
+  if (finishedBanner) finishedBanner.style.display = 'block';
+  if (AppState.audio.thenQuiz) {
+    setTimeout(() => startPracticeQuiz(AppState.audio.line), 1500);
+  }
+}
+
+function toggleAudioPlayback() {
+  if (!TTS.synth.speaking && !TTS.synth.paused) {
+    // Znovu spustit
+    AudioPlayer.play(AppState.audio.line, AppState.audio.speed);
+  } else {
+    AudioPlayer.togglePause();
+  }
+  updateAudioPlayBtn();
+}
+
+function setAudioSpeed(speed) {
+  AudioPlayer.setSpeed(speed);
+  AppState.audio.speed = speed;
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.classList.toggle('active', parseFloat(btn.dataset.speed) === speed);
+  });
+  // Zastavit a znovu spustit od aktuální pozice
+  const currentIdx = AudioPlayer.currentIdx;
+  AudioPlayer.stop();
+  setTimeout(() => {
+    AudioPlayer.currentIdx = currentIdx;
+    AudioPlayer.play(AppState.audio.line, speed);
+  }, 300);
+}
+
+/* ========================================================
+   KVÍZ
+======================================================== */
+
+function startPracticeQuiz(line) {
+  const count = AppState.settings.sessionLength;
+  const questions = generateSession('B', [line.number], count, AppState.settings.enabledTypesB);
+  if (questions.length === 0) {
+    alert('Nepodařilo se vygenerovat otázky pro tuto linku.');
+    return;
+  }
+  AppState.quiz = new QuizState(questions);
+  renderQuizQuestion();
+  showScreen('quiz');
+}
+
+/** Vykreslí aktuální otázku kvízu. */
+function renderQuizQuestion() {
+  const quiz = AppState.quiz;
+  if (!quiz || quiz.isFinished) {
+    showResults();
+    return;
+  }
+
+  const q = quiz.current;
+  const container = document.getElementById('quiz-container');
+  const counterEl = document.getElementById('quiz-counter');
+  const scoreEl = document.getElementById('quiz-score');
+  const progressBar = document.getElementById('quiz-progress-bar');
+  const streakEl = document.getElementById('quiz-streak');
+
+  counterEl.textContent = `Otázka ${quiz.currentIndex + 1} z ${quiz.total}`;
+  scoreEl.textContent = `✅ ${quiz.score}`;
+  streakEl.textContent = quiz.streak >= 3 ? `🔥 ${quiz.streak}` : '';
+  progressBar.style.width = `${quiz.progressPercent}%`;
+
+  container.innerHTML = '';
+
+  // Otázka
+  const questionEl = document.createElement('div');
+  questionEl.className = 'quiz-question';
+  questionEl.textContent = q.question;
+  container.appendChild(questionEl);
+
+  // Možnosti podle typu
+  if (q.isOrdering) {
+    renderOrderingQuestion(container, q, quiz);
+  } else if (q.isMultiSelect) {
+    renderMultiSelectQuestion(container, q, quiz);
+  } else {
+    renderStandardQuestion(container, q, quiz);
+  }
+}
+
+/** Standardní otázka s 4 možnostmi. */
+function renderStandardQuestion(container, q, quiz) {
+  const optionsEl = document.createElement('div');
+  optionsEl.className = 'quiz-options';
+
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option-btn';
+    btn.textContent = opt;
+    btn.onclick = () => {
+      if (quiz.answered) return;
+      const result = quiz.answer(opt);
+      highlightOptions(optionsEl, opt, q.correct, result.isCorrect);
+      showExplanation(container, q.explanation, result.isCorrect);
+      showNextButton(container);
+    };
+    optionsEl.appendChild(btn);
+  });
+
+  container.appendChild(optionsEl);
+}
+
+/** Otázka pro seřazení zastávek. */
+function renderOrderingQuestion(container, q, quiz) {
+  const orderingDiv = document.createElement('div');
+  orderingDiv.className = 'ordering-container';
+
+  const userOrder = [...q.options]; // začínáme s promíchaným pořadím
+  quiz.orderingAnswer = [...userOrder];
+
+  const renderList = () => {
+    orderingDiv.innerHTML = '<p class="ordering-hint">Klikni na zastávky ve správném pořadí od první po poslední:</p>';
+    const selected = [];
+    const available = [...userOrder];
+
+    const selectedDiv = document.createElement('div');
+    selectedDiv.className = 'ordering-selected';
+    selectedDiv.innerHTML = '<div class="ordering-label">Tvoje pořadí:</div>';
+    const selectedList = document.createElement('div');
+    selectedList.className = 'ordering-slots';
+    for (let i = 0; i < q.correct.length; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'ordering-slot empty';
+      slot.dataset.idx = i;
+      slot.textContent = `${i + 1}.`;
+      selectedList.appendChild(slot);
+    }
+    selectedDiv.appendChild(selectedList);
+    orderingDiv.appendChild(selectedDiv);
+
+    const availableDiv = document.createElement('div');
+    availableDiv.className = 'ordering-available';
+    availableDiv.innerHTML = '<div class="ordering-label">Dostupné zastávky:</div>';
+    const chips = document.createElement('div');
+    chips.className = 'ordering-chips';
+
+    let clickOrder = [];
+
+    available.forEach((stop, i) => {
+      const chip = document.createElement('button');
+      chip.className = 'ordering-chip';
+      chip.textContent = stop;
+      chip.dataset.stop = stop;
+      chip.onclick = () => {
+        if (quiz.answered) return;
+        if (clickOrder.includes(stop)) return;
+        clickOrder.push(stop);
+        chip.classList.add('used');
+        chip.disabled = true;
+
+        // Vlož do slotu
+        const slotIdx = clickOrder.length - 1;
+        const slot = selectedList.children[slotIdx];
+        if (slot) {
+          slot.textContent = `${slotIdx + 1}. ${stop}`;
+          slot.classList.remove('empty');
+          slot.classList.add('filled');
+        }
+
+        // Pokud jsou všechny vybrány, vyhodnoť
+        if (clickOrder.length === q.correct.length) {
+          const result = quiz.answer(clickOrder);
+          // Obarvi sloty
+          clickOrder.forEach((s, idx) => {
+            const sl = selectedList.children[idx];
+            if (sl) {
+              sl.classList.add(s === q.correct[idx] ? 'correct' : 'wrong');
+            }
+          });
+          showExplanation(container, q.explanation, result.isCorrect);
+          showNextButton(container);
+        }
+      };
+      chips.appendChild(chip);
+    });
+    availableDiv.appendChild(chips);
+    orderingDiv.appendChild(availableDiv);
+  };
+
+  renderList();
+  container.appendChild(orderingDiv);
+}
+
+/** Otázka s více správnými odpověďmi (checkboxy). */
+function renderMultiSelectQuestion(container, q, quiz) {
+  const msDiv = document.createElement('div');
+  msDiv.className = 'multiselect-container';
+
+  const checkboxes = [];
+  q.options.forEach(opt => {
+    const label = document.createElement('label');
+    label.className = 'multiselect-label';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = opt;
+    cb.className = 'multiselect-cb';
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(` ${opt}`));
+    msDiv.appendChild(label);
+    checkboxes.push(cb);
+  });
+
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className = 'btn-primary mt-16';
+  confirmBtn.textContent = 'Potvrdit odpověď';
+  confirmBtn.onclick = () => {
+    if (quiz.answered) return;
+    const selected = checkboxes.filter(cb => cb.checked).map(cb => cb.value);
+    const result = quiz.answer(selected);
+    checkboxes.forEach(cb => {
+      const lbl = cb.parentElement;
+      const isSelected = cb.checked;
+      const isCorrect = Array.isArray(q.correct) && q.correct.includes(cb.value);
+      if (isCorrect) lbl.classList.add('correct');
+      else if (isSelected) lbl.classList.add('wrong');
+    });
+    showExplanation(container, q.explanation, result.isCorrect);
+    showNextButton(container);
+  };
+
+  msDiv.appendChild(confirmBtn);
+  container.appendChild(msDiv);
+}
+
+/** Zvýrazní správnou/špatnou odpověď. */
+function highlightOptions(container, chosen, correct, isCorrect) {
+  container.querySelectorAll('.quiz-option-btn').forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === correct) btn.classList.add('correct');
+    else if (btn.textContent === chosen && !isCorrect) btn.classList.add('wrong');
+  });
+
+  // Animace na celý kvíz kontejner
+  const quizBox = document.getElementById('quiz-container');
+  if (quizBox) {
+    quizBox.classList.add(isCorrect ? 'flash-correct' : 'flash-wrong');
+    setTimeout(() => quizBox.classList.remove('flash-correct', 'flash-wrong'), 700);
+  }
+}
+
+/** Zobrazí vysvětlení pod otázkou. */
+function showExplanation(container, text, isCorrect) {
+  const el = document.createElement('div');
+  el.className = `quiz-explanation ${isCorrect ? 'correct' : 'wrong'}`;
+  el.innerHTML = `${isCorrect ? '✅' : '❌'} ${text}`;
+  container.appendChild(el);
+}
+
+/** Zobrazí tlačítko „Další otázka". */
+function showNextButton(container) {
+  const btn = document.createElement('button');
+  btn.className = 'btn-next';
+  btn.textContent = AppState.quiz.currentIndex + 1 >= AppState.quiz.total ? '🏆 Zobrazit výsledky' : 'Další otázka →';
+  btn.onclick = () => {
+    AppState.quiz.next();
+    renderQuizQuestion();
+  };
+  container.appendChild(btn);
+  btn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+/* ========================================================
+   VÝSLEDKOVÁ OBRAZOVKA
+======================================================== */
+
+function showResults() {
+  const quiz = AppState.quiz;
+  const pct = quiz.total > 0 ? Math.round((quiz.score / quiz.total) * 100) : 0;
+  const stars = quiz.stars;
+
+  document.getElementById('result-score').textContent = `${quiz.score} / ${quiz.total}`;
+  document.getElementById('result-percent').textContent = `${pct} %`;
+  document.getElementById('result-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
+  document.getElementById('result-correct').textContent = `✅ Správně: ${quiz.score}`;
+  document.getElementById('result-wrong').textContent = `❌ Špatně: ${quiz.total - quiz.score}`;
+  document.getElementById('result-streak').textContent = `🔥 Nejlepší série: ${quiz.maxStreak}`;
+
+  // Seznam chybných odpovědí
+  const wrongList = document.getElementById('result-wrong-list');
+  wrongList.innerHTML = '';
+  const wrongs = quiz.results.filter(r => !r.isCorrect);
+  if (wrongs.length === 0) {
+    wrongList.innerHTML = '<p class="all-correct">🎉 Všechno správně! Perfektní výkon!</p>';
+  } else {
+    wrongs.forEach(r => {
+      const item = document.createElement('div');
+      item.className = 'wrong-item';
+      const correctStr = Array.isArray(r.question.correct)
+        ? r.question.correct.join(', ')
+        : r.question.correct;
+      item.innerHTML = `
+        <div class="wrong-q">${r.question.question}</div>
+        <div class="wrong-ans">Správná odpověď: <strong>${correctStr}</strong></div>
+      `;
+      wrongList.appendChild(item);
+    });
+  }
+
+  showScreen('results');
+}
+
+function retryQuiz() {
+  // Regeneruj stejný typ sezení
+  AppState.quiz = new QuizState(shuffle(AppState.quiz.questions));
+  AppState.quiz.questions.forEach(q => { /* reset */ });
+  // Jednodušeji: generuj nové sezení
+  startQuizB(); // fallback – vrátí na sekci B
+  showScreen('home');
+}
+
+/* ========================================================
+   POMOCNÉ FUNKCE UI
+======================================================== */
+
+/** Přepíná výběr linky v poli čísel. */
+function toggleLineSelection(arr, num) {
+  const idx = arr.indexOf(num);
+  if (idx >= 0) {
+    if (arr.length > 1) arr.splice(idx, 1); // Nech aspoň 1
+  } else {
+    arr.push(num);
+    arr.sort((a, b) => a - b);
+  }
+}
+
+/** Vybere/odebere všechny linky v filtru. */
+function toggleAllLines(arrRef, allNums, containerSelector) {
+  const allSelected = allNums.every(n => arrRef.includes(n));
+  if (allSelected) {
+    // Odeber vše kromě první
+    arrRef.length = 0;
+    arrRef.push(allNums[0]);
+  } else {
+    arrRef.length = 0;
+    allNums.forEach(n => arrRef.push(n));
+  }
+  document.querySelectorAll(containerSelector + ' .line-filter-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', arrRef.includes(TRAM_DATA.lines[i].number));
+  });
+}
+
+/* ========================================================
+   INICIALIZACE APLIKACE
+======================================================== */
+
+document.addEventListener('DOMContentLoaded', () => {
+  TTS.init();
+
+  // === Domovská obrazovka ===
+  document.getElementById('btn-section-a').addEventListener('click', openSectionA);
+  document.getElementById('btn-section-b').addEventListener('click', openSectionB);
+  document.getElementById('btn-section-c').addEventListener('click', openSectionC);
+  document.getElementById('btn-settings').addEventListener('click', openSettings);
+
+  // === Nastavení ===
+  document.getElementById('settings-save').addEventListener('click', saveSettings);
+  document.getElementById('settings-back').addEventListener('click', () => showScreen('home'));
+  document.querySelectorAll('.session-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.session-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // === Sekce A ===
+  document.getElementById('a-back').addEventListener('click', () => showScreen('home'));
+  document.getElementById('a-start-flashcards').addEventListener('click', startFlashcards);
+  document.getElementById('a-start-quiz').addEventListener('click', startQuizA);
+  document.getElementById('a-select-all').addEventListener('click', () => {
+    toggleAllLines(AppState.selectedLinesA, TRAM_DATA.lines.map(l => l.number), '#filter-a');
+  });
+
+  // === Flashkarty ===
+  document.getElementById('fc-back').addEventListener('click', () => {
+    AudioPlayer.stop();
+    showScreen('section-a');
+  });
+  document.getElementById('fc-card').addEventListener('click', flipFlashcard);
+  document.getElementById('fc-prev').addEventListener('click', prevFlashcard);
+  document.getElementById('fc-next').addEventListener('click', nextFlashcard);
+
+  // === Sekce B ===
+  document.getElementById('b-back').addEventListener('click', () => showScreen('home'));
+  document.getElementById('b-start-quiz').addEventListener('click', startQuizB);
+  document.getElementById('b-select-all').addEventListener('click', () => {
+    toggleAllLines(AppState.selectedLinesB, TRAM_DATA.lines.map(l => l.number), '#filter-b');
+  });
+
+  // === Sekce C ===
+  document.getElementById('c-back').addEventListener('click', () => showScreen('home'));
+  document.getElementById('practice-mode-audio').addEventListener('click', () => startPracticeMode('audio'));
+  document.getElementById('practice-mode-quiz').addEventListener('click', () => startPracticeMode('quiz'));
+  document.getElementById('practice-mode-audioquiz').addEventListener('click', () => startPracticeMode('audioquiz'));
+
+  // === Audio ===
+  document.getElementById('audio-back').addEventListener('click', () => {
+    AudioPlayer.stop();
+    showScreen('section-c');
+  });
+  document.getElementById('audio-play-btn').addEventListener('click', toggleAudioPlayback);
+  document.getElementById('audio-restart-btn').addEventListener('click', () => {
+    AudioPlayer.stop();
+    setTimeout(() => {
+      document.getElementById('audio-finished-banner').style.display = 'none';
+      AudioPlayer.play(AppState.audio.line, AppState.audio.speed);
+      updateAudioPlayBtn();
+    }, 300);
+  });
+  document.getElementById('audio-quiz-btn').addEventListener('click', () => {
+    AudioPlayer.stop();
+    startPracticeQuiz(AppState.audio.line);
+  });
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.addEventListener('click', () => setAudioSpeed(parseFloat(btn.dataset.speed)));
+  });
+
+  // === Kvíz ===
+  document.getElementById('quiz-back').addEventListener('click', () => {
+    AudioPlayer.stop();
+    showScreen('home');
+  });
+
+  // === Výsledky ===
+  document.getElementById('result-retry').addEventListener('click', () => {
+    // Zpět na domov, uživatel si vybere znovu
+    showScreen('home');
+  });
+  document.getElementById('result-home').addEventListener('click', () => showScreen('home'));
+
+  // Inicializuj domovskou obrazovku
+  showScreen('home');
+});

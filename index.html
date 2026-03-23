@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#0d1b2a" />
+  <title>Šalina Brno 🚋 – Procvičuj tramvaje DPMB</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- ====================================================
+       DOMOVSKÁ OBRAZOVKA
+  ==================================================== -->
+  <div id="screen-home" class="screen">
+    <div class="home-header">
+      <div class="home-logo">🚋</div>
+      <h1 class="home-title">Šalina Brno</h1>
+      <p class="home-subtitle">Procvičuj brněnské tramvaje · DPMB</p>
+    </div>
+
+    <div class="home-cards">
+      <button class="section-card card-a" id="btn-section-a">
+        <div class="section-card-icon">🗺️</div>
+        <div class="section-card-text">
+          <h3>Odkud → Kam</h3>
+          <p>Nauč se trasy linek – kartičky i kvíz</p>
+        </div>
+      </button>
+
+      <button class="section-card card-b" id="btn-section-b">
+        <div class="section-card-icon">🛑</div>
+        <div class="section-card-text">
+          <h3>Zastávky</h3>
+          <p>Procvičuj pořadí a názvy zastávek</p>
+        </div>
+      </button>
+
+      <button class="section-card card-c" id="btn-section-c">
+        <div class="section-card-icon">🎧</div>
+        <div class="section-card-text">
+          <h3>Procvič linku</h3>
+          <p>Poslechni si zastávky a udělej kvíz</p>
+        </div>
+      </button>
+    </div>
+
+    <div class="home-settings-row">
+      <button class="btn-settings" id="btn-settings">⚙️ Nastavení</button>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SEKCE A – ODKUD → KAM
+  ==================================================== -->
+  <div id="screen-section-a" class="screen">
+    <div class="screen-header">
+      <button class="btn-back" id="a-back" aria-label="Zpět">←</button>
+      <h2>🗺️ Odkud → Kam</h2>
+    </div>
+    <div class="screen-content">
+
+      <!-- Filtr linek -->
+      <div class="filter-section">
+        <div class="filter-controls">
+          <h3>Vyber linky k procvičení</h3>
+          <button class="btn-select-all" id="a-select-all">Vybrat vše / nic</button>
+        </div>
+        <div class="line-filter-row" id="filter-a"></div>
+      </div>
+
+      <!-- Výběr režimu -->
+      <div class="mode-section">
+        <h3>Zvol režim</h3>
+        <div class="info-box">
+          🃏 <strong>Kartičky</strong> – přelistuj všechny vybrané linky, otočením uvidíš trasu.<br>
+          📝 <strong>Kvíz</strong> – odpovídej na otázky a získávej body.
+        </div>
+      </div>
+
+      <div class="start-section">
+        <button class="btn-primary" id="a-start-flashcards">🃏 Spustit kartičky</button>
+        <button class="btn-secondary" id="a-start-quiz">📝 Spustit kvíz</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ====================================================
+       FLASHKARTY
+  ==================================================== -->
+  <div id="screen-flashcards" class="screen">
+    <div class="screen-header">
+      <button class="btn-back" id="fc-back" aria-label="Zpět">←</button>
+      <h2>🃏 Kartičky – trasy linek</h2>
+    </div>
+
+    <div class="flashcard-container">
+      <div class="fc-counter" id="fc-counter">1 / 11</div>
+
+      <!-- Flip card -->
+      <div class="fc-card-wrapper">
+        <div id="fc-card">
+          <div class="fc-face fc-front">
+            <div id="fc-front-text">
+              <span class="fc-line-num">1</span>
+              <span class="fc-hint">Klikni pro otočení</span>
+            </div>
+          </div>
+          <div class="fc-face fc-back">
+            <div id="fc-back-text"></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="fc-flip-hint">👆 Klikni na kartičku pro otočení</p>
+
+      <!-- Navigace -->
+      <div class="fc-nav">
+        <button class="fc-nav-btn" id="fc-prev" aria-label="Předchozí">←</button>
+        <button class="fc-nav-btn" id="fc-next" aria-label="Další">→</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SEKCE B – ZASTÁVKY
+  ==================================================== -->
+  <div id="screen-section-b" class="screen">
+    <div class="screen-header">
+      <button class="btn-back" id="b-back" aria-label="Zpět">←</button>
+      <h2>🛑 Zastávky</h2>
+    </div>
+    <div class="screen-content">
+
+      <!-- Filtr linek -->
+      <div class="filter-section">
+        <div class="filter-controls">
+          <h3>Vyber linky k procvičení</h3>
+          <button class="btn-select-all" id="b-select-all">Vybrat vše / nic</button>
+        </div>
+        <div class="line-filter-row" id="filter-b"></div>
+      </div>
+
+      <div class="info-box">
+        🧠 Otázky budou různého typu – pořadí zastávek, sousedé, chybějící zastávka, počty a další. Čím víc linek vyberesh, tím pestřejší kvíz!
+      </div>
+
+      <div class="start-section">
+        <button class="btn-primary" id="b-start-quiz">📝 Spustit kvíz o zastávkách</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SEKCE C – PROCVIČ LINKU
+  ==================================================== -->
+  <div id="screen-section-c" class="screen">
+    <div class="screen-header">
+      <button class="btn-back" id="c-back" aria-label="Zpět">←</button>
+      <h2>🎧 Procvič linku</h2>
+    </div>
+    <div class="screen-content">
+
+      <div class="info-box mb-8">
+        Vyber linku, pak si ji poslechni nebo udělej kvíz.
+      </div>
+
+      <!-- Tlačítka linek -->
+      <div id="line-buttons"></div>
+
+      <!-- Info o vybrané lince -->
+      <div id="practice-line-info">
+        <h3 id="practice-line-num">Linka 1</h3>
+        <div class="practice-route">
+          <span class="practice-route-stop" id="practice-line-from">–</span>
+          <span class="practice-route-arrow">↕</span>
+          <span class="practice-route-stop" id="practice-line-to">–</span>
+        </div>
+        <p class="practice-stop-count" id="practice-line-stops"></p>
+      </div>
+
+      <!-- Výběr režimu -->
+      <div class="practice-modes">
+        <button class="btn-mode btn-mode-audio" id="practice-mode-audio">
+          <span class="btn-mode-icon">🎧</span>
+          <span class="btn-mode-text">
+            <h4>Audio</h4>
+            <p>Poslechni si všechny zastávky s hlasem</p>
+          </span>
+        </button>
+        <button class="btn-mode btn-mode-quiz" id="practice-mode-quiz">
+          <span class="btn-mode-icon">📝</span>
+          <span class="btn-mode-text">
+            <h4>Kvíz</h4>
+            <p>Procvičuj zastávky formou otázek</p>
+          </span>
+        </button>
+        <button class="btn-mode btn-mode-audioquiz" id="practice-mode-audioquiz">
+          <span class="btn-mode-icon">🎧📝</span>
+          <span class="btn-mode-text">
+            <h4>Audio + Kvíz</h4>
+            <p>Nejdřív poslechni, pak kvíz</p>
+          </span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ====================================================
+       AUDIO PŘEHRÁVAČ
+  ==================================================== -->
+  <div id="screen-audio" class="screen">
+    <div class="screen-header">
+      <button class="btn-back" id="audio-back" aria-label="Zpět">←</button>
+      <h2>🎧 Přehrávání zastávek</h2>
+    </div>
+
+    <!-- Info o lince -->
+    <div class="audio-header-info">
+      <div class="audio-line-title" id="audio-line-title">Linka 1</div>
+      <div class="audio-line-route" id="audio-line-route"></div>
+    </div>
+
+    <!-- Ovládání -->
+    <div class="audio-controls">
+      <div class="audio-progress-row">
+        <div class="audio-progress-track">
+          <div id="audio-progress-bar"></div>
+        </div>
+        <div id="audio-progress-text">Zastávka 0 / 0</div>
+      </div>
+      <div class="audio-btns-row">
+        <button class="btn-play" id="audio-play-btn">▶ Přehrát</button>
+        <div class="speed-controls">
+          <button class="speed-btn" data-speed="0.7">🐢</button>
+          <button class="speed-btn active" data-speed="1.0">▶</button>
+          <button class="speed-btn" data-speed="1.2">⚡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Banner po dokončení -->
+    <div id="audio-finished-banner">
+      ✅ Hotovo! Všechny zastávky byly přečteny.
+    </div>
+
+    <!-- Seznam zastávek -->
+    <div class="audio-stop-list-container">
+      <ul class="audio-stop-list" id="audio-stop-list"></ul>
+    </div>
+
+    <!-- Akce dole -->
+    <div class="audio-footer">
+      <button class="btn-audio-action btn-audio-restart" id="audio-restart-btn">🔄 Znovu</button>
+      <button class="btn-audio-action btn-audio-quiz" id="audio-quiz-btn">📝 Spustit kvíz</button>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       KVÍZ
+  ==================================================== -->
+  <div id="screen-quiz" class="screen">
+    <div class="quiz-header">
+      <div class="quiz-meta">
+        <button class="btn-back" id="quiz-back" aria-label="Zpět">←</button>
+        <span class="quiz-counter" id="quiz-counter">Otázka 1 z 10</span>
+        <span class="quiz-streak-display" id="quiz-streak"></span>
+        <span class="quiz-score-display" id="quiz-score">✅ 0</span>
+      </div>
+      <div class="quiz-progress-track">
+        <div id="quiz-progress-bar" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div id="quiz-container">
+      <!-- Otázky se generují dynamicky -->
+    </div>
+  </div>
+
+  <!-- ====================================================
+       VÝSLEDKY
+  ==================================================== -->
+  <div id="screen-results" class="screen">
+    <div class="screen-header">
+      <h2>🏆 Výsledky</h2>
+    </div>
+
+    <div class="results-container">
+      <div class="result-trophy">🏆</div>
+
+      <div class="result-score-big">
+        <div class="score-num" id="result-score">0 / 0</div>
+        <div class="score-pct" id="result-percent">0 %</div>
+      </div>
+
+      <div class="result-stars" id="result-stars">☆☆☆☆☆</div>
+
+      <div class="result-stats">
+        <div class="result-stat" id="result-correct">✅ Správně: 0</div>
+        <div class="result-stat" id="result-wrong">❌ Špatně: 0</div>
+        <div class="result-stat" id="result-streak">🔥 Nejlepší série: 0</div>
+      </div>
+
+      <div class="result-wrong-section">
+        <h3>❌ Chybné odpovědi:</h3>
+        <div id="result-wrong-list"></div>
+      </div>
+
+      <div class="result-buttons">
+        <button class="btn-primary" id="result-retry">🔄 Zkusit znovu</button>
+        <button class="btn-secondary" id="result-home">🏠 Zpět domů</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       NASTAVENÍ
+  ==================================================== -->
+  <div id="screen-settings" class="screen">
+    <div class="screen-header">
+      <button class="btn-back" id="settings-back" aria-label="Zpět">←</button>
+      <h2>⚙️ Nastavení</h2>
+    </div>
+    <div class="screen-content">
+
+      <!-- Délka sezení -->
+      <div class="settings-section">
+        <h3>📊 Délka kvízu</h3>
+        <div class="session-length-row">
+          <button class="session-btn" data-val="5">5</button>
+          <button class="session-btn active" data-val="10">10</button>
+          <button class="session-btn" data-val="20">20</button>
+          <button class="session-btn" data-val="0">∞ vše</button>
+        </div>
+      </div>
+
+      <!-- Typy otázek A -->
+      <div class="settings-section">
+        <h3>🗺️ Typy otázek – Odkud → Kam</h3>
+        <div class="type-toggle-list">
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="A" data-type="A_odkudKam" checked>
+            <span>Odkud kam jede linka X?</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="A" data-type="A_ktaraLinkaJede" checked>
+            <span>Která linka jede z A do B?</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="A" data-type="A_zacina" checked>
+            <span>Která linka začíná/končí v zastávce X?</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="A" data-type="A_pravdaLez" checked>
+            <span>Pravda nebo lež o trase linky</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="A" data-type="A_konecne" checked>
+            <span>Která linka má tyto konečné zastávky?</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Typy otázek B -->
+      <div class="settings-section">
+        <h3>🛑 Typy otázek – Zastávky</h3>
+        <div class="type-toggle-list">
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="B" data-type="B_nasleduje" checked>
+            <span>Jaká zastávka NÁSLEDUJE po X?</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="B" data-type="B_predchazi" checked>
+            <span>Jaká zastávka PŘEDCHÁZÍ X?</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="B" data-type="B_doplnChybejici" checked>
+            <span>Doplň chybějící zastávku: A → ??? → C</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="B" data-type="B_jeNaLince" checked>
+            <span>Je zastávka X na lince Y? (Ano/Ne)</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="B" data-type="B_neniNaLince" checked>
+            <span>Která zastávka NENÍ na lince X?</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="B" data-type="B_naJakeLince" checked>
+            <span>Na jaké lince je zastávka X?</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="B" data-type="B_jakeLinkySdili" checked>
+            <span>Jaké linky zastavují na zastávce X?</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="B" data-type="B_kolikataZastavka" checked>
+            <span>Kolikátá zastávka je X od začátku?</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="B" data-type="B_nZastavka" checked>
+            <span>Jaká je N. zastávka na lince X?</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="B" data-type="B_seradZastavky" checked>
+            <span>Seřaď zastávky ve správném pořadí</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="B" data-type="B_konecna" checked>
+            <span>Která je konečná zastávka linky X?</span>
+          </label>
+          <label class="type-toggle-item">
+            <input type="checkbox" class="type-toggle" data-section="B" data-type="B_pocetZastavek" checked>
+            <span>Kolik zastávek má linka X?</span>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="settings-save">💾 Uložit nastavení</button>
+
+    </div>
+  </div>
+
+</div><!-- /#app -->
+
+<!-- Skripty (pořadí záleží!) -->
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
