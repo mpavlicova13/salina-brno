@@ -151,90 +151,96 @@ const AudioPlayer = {
   currentLine: null,
   currentIdx: 0,
   playing: false,
+  paused: false,
   speed: 1.0,
-  cancelled: false,
-  _currentAudio: null,     // aktuálně přehrávaný HTML Audio element
-  _advanceResolve: null,
+  _gen: 0,           // generační čítač – zruší stará přehrávání okamžitě
+  _currentAudio: null,
 
   isTurtleMode() { return this.speed <= 0.5; },
 
-  /** Spustí přehrávání celé linky od začátku. */
   async play(line, speed = 1.0) {
+    // Nová generace zruší jakýkoli předchozí loop
+    this._gen++;
+    const gen = this._gen;
+
     this.currentLine = line;
     this.currentIdx = 0;
     this.playing = true;
-    this.cancelled = false;
+    this.paused = false;
     this.speed = speed;
+    if (this._currentAudio) { this._currentAudio.pause(); this._currentAudio = null; }
+    TTS.stop();
+    updateAudioPlayBtn();
 
     // Oznámení linky
     renderAudioHighlight(-1);
+    const introRate = this.isTurtleMode() ? 1.0 : this.speed;
     try {
-      await playAudioFile(`_linka_${line.number}`, this.speed);
+      await playAudioFile(`_linka_${line.number}`, introRate);
     } catch {
-      const intro = `Linka číslo ${line.number}. Trasa z ${cleanStopForTTS(line.stops[0])} do ${cleanStopForTTS(line.stops[line.stops.length - 1])}.`;
-      await TTS.speak(intro, this.speed);
+      const intro = `Linka číslo ${line.number}.`;
+      await TTS.speak(intro, introRate).catch(() => {});
     }
-
-    if (this.cancelled) return;
+    if (this._gen !== gen) return;
 
     // Čtení zastávek
     for (let i = 0; i < line.stops.length; i++) {
-      if (this.cancelled) return;
+      // Čekej pokud je pozastaveno
+      while (this.paused && this._gen === gen) {
+        await new Promise(r => setTimeout(r, 100));
+      }
+      if (this._gen !== gen) return;
+
       this.currentIdx = i;
       renderAudioHighlight(i);
-      // V pomalém režimu hraj normální rychlostí, jen s delší pauzou
-      const playbackRate = this.isTurtleMode() ? 1.0 : this.speed;
+
+      const rate = this.isTurtleMode() ? 1.0 : this.speed;
       try {
-        await playAudioFile(stopToFilename(line.stops[i]), playbackRate);
+        await this._playFile(stopToFilename(line.stops[i]), rate);
       } catch {
-        await TTS.speak(cleanStopForTTS(line.stops[i]), playbackRate);
+        await TTS.speak(cleanStopForTTS(line.stops[i]), rate).catch(() => {});
       }
+      if (this._gen !== gen) return;
 
-      if (this.cancelled) return;
-
-      // Pauza mezi zastávkami: v pomalém režimu 3s, jinak 300ms
-      await this.pause(this.isTurtleMode() ? 3000 : 300);
-    }
-
-    if (!this.cancelled) {
-      this.playing = false;
+      // Pauza mezi zastávkami
       this._currentAudio = null;
-      renderAudioHighlight(-1);
-      onAudioFinished();
+      await new Promise(r => setTimeout(r, this.isTurtleMode() ? 3000 : 300));
+      if (this._gen !== gen) return;
     }
+
+    this.playing = false;
+    this._currentAudio = null;
+    renderAudioHighlight(-1);
+    updateAudioPlayBtn();
+    onAudioFinished();
   },
 
-  async sayWithHighlight(idx, text) {
-    renderAudioHighlight(idx);
-    await TTS.speak(text, this.speed);
-  },
-
-  pause(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  _playFile(filename, speed) {
+    return new Promise((resolve, reject) => {
+      const audio = new Audio(`audio/${filename}.m4a`);
+      audio.playbackRate = Math.min(Math.max(speed, 0.5), 2.0);
+      this._currentAudio = audio;
+      audio.onended = resolve;
+      audio.onerror = reject;
+      audio.play().catch(reject);
+    });
   },
 
   stop() {
-    this.cancelled = true;
+    this._gen++;     // zruší aktivní loop
     this.playing = false;
-    if (this._currentAudio) {
-      this._currentAudio.pause();
-      this._currentAudio = null;
-    }
+    this.paused = false;
+    if (this._currentAudio) { this._currentAudio.pause(); this._currentAudio = null; }
     TTS.stop();
+    updateAudioPlayBtn();
   },
 
   togglePause() {
+    if (!this.playing) return;
+    this.paused = !this.paused;
     if (this._currentAudio) {
-      if (this._currentAudio.paused) {
-        this._currentAudio.play();
-        this.playing = true;
-      } else {
-        this._currentAudio.pause();
-        this.playing = false;
-      }
-    } else {
-      TTS.pauseResume();
-      this.playing = !TTS.synth.paused;
+      if (this.paused) this._currentAudio.pause();
+      else this._currentAudio.play();
     }
     updateAudioPlayBtn();
   },
@@ -592,15 +598,10 @@ function updateAudioProgress(current, total) {
 function updateAudioPlayBtn() {
   const btn = document.getElementById('audio-play-btn');
   if (!btn) return;
-  const isPlaying = AudioPlayer.playing;
-  const isPaused = AudioPlayer._currentAudio
-    ? AudioPlayer._currentAudio.paused
-    : TTS.synth.paused;
-
-  if (isPlaying && !isPaused) {
+  if (AudioPlayer.playing && !AudioPlayer.paused) {
     btn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-pause"/></svg> Pozastavit';
     btn.className = 'btn-play playing';
-  } else if (isPaused) {
+  } else if (AudioPlayer.paused) {
     btn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-play"/></svg> Pokračovat';
     btn.className = 'btn-play paused';
   } else {
@@ -632,29 +633,25 @@ function toggleAudioLoop() {
 }
 
 function toggleAudioPlayback() {
-  if (!AudioPlayer.playing && !AudioPlayer._currentAudio?.paused && !TTS.synth.paused) {
-    // Přehrávání nespuštěno – spusť od začátku
+  if (!AudioPlayer.playing) {
     document.getElementById('audio-finished-banner').style.display = 'none';
     AudioPlayer.play(AppState.audio.line, AppState.audio.speed);
   } else {
     AudioPlayer.togglePause();
   }
-  updateAudioPlayBtn();
 }
 
 function setAudioSpeed(speed) {
+  const wasPlaying = AudioPlayer.playing;
+  AudioPlayer.stop();
   AudioPlayer.setSpeed(speed);
   AppState.audio.speed = speed;
-  document.querySelectorAll('.speed-btn').forEach(btn => {
+  document.querySelectorAll('.speed-btn[data-speed]').forEach(btn => {
     btn.classList.toggle('active', parseFloat(btn.dataset.speed) === speed);
   });
-  // Zastavit a znovu spustit od aktuální pozice
-  const currentIdx = AudioPlayer.currentIdx;
-  AudioPlayer.stop();
-  setTimeout(() => {
-    AudioPlayer.currentIdx = currentIdx;
-    AudioPlayer.play(AppState.audio.line, speed);
-  }, 300);
+  if (wasPlaying) {
+    setTimeout(() => AudioPlayer.play(AppState.audio.line, speed), 150);
+  }
 }
 
 /* ========================================================
