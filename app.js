@@ -66,11 +66,11 @@ const TTS = {
       this.czechVoices = czech;
 
       if (czech.length > 0) {
-        // Preferuj kvalitnější hlasy (enhanced, neural, natural, premium, online)
-        const quality = ['enhanced', 'neural', 'natural', 'premium', 'online'];
+        // Preferuj kvalitnější hlasy: nejdřív podle názvu, pak lokální (device-installed = enhanced na Apple)
+        const quality = ['enhanced', 'neural', 'natural', 'premium'];
         const best = czech.find(v =>
           quality.some(k => v.name.toLowerCase().includes(k))
-        ) || czech[0];
+        ) || czech.find(v => v.localService) || czech[0];
 
         // Pokud má uživatel uloženou preferenci, použij ji
         const savedName = AppState.settings.selectedVoiceName;
@@ -260,8 +260,8 @@ function renderVoiceSelector() {
 
   const currentName = TTS.czechVoice ? TTS.czechVoice.name : '';
   select.innerHTML = voices.map(v => {
-    const quality = ['enhanced', 'neural', 'natural', 'premium', 'online'];
-    const isHQ = quality.some(k => v.name.toLowerCase().includes(k));
+    const quality = ['enhanced', 'neural', 'natural', 'premium'];
+    const isHQ = quality.some(k => v.name.toLowerCase().includes(k)) || v.localService;
     const label = v.name + (isHQ ? ' ★' : '');
     return `<option value="${v.name}" ${v.name === currentName ? 'selected' : ''}>${label}</option>`;
   }).join('');
