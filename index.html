@@ -156,30 +156,21 @@
       <div class="home-header">
         <img src="logo_dpmb.png" alt="DPMB logo" class="home-logo-img">
         <p class="home-subtitle">Procvičuj brněnské tramvaje</p>
-        <button class="profile-avatar-btn" id="btn-switch-profile">
-          <span id="gam-avatar">❓</span>
-        </button>
-      </div>
-
-      <div class="home-progress-bar">
-        <div class="home-progress-item">
-          <span class="home-progress-label">Úroveň</span>
-          <span class="home-progress-value" id="home-level-name">Nováček</span>
-        </div>
-        <div class="home-progress-divider"></div>
-        <div class="home-progress-item">
-          <span class="home-progress-label">Kvízy</span>
-          <span class="home-progress-value" id="home-quizzes">0</span>
-        </div>
-        <div class="home-progress-divider"></div>
-        <div class="home-xp-section">
-          <div class="home-xp-labels">
-            <span id="home-xp-text">0 XP</span>
-            <span class="home-level-badge" id="home-level-num">1</span>
+        <div class="home-profile-block">
+          <div class="home-profile-stats">
+            <div class="home-profile-stat"><span class="home-profile-stat-val" id="home-level-name">Nováček</span><span class="home-profile-stat-lbl">úroveň</span></div>
+            <div class="home-profile-stat"><span class="home-profile-stat-val" id="home-quizzes">0</span><span class="home-profile-stat-lbl">kvízy</span></div>
           </div>
-          <div class="home-xp-track">
-            <div class="home-xp-fill" id="home-xp-fill" style="width:0%"></div>
+          <div class="home-xp-mini">
+            <div class="home-xp-mini-labels">
+              <span id="home-xp-text">0 XP</span>
+              <span class="home-level-badge" id="home-level-num">1</span>
+            </div>
+            <div class="home-xp-track"><div class="home-xp-fill" id="home-xp-fill" style="width:0%"></div></div>
           </div>
+          <button class="profile-avatar-btn" id="btn-switch-profile">
+            <span id="gam-avatar">❓</span>
+          </button>
         </div>
       </div>
 

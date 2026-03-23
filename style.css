@@ -1860,86 +1860,67 @@ button:active {
 .bottom-nav-btn.active { color: var(--blue); font-weight: 700; }
 .bottom-nav-btn.active .icon { stroke: var(--blue); }
 
-/* Avatar tlačítko v hlavičce */
+/* Avatar + stats blok v hlavičce */
 .home-header { position: relative; }
 
-/* Progress bar na homepage */
-.home-progress-bar {
+.home-profile-block {
+  position: absolute;
+  top: 0;
+  right: 0;
   display: flex;
   align-items: center;
-  background: var(--white);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  padding: 10px 16px;
-  margin: 0 0 14px;
-  gap: 0;
+  gap: 8px;
 }
-.home-progress-item {
+.home-profile-stats {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  flex: 0 0 auto;
-  padding: 0 12px;
+  gap: 3px;
+  align-items: flex-end;
 }
-.home-progress-label {
-  font-size: 0.68rem;
-  color: var(--gray-dark);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-weight: 600;
-}
-.home-progress-value {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--blue);
-  margin-top: 2px;
-}
-.home-progress-divider {
-  width: 1px;
-  height: 32px;
-  background: var(--gray-mid);
-  flex-shrink: 0;
-}
-.home-xp-section {
-  flex: 1;
-  padding: 0 0 0 12px;
-}
-.home-xp-labels {
+.home-profile-stat {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 5px;
+  align-items: baseline;
+  gap: 4px;
 }
-.home-xp-labels span:first-child {
-  font-size: 0.75rem;
-  color: var(--gray-dark);
-  font-weight: 600;
+.home-profile-stat-val {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--white);
+}
+.home-profile-stat-lbl {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+}
+.home-xp-mini {
+  display: none;
 }
 .home-level-badge {
-  background: var(--blue);
+  background: rgba(255,255,255,0.25);
   color: var(--white);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
   border-radius: 20px;
-  padding: 2px 8px;
+  padding: 1px 6px;
 }
 .home-xp-track {
-  height: 8px;
-  background: var(--gray-mid);
-  border-radius: 4px;
+  height: 6px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 3px;
   overflow: hidden;
+  min-width: 60px;
 }
 .home-xp-fill {
   height: 100%;
-  background: var(--blue);
-  border-radius: 4px;
+  background: var(--white);
+  border-radius: 3px;
   transition: width 0.4s ease;
 }
 .stats-panel-title { font-size: 1.3rem; font-weight: 700; color: var(--blue); margin: 0; }
 .profile-avatar-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
+  position: relative;
+  top: auto;
+  right: auto;
   font-size: 1.8rem;
   line-height: 1;
   background: var(--white);
