@@ -94,7 +94,7 @@ function generateA_ktaraLinkaJede(lines) {
   const options = shuffle([correct, ...wrongs]);
   return {
     type: 'A_ktaraLinkaJede',
-    question: `🚋 Která linka jede z "${from}" do "${to}"?`,
+    question: `🚋 Která linka jede z ${from} do ${to}?`,
     options,
     correct,
     explanation: `Z ${from} do ${to} jede linka ${line.number}.`
@@ -115,7 +115,7 @@ function generateA_zacina(lines) {
   const options = shuffle([correct, ...wrongs]);
   return {
     type: 'A_zacina',
-    question: `🛑 Která linka ${verb} v zastávce "${terminus}"?`,
+    question: `🛑 Která linka ${verb} v zastávce ${terminus}?`,
     options,
     correct,
     explanation: `Zastávka ${terminus} je ${verb === 'začíná' ? 'první' : 'konečná'} zastávka linky ${line.number}.`
@@ -146,7 +146,7 @@ function generateA_pravdaLez(lines) {
   const options = ['Pravda ✅', 'Lež ❌'];
   return {
     type: 'A_pravdaLez',
-    question: `❓ Pravda nebo lež?\nLinka ${line.number} jede z "${statedFrom}" do "${statedTo}".`,
+    question: `❓ Pravda nebo lež?\nLinka ${line.number} jede z ${statedFrom} do ${statedTo}.`,
     options,
     correct,
     isTrueFalse: true,
@@ -169,7 +169,7 @@ function generateA_konecne(lines) {
   const options = shuffle([correct, ...wrongs]);
   return {
     type: 'A_konecne',
-    question: `🚋 Která linka má tyto konečné zastávky:\n"${from}" a "${to}"?`,
+    question: `🚋 Která linka má tyto konečné zastávky:\n${from} a ${to}?`,
     options,
     correct,
     explanation: `Konečné zastávky linky ${line.number} jsou ${from} a ${to}.`
@@ -210,7 +210,7 @@ function generateB_nasleduje(lines) {
   const options = buildOptions(correct, candidates);
   return {
     type: 'B_nasleduje',
-    question: `🚋 Linka ${line.number} – jaká zastávka NÁSLEDUJE po zastávce\n"${stop}"\nve směru "${direction}"?`,
+    question: `🚋 Linka ${line.number} – jaká zastávka NÁSLEDUJE po zastávce\n${stop}\nve směru ${direction}?`,
     options,
     correct,
     explanation: `Po zastávce ${stop} na lince ${line.number} (směr ${direction}) následuje ${correct}.`
@@ -232,7 +232,7 @@ function generateB_predchazi(lines) {
   const options = buildOptions(correct, candidates);
   return {
     type: 'B_predchazi',
-    question: `🚋 Linka ${line.number} – jaká zastávka PŘEDCHÁZÍ zastávce\n"${stop}"\nve směru "${direction}"?`,
+    question: `🚋 Linka ${line.number} – jaká zastávka PŘEDCHÁZÍ zastávce\n${stop}\nve směru ${direction}?`,
     options,
     correct,
     explanation: `Před zastávkou ${stop} na lince ${line.number} (směr ${direction}) je ${correct}.`
@@ -255,7 +255,7 @@ function generateB_doplnChybejici(lines) {
   const options = buildOptions(correct, candidates);
   return {
     type: 'B_doplnChybejici',
-    question: `🚋 Linka ${line.number} – doplň chybějící zastávku:\n"${prev}" → ??? → "${next}"`,
+    question: `🚋 Linka ${line.number} – doplň chybějící zastávku:\n${prev} → ??? → ${next}`,
     options,
     correct,
     explanation: `Chybějící zastávka mezi ${prev} a ${next} na lince ${line.number} je ${correct}.`
@@ -285,7 +285,7 @@ function generateB_jeNaLince(lines) {
   const options = ['Ano ✅', 'Ne ❌'];
   return {
     type: 'B_jeNaLince',
-    question: `❓ Je zastávka "${stop}" na lince ${line.number}?`,
+    question: `❓ Je zastávka ${stop} na lince ${line.number}?`,
     options,
     correct,
     isTrueFalse: true,
@@ -337,7 +337,7 @@ function generateB_naJakeLince(lines) {
   const options = shuffle([correct, ...wrongs]);
   return {
     type: 'B_naJakeLince',
-    question: `🛑 Na jaké lince se nachází zastávka "${stop}"?`,
+    question: `🛑 Na jaké lince se nachází zastávka ${stop}?`,
     options,
     correct,
     explanation: `Zastávka ${stop} se nachází na lince ${lineNum}.`
@@ -365,7 +365,7 @@ function generateB_jakeLinkySdili(lines) {
   const correctSet = lineNums.map(n => `Linka ${n}`);
   return {
     type: 'B_jakeLinkySdili',
-    question: `🛑 Jaké linky zastavují na zastávce "${stop}"?\n(Vyber všechny správné odpovědi)`,
+    question: `🛑 Jaké linky zastavují na zastávce ${stop}?\n(Vyber všechny správné odpovědi)`,
     options: allOptions,
     correct: correctSet, // pole správných odpovědí
     isMultiSelect: true,
@@ -396,7 +396,7 @@ function generateB_kolikataZastavka(lines) {
   const options = shuffle([correct, ...[...wrongNums].map(n => `${n}.`)]);
   return {
     type: 'B_kolikataZastavka',
-    question: `🚋 Linka ${line.number} – kolikátá zastávka je "${stop}"\nod zastávky "${fromTerminus}"?`,
+    question: `🚋 Linka ${line.number} – kolikátá zastávka je ${stop}\nod zastávky ${fromTerminus}?`,
     options,
     correct,
     explanation: `Zastávka ${stop} je ${idx + 1}. zastávka linky ${line.number} od ${fromTerminus}.`
@@ -418,7 +418,7 @@ function generateB_nZastavka(lines) {
   const options = buildOptions(correct, candidates);
   return {
     type: 'B_nZastavka',
-    question: `🚋 Linka ${line.number} – jaká je ${n}. zastávka\nve směru "${direction}"?`,
+    question: `🚋 Linka ${line.number} – jaká je ${n}. zastávka\nve směru ${direction}?`,
     options,
     correct,
     explanation: `${n}. zastávka linky ${line.number} ve směru ${direction} je ${correct}.`
@@ -440,7 +440,7 @@ function generateB_seradZastavky(lines) {
   const shuffled = shuffle(consecutive);
   return {
     type: 'B_seradZastavky',
-    question: `🚋 Linka ${line.number} – seřaď zastávky ve směru "${direction}":`,
+    question: `🚋 Linka ${line.number} – seřaď zastávky ve směru ${direction}:`,
     options: shuffled,      // zobrazíme jako přetahovací / klikací
     correct: consecutive,   // správné pořadí
     isOrdering: true,
