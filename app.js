@@ -1027,15 +1027,99 @@ const ACHIEVEMENTS = [
   { id: 'max_level',     name: 'Legenda Brna!',    desc: 'Dosáhla jsi nejvyšší úrovně',    icon: '👑' },
 ];
 
+const AVATARS = [
+  '🚋','🚌','🚃','🚂','🏙️',
+  '⭐','🌟','🎯','🏆','🥇',
+  '🦊','🐱','🐶','🦁','🐸',
+  '🐧','🦄','🌈','🎨','🎪',
+  '👩','👨','👧','👦','🧑',
+];
+
+function loadProfiles() {
+  try { const s = localStorage.getItem('salina_profiles'); if (s) return JSON.parse(s); } catch(e) {}
+  return { current: null, list: [] };
+}
+function saveProfiles(data) {
+  try { localStorage.setItem('salina_profiles', JSON.stringify(data)); } catch(e) {}
+}
+function getCurrentProfile() {
+  const data = loadProfiles();
+  if (!data.current) return null;
+  return data.list.find(p => p.id === data.current) || null;
+}
+function createProfile(name, avatar) {
+  const data = loadProfiles();
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  const profile = { id, name: name.trim(), avatar, gam: { xp: 0, level: 1, achievements: [], stats: { totalCorrect: 0, totalQuizzes: 0, perfectQuizzes: 0, maxStreak: 0 } } };
+  data.list.push(profile);
+  data.current = id;
+  saveProfiles(data);
+  return profile;
+}
+function switchToProfile(id) {
+  const data = loadProfiles();
+  data.current = id;
+  saveProfiles(data);
+}
+function renderProfilesScreen() {
+  const data = loadProfiles();
+  const grid = document.getElementById('profiles-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  data.list.forEach(profile => {
+    const lv = getLevelForXP(profile.gam.xp);
+    const card = document.createElement('button');
+    card.className = 'profile-card' + (profile.id === data.current ? ' profile-card-active' : '');
+    card.innerHTML = `<span class="profile-card-avatar">${profile.avatar}</span><span class="profile-card-name">${profile.name}</span><span class="profile-card-level">Lv.${lv.level} · ${lv.name}</span>`;
+    card.onclick = () => { switchToProfile(profile.id); updateGamUI(); showScreen('home'); };
+    grid.appendChild(card);
+  });
+  const addCard = document.createElement('button');
+  addCard.className = 'profile-card profile-card-add';
+  addCard.innerHTML = '<span class="profile-card-plus">+</span><span>Nový hráč</span>';
+  addCard.onclick = showProfileCreateForm;
+  grid.appendChild(addCard);
+}
+function showProfileCreateForm() {
+  const form = document.getElementById('profile-create-form');
+  if (!form) return;
+  form.style.display = 'block';
+  document.getElementById('profiles-grid').style.display = 'none';
+  document.getElementById('profile-name-input').value = '';
+  const picker = document.getElementById('avatar-picker');
+  picker.innerHTML = '';
+  let selectedAvatar = AVATARS[0];
+  AVATARS.forEach(emoji => {
+    const btn = document.createElement('button');
+    btn.className = 'avatar-option';
+    btn.textContent = emoji;
+    btn.onclick = () => { picker.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); selectedAvatar = emoji; };
+    picker.appendChild(btn);
+  });
+  picker.querySelector('.avatar-option').classList.add('selected');
+  document.getElementById('btn-confirm-profile').onclick = () => {
+    const name = document.getElementById('profile-name-input').value.trim();
+    if (!name) { document.getElementById('profile-name-input').focus(); return; }
+    createProfile(name, selectedAvatar);
+    updateGamUI();
+    form.style.display = 'none';
+    showScreen('home');
+  };
+  document.getElementById('btn-cancel-profile').onclick = () => {
+    form.style.display = 'none';
+    document.getElementById('profiles-grid').style.display = 'grid';
+  };
+}
+
 function loadGamState() {
-  try {
-    const s = localStorage.getItem('salina_gam');
-    if (s) return JSON.parse(s);
-  } catch(e) {}
+  const p = getCurrentProfile();
+  if (p) return p.gam;
   return { xp: 0, level: 1, achievements: [], stats: { totalCorrect: 0, totalQuizzes: 0, perfectQuizzes: 0, maxStreak: 0 } };
 }
 function saveGamState(g) {
-  try { localStorage.setItem('salina_gam', JSON.stringify(g)); } catch(e) {}
+  const data = loadProfiles();
+  const p = data.list.find(p => p.id === data.current);
+  if (p) { p.gam = g; saveProfiles(data); }
 }
 function getLevelForXP(xp) {
   let cur = LEVELS[0];
@@ -1044,11 +1128,16 @@ function getLevelForXP(xp) {
 }
 function updateGamUI() {
   const g = loadGamState();
+  const profile = getCurrentProfile();
   const lv = getLevelForXP(g.xp);
   const next = LEVELS.find(l => l.level === lv.level + 1) || null;
   const xpInLv = g.xp - lv.xpRequired;
   const xpNeeded = next ? next.xpRequired - lv.xpRequired : 1;
   const pct = next ? Math.min(100, Math.round((xpInLv / xpNeeded) * 100)) : 100;
+  const avatarEl = document.getElementById('gam-avatar');
+  const nameEl2 = document.getElementById('gam-name');
+  if (avatarEl && profile) avatarEl.textContent = profile.avatar;
+  if (nameEl2 && profile) nameEl2.textContent = profile.name;
   const numEl = document.getElementById('gam-level-num');
   const nameEl = document.getElementById('gam-level-name');
   const fillEl = document.getElementById('gam-xp-fill');
@@ -1105,12 +1194,26 @@ function launchConfetti() {
 
 document.addEventListener('DOMContentLoaded', () => {
   TTS.init();
-  // Reset XP pokud je level 2 s nízkou hodnotou (přechod na nové prahy)
-  try {
-    const g = loadGamState();
-    if (g.xp > 0 && g.xp < 500) { g.xp = 0; g.level = 1; g.achievements = []; saveGamState(g); }
-  } catch(e) {}
-  updateGamUI();
+
+  // Profil flow: první spuštění nebo přepnutí hráče
+  const profileData = loadProfiles();
+  if (profileData.list.length === 0) {
+    showScreen('profiles');
+    showProfileCreateForm();
+    const cancelBtn = document.getElementById('btn-cancel-profile');
+    if (cancelBtn) cancelBtn.style.display = 'none';
+  } else if (!profileData.current || !profileData.list.find(p => p.id === profileData.current)) {
+    showScreen('profiles');
+    renderProfilesScreen();
+  } else {
+    updateGamUI();
+    showScreen('home');
+  }
+
+  document.getElementById('btn-switch-profile').addEventListener('click', () => {
+    renderProfilesScreen();
+    showScreen('profiles');
+  });
 
   // === Domovská obrazovka ===
   document.getElementById('btn-section-a').addEventListener('click', openSectionA);
