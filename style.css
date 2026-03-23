@@ -1521,3 +1521,42 @@ button:active {
 }
 .report-status.success { background: #e6f9ed; color: #1a7a3a; }
 .report-status.error   { background: #fdecea; color: #c0392b; }
+
+/* ========================================================
+   AUDIO – POMALÝ REŽIM (ŽELVIČKA): ZOPAKOVAT / DALŠÍ
+======================================================== */
+
+#audio-turtle-controls {
+  display: none;
+  gap: 12px;
+  justify-content: center;
+  padding: 12px 20px 4px;
+  animation: fadeIn 0.2s ease;
+}
+
+.btn-turtle-repeat,
+.btn-turtle-next {
+  flex: 1;
+  max-width: 200px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.2s;
+}
+.btn-turtle-repeat:active,
+.btn-turtle-next:active { transform: scale(0.97); }
+
+.btn-turtle-repeat {
+  background: #f0f0f0;
+  color: #333;
+}
+.btn-turtle-repeat:hover { background: #e0e0e0; }
+
+.btn-turtle-next {
+  background: var(--yellow, #FFD100);
+  color: #0d1b2a;
+}
+.btn-turtle-next:hover { opacity: 0.9; }
