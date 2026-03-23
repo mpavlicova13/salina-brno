@@ -1154,22 +1154,46 @@ function updateGamUI() {
   const g = loadGamState();
   const profile = getCurrentProfile();
   const lv = getLevelForXP(g.xp);
+  const avatarEl = document.getElementById('gam-avatar');
+  const xpEl = document.getElementById('gam-xp-display');
+  const lvEl = document.getElementById('gam-level-num');
+  if (avatarEl && profile) avatarEl.textContent = profile.avatar;
+  if (xpEl) xpEl.textContent = g.xp + ' XP';
+  if (lvEl) lvEl.textContent = lv.level;
+}
+function renderStatsScreen() {
+  const g = loadGamState();
+  const profile = getCurrentProfile();
+  const lv = getLevelForXP(g.xp);
   const next = LEVELS.find(l => l.level === lv.level + 1) || null;
   const xpInLv = g.xp - lv.xpRequired;
   const xpNeeded = next ? next.xpRequired - lv.xpRequired : 1;
   const pct = next ? Math.min(100, Math.round((xpInLv / xpNeeded) * 100)) : 100;
-  const avatarEl = document.getElementById('gam-avatar');
-  const nameEl2 = document.getElementById('gam-name');
-  if (avatarEl && profile) avatarEl.textContent = profile.avatar;
-  if (nameEl2 && profile) nameEl2.textContent = profile.name;
-  const numEl = document.getElementById('gam-level-num');
-  const nameEl = document.getElementById('gam-level-name');
-  const fillEl = document.getElementById('gam-xp-fill');
-  const textEl = document.getElementById('gam-xp-text');
-  if (numEl) numEl.textContent = lv.level;
-  if (nameEl) nameEl.textContent = lv.name;
-  if (fillEl) fillEl.style.width = pct + '%';
-  if (textEl) textEl.textContent = next ? `${xpInLv} / ${xpNeeded} XP` : 'MAX LEVEL!';
+
+  if (profile) {
+    document.getElementById('stats-avatar').textContent = profile.avatar;
+    document.getElementById('stats-name').textContent = profile.name;
+  }
+  document.getElementById('stats-level-num').textContent = lv.level;
+  document.getElementById('stats-level-name').textContent = lv.name;
+  document.getElementById('stats-xp-total').textContent = g.xp + ' XP celkem';
+  document.getElementById('stats-xp-fill').style.width = pct + '%';
+  document.getElementById('stats-xp-progress').textContent = next ? `${xpInLv} / ${xpNeeded} XP` : 'MAX LEVEL!';
+  document.getElementById('stats-next-level').textContent = next ? `→ Level ${next.level}: ${next.name}` : '🏆 Nejvyšší level!';
+  document.getElementById('stats-correct').textContent = g.stats.totalCorrect;
+  document.getElementById('stats-quizzes').textContent = g.stats.totalQuizzes;
+  document.getElementById('stats-perfect').textContent = g.stats.perfectQuizzes;
+  document.getElementById('stats-streak').textContent = g.stats.maxStreak;
+
+  const achEl = document.getElementById('stats-achievements');
+  achEl.innerHTML = '';
+  ACHIEVEMENTS.forEach(a => {
+    const unlocked = g.achievements.includes(a.id);
+    const item = document.createElement('div');
+    item.className = 'achievement-item' + (unlocked ? ' achievement-unlocked' : ' achievement-locked');
+    item.innerHTML = `<span class="ach-icon">${a.icon}</span><div class="ach-info"><strong>${a.name}</strong><span>${a.desc}</span></div>${unlocked ? '<span class="ach-check">✓</span>' : '<span class="ach-lock">🔒</span>'}`;
+    achEl.appendChild(item);
+  });
 }
 function addXPAndLevel(amount, g) {
   const oldLv = getLevelForXP(g.xp);
@@ -1232,7 +1256,12 @@ document.addEventListener('DOMContentLoaded', () => {
     showScreen('home');
   }
 
-  document.getElementById('btn-switch-profile').addEventListener('click', () => {
+  document.getElementById('btn-open-stats').addEventListener('click', () => {
+    renderStatsScreen();
+    showScreen('stats');
+  });
+  document.getElementById('stats-back').addEventListener('click', () => showScreen('home'));
+  document.getElementById('stats-switch-btn').addEventListener('click', () => {
     renderProfilesScreen();
     showScreen('profiles');
   });
