@@ -415,7 +415,7 @@ function showFlashcard() {
   const card = document.getElementById('fc-card');
 
   counter.textContent = `${flashcardIndex + 1} / ${flashcardLines.length}`;
-  front.innerHTML = `<span class="fc-line-num">${line.number}</span>`;
+  front.innerHTML = `<span class="fc-line-num">${line.number}</span><svg class="icon fc-flip-icon" aria-hidden="true"><use href="#icon-refresh"/></svg>`;
   back.innerHTML = `
     <div class="fc-line-num">${line.number}</div>
     <div class="fc-route">
