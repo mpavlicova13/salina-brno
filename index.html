@@ -149,54 +149,113 @@
   <!-- ====================================================
        DOMOVSKÁ OBRAZOVKA
   ==================================================== -->
-  <div id="screen-home" class="screen">
-    <div class="home-header">
-      <img src="logo_dpmb.png" alt="DPMB logo" class="home-logo-img">
-      <p class="home-subtitle">Procvičuj brněnské tramvaje</p>
-      <button class="home-stats-badge" id="btn-open-stats">
-        <span class="hsb-avatar" id="gam-avatar">❓</span>
-        <span class="hsb-xp" id="gam-xp-display">0 XP</span>
-        <span class="hsb-level" id="gam-level-num">1</span>
-      </button>
+  <div id="screen-home" class="screen screen-with-tabs">
+
+    <!-- Panel: Domů -->
+    <div id="panel-home" class="tab-panel active">
+      <div class="home-header">
+        <img src="logo_dpmb.png" alt="DPMB logo" class="home-logo-img">
+        <p class="home-subtitle">Procvičuj brněnské tramvaje</p>
+        <button class="profile-avatar-btn" id="btn-switch-profile">
+          <span id="gam-avatar">❓</span>
+        </button>
+      </div>
+
+      <div class="home-cards">
+        <button class="section-card card-a" id="btn-section-a">
+          <div class="section-card-icon">
+            <svg class="icon icon-section" aria-hidden="true"><use href="#icon-map"/></svg>
+          </div>
+          <div class="section-card-text">
+            <h3>Odkud → Kam</h3>
+            <p>Nauč se trasy linek – kartičky i kvíz</p>
+          </div>
+        </button>
+
+        <button class="section-card card-b" id="btn-section-b">
+          <div class="section-card-icon">
+            <svg class="icon icon-section" aria-hidden="true"><use href="#icon-pin"/></svg>
+          </div>
+          <div class="section-card-text">
+            <h3>Zastávky</h3>
+            <p>Procvičuj pořadí a názvy zastávek</p>
+          </div>
+        </button>
+
+        <button class="section-card card-c" id="btn-section-c">
+          <div class="section-card-icon">
+            <svg class="icon icon-section" aria-hidden="true"><use href="#icon-headphones"/></svg>
+          </div>
+          <div class="section-card-text">
+            <h3>Procvič linku</h3>
+            <p>Poslechni si zastávky a udělej kvíz</p>
+          </div>
+        </button>
+      </div>
+
+      <div class="home-settings-row">
+        <button class="btn-settings" id="btn-settings">
+          <svg class="icon" aria-hidden="true"><use href="#icon-settings"/></svg> Nastavení
+        </button>
+      </div>
     </div>
 
-    <div class="home-cards">
-      <button class="section-card card-a" id="btn-section-a">
-        <div class="section-card-icon">
-          <svg class="icon icon-section" aria-hidden="true"><use href="#icon-map"/></svg>
-        </div>
-        <div class="section-card-text">
-          <h3>Odkud → Kam</h3>
-          <p>Nauč se trasy linek – kartičky i kvíz</p>
-        </div>
-      </button>
+    <!-- Panel: Statistiky -->
+    <div id="panel-stats" class="tab-panel">
+      <div class="home-header">
+        <h2 class="stats-panel-title">Statistiky</h2>
+        <button class="profile-avatar-btn" id="btn-switch-profile-stats">
+          <span id="gam-avatar-stats">❓</span>
+        </button>
+      </div>
 
-      <button class="section-card card-b" id="btn-section-b">
-        <div class="section-card-icon">
-          <svg class="icon icon-section" aria-hidden="true"><use href="#icon-pin"/></svg>
+      <div class="stats-profile-row">
+        <span class="stats-profile-avatar" id="stats-avatar">❓</span>
+        <div class="stats-profile-info">
+          <span class="stats-profile-name" id="stats-name">---</span>
+          <button class="btn-link" id="stats-switch-btn">Přepnout hráče</button>
         </div>
-        <div class="section-card-text">
-          <h3>Zastávky</h3>
-          <p>Procvičuj pořadí a názvy zastávek</p>
-        </div>
-      </button>
+      </div>
 
-      <button class="section-card card-c" id="btn-section-c">
-        <div class="section-card-icon">
-          <svg class="icon icon-section" aria-hidden="true"><use href="#icon-headphones"/></svg>
+      <div class="stats-level-card">
+        <div class="stats-level-top">
+          <span class="stats-level-badge" id="stats-level-num">1</span>
+          <div class="stats-level-labels">
+            <span class="stats-level-name" id="stats-level-name">Nováček</span>
+            <span class="stats-xp-total" id="stats-xp-total">0 XP celkem</span>
+          </div>
         </div>
-        <div class="section-card-text">
-          <h3>Procvič linku</h3>
-          <p>Poslechni si zastávky a udělej kvíz</p>
+        <div class="gam-xp-bar" style="height:14px;margin:12px 0 6px">
+          <div class="gam-xp-fill" id="stats-xp-fill" style="width:0%"></div>
         </div>
-      </button>
+        <div class="stats-level-footer">
+          <span id="stats-xp-progress">0 / 500 XP</span>
+          <span id="stats-next-level">→ Level 2: Cestující</span>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stats-num-card"><div class="stats-big-num" id="stats-correct">0</div><div class="stats-num-label">Správně</div></div>
+        <div class="stats-num-card"><div class="stats-big-num" id="stats-quizzes">0</div><div class="stats-num-label">Kvízy</div></div>
+        <div class="stats-num-card"><div class="stats-big-num" id="stats-perfect">0</div><div class="stats-num-label">Perfektní</div></div>
+        <div class="stats-num-card"><div class="stats-big-num" id="stats-streak">0</div><div class="stats-num-label">Max série</div></div>
+      </div>
+
+      <h3 class="stats-section-title">Milníky</h3>
+      <div id="stats-achievements" class="stats-achievements"></div>
     </div>
 
-    <div class="home-settings-row">
-      <button class="btn-settings" id="btn-settings">
-        <svg class="icon" aria-hidden="true"><use href="#icon-settings"/></svg> Nastavení
+    <!-- Bottom tab bar -->
+    <nav class="bottom-nav">
+      <button class="bottom-nav-btn active" id="tab-btn-home">
+        <svg class="icon" aria-hidden="true"><use href="#icon-home"/></svg>
+        <span>Domů</span>
       </button>
-    </div>
+      <button class="bottom-nav-btn" id="tab-btn-stats">
+        <svg class="icon" aria-hidden="true"><use href="#icon-bar-chart"/></svg>
+        <span>Statistiky</span>
+      </button>
+    </nav>
   </div>
 
   <!-- ====================================================

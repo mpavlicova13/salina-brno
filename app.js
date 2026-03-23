@@ -1151,15 +1151,20 @@ function getLevelForXP(xp) {
   return cur;
 }
 function updateGamUI() {
-  const g = loadGamState();
   const profile = getCurrentProfile();
-  const lv = getLevelForXP(g.xp);
-  const avatarEl = document.getElementById('gam-avatar');
-  const xpEl = document.getElementById('gam-xp-display');
-  const lvEl = document.getElementById('gam-level-num');
-  if (avatarEl && profile) avatarEl.textContent = profile.avatar;
-  if (xpEl) xpEl.textContent = g.xp + ' XP';
-  if (lvEl) lvEl.textContent = lv.level;
+  if (!profile) return;
+  const avatar = profile.avatar;
+  ['gam-avatar', 'gam-avatar-stats'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = avatar;
+  });
+}
+function switchHomeTab(tab) {
+  document.getElementById('panel-home').classList.toggle('active', tab === 'home');
+  document.getElementById('panel-stats').classList.toggle('active', tab === 'stats');
+  document.getElementById('tab-btn-home').classList.toggle('active', tab === 'home');
+  document.getElementById('tab-btn-stats').classList.toggle('active', tab === 'stats');
+  if (tab === 'stats') renderStatsScreen();
 }
 function renderStatsScreen() {
   const g = loadGamState();
@@ -1256,15 +1261,11 @@ document.addEventListener('DOMContentLoaded', () => {
     showScreen('home');
   }
 
-  document.getElementById('btn-open-stats').addEventListener('click', () => {
-    renderStatsScreen();
-    showScreen('stats');
-  });
-  document.getElementById('stats-back').addEventListener('click', () => showScreen('home'));
-  document.getElementById('stats-switch-btn').addEventListener('click', () => {
-    renderProfilesScreen();
-    showScreen('profiles');
-  });
+  document.getElementById('tab-btn-home').addEventListener('click', () => switchHomeTab('home'));
+  document.getElementById('tab-btn-stats').addEventListener('click', () => switchHomeTab('stats'));
+  document.getElementById('btn-switch-profile').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
+  document.getElementById('btn-switch-profile-stats').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
+  document.getElementById('stats-switch-btn').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
 
   // === Domovská obrazovka ===
   document.getElementById('btn-section-a').addEventListener('click', openSectionA);
