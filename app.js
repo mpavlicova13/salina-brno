@@ -1065,9 +1065,6 @@ function addXPAndLevel(amount, g) {
   g.level = newLv.level;
   saveGamState(g);
   updateGamUI();
-  if (newLv.level > oldLv.level) {
-    showLevelUpToast(newLv);
-  }
 }
 function checkAchievements(g) {
   const unlocked = [];
@@ -1086,27 +1083,7 @@ function checkAchievements(g) {
   });
   if (unlocked.length) {
     saveGamState(g);
-    unlocked.forEach((a, i) => setTimeout(() => showAchievementToast(a), 500 + i * 1800));
   }
-}
-function showToast(html, duration, cls) {
-  const container = document.getElementById('toast-container');
-  if (!container) return;
-  const toast = document.createElement('div');
-  toast.className = `toast ${cls || ''}`;
-  toast.innerHTML = html;
-  container.appendChild(toast);
-  requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('toast-show')));
-  setTimeout(() => {
-    toast.classList.remove('toast-show');
-    setTimeout(() => toast.remove(), 400);
-  }, duration || 3000);
-}
-function showLevelUpToast(lv) {
-  showToast(`<span class="toast-big">🎉 Level ${lv.level}!</span><span class="toast-sub">${lv.name}</span>`, 4000, 'toast-levelup');
-}
-function showAchievementToast(a) {
-  showToast(`<span class="toast-icon">${a.icon}</span><span class="toast-body"><strong>${a.name}</strong><span>${a.desc}</span></span>`, 3500, 'toast-achievement');
 }
 function launchConfetti() {
   const container = document.getElementById('confetti-container');
