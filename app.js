@@ -929,6 +929,35 @@ function showResults() {
     });
   }
 
+  // ── Gamifikace ──────────────────────────────────────────
+  const gam = loadGamState();
+  const isPerfect = quiz.score === quiz.total && quiz.total > 0;
+
+  // XP: 10 za každou správnou + 50 bonus za perfektní + streak bonus
+  let xpEarned = quiz.score * 10;
+  if (isPerfect) xpEarned += 50;
+  xpEarned += Math.min(quiz.maxStreak * 2, 20);
+
+  // Statistiky
+  gam.stats.totalCorrect += quiz.score;
+  gam.stats.totalQuizzes += 1;
+  if (isPerfect) gam.stats.perfectQuizzes += 1;
+  if (quiz.maxStreak > gam.stats.maxStreak) gam.stats.maxStreak = quiz.maxStreak;
+
+  addXPAndLevel(xpEarned, gam);
+  checkAchievements(gam);
+
+  // Zobraz získané XP
+  const xpEl = document.getElementById('result-xp-earned');
+  if (xpEl) {
+    xpEl.textContent = `+${xpEarned} XP získáno!`;
+    xpEl.style.display = 'inline-block';
+  }
+
+  // Konfety při perfektním kvízu
+  if (isPerfect) setTimeout(launchConfetti, 400);
+  // ────────────────────────────────────────────────────────
+
   showScreen('results');
 }
 
@@ -973,11 +1002,133 @@ function toggleAllLines(arrRef, allNums, containerSelector) {
 }
 
 /* ========================================================
+   GAMIFIKACE
+======================================================== */
+
+const LEVELS = [
+  { level: 1, name: 'Nováček',          xpRequired: 0    },
+  { level: 2, name: 'Cestující',         xpRequired: 100  },
+  { level: 3, name: 'Pravidelný host',   xpRequired: 250  },
+  { level: 4, name: 'Znalec MHD',        xpRequired: 500  },
+  { level: 5, name: 'Průvodčí',          xpRequired: 900  },
+  { level: 6, name: 'Řidič tramvaje',    xpRequired: 1400 },
+  { level: 7, name: 'Dispečer',          xpRequired: 2200 },
+  { level: 8, name: 'Legenda Brna',      xpRequired: 3500 },
+];
+
+const ACHIEVEMENTS = [
+  { id: 'first_correct', name: 'První správná!',  desc: 'Odpověděla jsi správně poprvé',  icon: '🎯' },
+  { id: 'streak_5',      name: 'Série 5!',         desc: '5× správně za sebou',            icon: '🔥' },
+  { id: 'streak_10',     name: 'Série 10!',        desc: '10× správně za sebou',           icon: '⚡' },
+  { id: 'perfect_quiz',  name: 'Perfektní kvíz!',  desc: '100 % správných odpovědí',       icon: '⭐' },
+  { id: 'quizzes_5',     name: 'Vytrvalkyně',      desc: 'Dokončila jsi 5 kvízů',          icon: '💪' },
+  { id: 'quizzes_10',    name: 'Maratonka',        desc: 'Dokončila jsi 10 kvízů',         icon: '🏆' },
+  { id: 'level_5',       name: 'Průvodčí!',        desc: 'Dosáhla jsi úrovně 5',           icon: '🎖️' },
+  { id: 'max_level',     name: 'Legenda Brna!',    desc: 'Dosáhla jsi nejvyšší úrovně',    icon: '👑' },
+];
+
+function loadGamState() {
+  try {
+    const s = localStorage.getItem('salina_gam');
+    if (s) return JSON.parse(s);
+  } catch(e) {}
+  return { xp: 0, level: 1, achievements: [], stats: { totalCorrect: 0, totalQuizzes: 0, perfectQuizzes: 0, maxStreak: 0 } };
+}
+function saveGamState(g) {
+  try { localStorage.setItem('salina_gam', JSON.stringify(g)); } catch(e) {}
+}
+function getLevelForXP(xp) {
+  let cur = LEVELS[0];
+  for (const l of LEVELS) { if (xp >= l.xpRequired) cur = l; }
+  return cur;
+}
+function updateGamUI() {
+  const g = loadGamState();
+  const lv = getLevelForXP(g.xp);
+  const next = LEVELS.find(l => l.level === lv.level + 1) || null;
+  const xpInLv = g.xp - lv.xpRequired;
+  const xpNeeded = next ? next.xpRequired - lv.xpRequired : 1;
+  const pct = next ? Math.min(100, Math.round((xpInLv / xpNeeded) * 100)) : 100;
+  const numEl = document.getElementById('gam-level-num');
+  const nameEl = document.getElementById('gam-level-name');
+  const fillEl = document.getElementById('gam-xp-fill');
+  const textEl = document.getElementById('gam-xp-text');
+  if (numEl) numEl.textContent = lv.level;
+  if (nameEl) nameEl.textContent = lv.name;
+  if (fillEl) fillEl.style.width = pct + '%';
+  if (textEl) textEl.textContent = next ? `${xpInLv} / ${xpNeeded} XP` : 'MAX LEVEL!';
+}
+function addXPAndLevel(amount, g) {
+  const oldLv = getLevelForXP(g.xp);
+  g.xp += amount;
+  const newLv = getLevelForXP(g.xp);
+  g.level = newLv.level;
+  saveGamState(g);
+  updateGamUI();
+  if (newLv.level > oldLv.level) {
+    showLevelUpToast(newLv);
+  }
+}
+function checkAchievements(g) {
+  const unlocked = [];
+  ACHIEVEMENTS.forEach(a => {
+    if (g.achievements.includes(a.id)) return;
+    let earned = false;
+    if (a.id === 'first_correct' && g.stats.totalCorrect >= 1)   earned = true;
+    if (a.id === 'streak_5'      && g.stats.maxStreak >= 5)      earned = true;
+    if (a.id === 'streak_10'     && g.stats.maxStreak >= 10)     earned = true;
+    if (a.id === 'perfect_quiz'  && g.stats.perfectQuizzes >= 1) earned = true;
+    if (a.id === 'quizzes_5'     && g.stats.totalQuizzes >= 5)   earned = true;
+    if (a.id === 'quizzes_10'    && g.stats.totalQuizzes >= 10)  earned = true;
+    if (a.id === 'level_5'       && g.level >= 5)                earned = true;
+    if (a.id === 'max_level'     && g.level >= 8)                earned = true;
+    if (earned) { g.achievements.push(a.id); unlocked.push(a); }
+  });
+  if (unlocked.length) {
+    saveGamState(g);
+    unlocked.forEach((a, i) => setTimeout(() => showAchievementToast(a), 500 + i * 1800));
+  }
+}
+function showToast(html, duration, cls) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = `toast ${cls || ''}`;
+  toast.innerHTML = html;
+  container.appendChild(toast);
+  requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('toast-show')));
+  setTimeout(() => {
+    toast.classList.remove('toast-show');
+    setTimeout(() => toast.remove(), 400);
+  }, duration || 3000);
+}
+function showLevelUpToast(lv) {
+  showToast(`<span class="toast-big">🎉 Level ${lv.level}!</span><span class="toast-sub">${lv.name}</span>`, 4000, 'toast-levelup');
+}
+function showAchievementToast(a) {
+  showToast(`<span class="toast-icon">${a.icon}</span><span class="toast-body"><strong>${a.name}</strong><span>${a.desc}</span></span>`, 3500, 'toast-achievement');
+}
+function launchConfetti() {
+  const container = document.getElementById('confetti-container');
+  if (!container) return;
+  container.innerHTML = '';
+  const colors = ['#da2127','#3a71b2','#27ae60','#f39c12','#ffffff','#9b59b6','#FFD100'];
+  for (let i = 0; i < 90; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};animation-delay:${Math.random()*1}s;animation-duration:${1.4+Math.random()*1.6}s;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>0.5?'50%':'3px'};`;
+    container.appendChild(p);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 3500);
+}
+
+/* ========================================================
    INICIALIZACE APLIKACE
 ======================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
   TTS.init();
+  updateGamUI();
 
   // === Domovská obrazovka ===
   document.getElementById('btn-section-a').addEventListener('click', openSectionA);

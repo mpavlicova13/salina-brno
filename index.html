@@ -129,6 +129,18 @@
       <p class="home-subtitle">Procvičuj brněnské tramvaje</p>
     </div>
 
+    <!-- Gamifikace: level + XP bar -->
+    <div class="gamification-bar" id="gamification-bar">
+      <div class="gam-level">
+        <span class="gam-level-badge" id="gam-level-num">1</span>
+        <span class="gam-level-name" id="gam-level-name">Nováček</span>
+      </div>
+      <div class="gam-xp-wrap">
+        <div class="gam-xp-bar"><div class="gam-xp-fill" id="gam-xp-fill" style="width:0%"></div></div>
+        <span class="gam-xp-text" id="gam-xp-text">0 / 100 XP</span>
+      </div>
+    </div>
+
     <div class="home-cards">
       <button class="section-card card-a" id="btn-section-a">
         <div class="section-card-icon">
@@ -421,6 +433,7 @@
       </div>
 
       <div class="result-stars" id="result-stars"></div>
+      <div class="result-xp-earned" id="result-xp-earned" style="display:none"></div>
 
       <div class="result-stats">
         <div class="result-stat" id="result-correct"></div>
@@ -627,6 +640,11 @@
     </div>
   </div>
 </div>
+
+<!-- Toast notifikace -->
+<div id="toast-container"></div>
+<!-- Konfety -->
+<div id="confetti-container"></div>
 
 <!-- Skripty (pořadí záleží!) -->
 <script src="data.js?v=2"></script>
