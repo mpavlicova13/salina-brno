@@ -128,17 +128,20 @@ function generateA_zacina(lines) {
 function generateA_pravdaLez(lines) {
   const line = pick(lines);
   const isTrue = Math.random() < 0.5;
+  const first = line.stops[0];
+  const last = line.stops[line.stops.length - 1];
   let statedFrom, statedTo;
+
   if (isTrue) {
-    statedFrom = line.stops[0];
-    statedTo = line.stops[line.stops.length - 1];
+    // Linka je obousměrná – oba směry jsou správná odpověď
+    [statedFrom, statedTo] = Math.random() < 0.5 ? [first, last] : [last, first];
   } else {
-    // Použijeme koncové zastávky jiné linky
+    // Lž = OBĚ konečné zastávky patří jiné lince (nikdy neobracej stejnou linku!)
     const wrongLine = pick(lines.filter(l => l.number !== line.number));
-    const swapEnds = Math.random() < 0.5;
-    statedFrom = swapEnds ? wrongLine.stops[0] : line.stops[line.stops.length - 1];
-    statedTo = swapEnds ? wrongLine.stops[wrongLine.stops.length - 1] : line.stops[0];
+    statedFrom = wrongLine.stops[0];
+    statedTo = wrongLine.stops[wrongLine.stops.length - 1];
   }
+
   const correct = isTrue ? 'Pravda ✅' : 'Lež ❌';
   const options = ['Pravda ✅', 'Lež ❌'];
   return {
@@ -148,8 +151,8 @@ function generateA_pravdaLez(lines) {
     correct,
     isTrueFalse: true,
     explanation: isTrue
-      ? `Správně! Linka ${line.number} skutečně jede z ${statedFrom} do ${statedTo}.`
-      : `Linka ${line.number} jede z ${line.stops[0]} do ${line.stops[line.stops.length - 1]}, ne z ${statedFrom} do ${statedTo}.`
+      ? `Správně! Linka ${line.number} jede mezi ${first} a ${last} (obousměrně).`
+      : `Linka ${line.number} jede mezi ${first} a ${last}, ne z ${statedFrom} do ${statedTo}.`
   };
 }
 
@@ -197,13 +200,12 @@ const questionTypesB = [
  */
 function generateB_nasleduje(lines) {
   const line = pick(lines);
-  const stops = line.stops;
-  // Vybíráme zastávku, která není poslední (aby měla následující)
+  // Obousměrná linka – náhodně vybereme směr
+  const stops = Math.random() < 0.5 ? line.stops : [...line.stops].reverse();
   const idx = Math.floor(Math.random() * (stops.length - 1));
   const stop = stops[idx];
   const correct = stops[idx + 1];
   const direction = stops[stops.length - 1];
-  // Špatné možnosti: sousední zastávky a náhodné ze stejné linky
   const candidates = stops.filter((_, i) => i !== idx + 1);
   const options = buildOptions(correct, candidates);
   return {
@@ -220,8 +222,8 @@ function generateB_nasleduje(lines) {
  */
 function generateB_predchazi(lines) {
   const line = pick(lines);
-  const stops = line.stops;
-  // Vybíráme zastávku, která není první
+  // Obousměrná linka – náhodně vybereme směr
+  const stops = Math.random() < 0.5 ? line.stops : [...line.stops].reverse();
   const idx = 1 + Math.floor(Math.random() * (stops.length - 1));
   const stop = stops[idx];
   const correct = stops[idx - 1];
@@ -233,7 +235,7 @@ function generateB_predchazi(lines) {
     question: `🚋 Linka ${line.number} – jaká zastávka PŘEDCHÁZÍ zastávce\n"${stop}"\nve směru "${direction}"?`,
     options,
     correct,
-    explanation: `Před zastávkou ${stop} na lince ${line.number} je ${correct}.`
+    explanation: `Před zastávkou ${stop} na lince ${line.number} (směr ${direction}) je ${correct}.`
   };
 }
 
@@ -242,7 +244,8 @@ function generateB_predchazi(lines) {
  */
 function generateB_doplnChybejici(lines) {
   const line = pick(lines);
-  const stops = line.stops;
+  // Obousměrná linka – náhodně vybereme směr
+  const stops = Math.random() < 0.5 ? line.stops : [...line.stops].reverse();
   if (stops.length < 3) return generateB_nasleduje(lines);
   const idx = 1 + Math.floor(Math.random() * (stops.length - 2));
   const prev = stops[idx - 1];
