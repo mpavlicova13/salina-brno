@@ -182,16 +182,18 @@ const AudioPlayer = {
       if (this.cancelled) return;
       this.currentIdx = i;
       renderAudioHighlight(i);
+      // V pomalém režimu hraj normální rychlostí, jen s delší pauzou
+      const playbackRate = this.isTurtleMode() ? 1.0 : this.speed;
       try {
-        await playAudioFile(stopToFilename(line.stops[i]), this.speed);
+        await playAudioFile(stopToFilename(line.stops[i]), playbackRate);
       } catch {
-        await TTS.speak(cleanStopForTTS(line.stops[i]), this.speed);
+        await TTS.speak(cleanStopForTTS(line.stops[i]), playbackRate);
       }
 
       if (this.cancelled) return;
 
-      // Pauza mezi zastávkami: v pomalém režimu delší, aby si člověk stihl zopakovat
-      await this.pause(this.isTurtleMode() ? 2500 : 300);
+      // Pauza mezi zastávkami: v pomalém režimu 3s, jinak 300ms
+      await this.pause(this.isTurtleMode() ? 3000 : 300);
     }
 
     if (!this.cancelled) {
