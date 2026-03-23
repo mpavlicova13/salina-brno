@@ -1006,14 +1006,14 @@ function toggleAllLines(arrRef, allNums, containerSelector) {
 ======================================================== */
 
 const LEVELS = [
-  { level: 1, name: 'Nováček',          xpRequired: 0    },
-  { level: 2, name: 'Cestující',         xpRequired: 100  },
-  { level: 3, name: 'Pravidelný host',   xpRequired: 250  },
-  { level: 4, name: 'Znalec MHD',        xpRequired: 500  },
-  { level: 5, name: 'Průvodčí',          xpRequired: 900  },
-  { level: 6, name: 'Řidič tramvaje',    xpRequired: 1400 },
-  { level: 7, name: 'Dispečer',          xpRequired: 2200 },
-  { level: 8, name: 'Legenda Brna',      xpRequired: 3500 },
+  { level: 1, name: 'Nováček',          xpRequired: 0     },
+  { level: 2, name: 'Cestující',         xpRequired: 500   },
+  { level: 3, name: 'Pravidelný host',   xpRequired: 1500  },
+  { level: 4, name: 'Znalec MHD',        xpRequired: 3500  },
+  { level: 5, name: 'Průvodčí',          xpRequired: 6500  },
+  { level: 6, name: 'Řidič tramvaje',    xpRequired: 10500 },
+  { level: 7, name: 'Dispečer',          xpRequired: 16000 },
+  { level: 8, name: 'Legenda Brna',      xpRequired: 24000 },
 ];
 
 const ACHIEVEMENTS = [
@@ -1128,6 +1128,11 @@ function launchConfetti() {
 
 document.addEventListener('DOMContentLoaded', () => {
   TTS.init();
+  // Reset XP pokud je level 2 s nízkou hodnotou (přechod na nové prahy)
+  try {
+    const g = loadGamState();
+    if (g.xp > 0 && g.xp < 500) { g.xp = 0; g.level = 1; g.achievements = []; saveGamState(g); }
+  } catch(e) {}
   updateGamUI();
 
   // === Domovská obrazovka ===
