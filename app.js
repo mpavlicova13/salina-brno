@@ -962,7 +962,7 @@ document.addEventListener('DOMContentLoaded', () => {
     AudioPlayer.stop();
     startPracticeQuiz(AppState.audio.line);
   });
-  document.querySelectorAll('.speed-btn').forEach(btn => {
+  document.querySelectorAll('.speed-btn[data-speed]').forEach(btn => {
     btn.addEventListener('click', () => setAudioSpeed(parseFloat(btn.dataset.speed)));
   });
 
