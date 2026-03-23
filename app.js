@@ -254,6 +254,7 @@ function showScreen(id) {
   if (el) {
     el.classList.add('active');
     AppState.screen = id;
+    window.scrollTo(0, 0);
   }
 }
 
@@ -543,9 +544,6 @@ function startAudio(line, thenQuiz = false) {
 
   renderAudioScreen(line);
   showScreen('audio');
-
-  // Začni přehrávat
-  AudioPlayer.play(line, AppState.audio.speed);
   updateAudioPlayBtn();
 }
 
@@ -577,7 +575,6 @@ function renderAudioHighlight(idx) {
     const el = document.getElementById(`audio-stop-${idx}`);
     if (el) {
       el.classList.add('current');
-      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
     updateAudioProgress(idx + 1, AppState.audio.line.stops.length);
   }
