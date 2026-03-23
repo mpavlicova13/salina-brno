@@ -902,7 +902,7 @@ function showResults() {
 
   document.getElementById('result-score').textContent = `${quiz.score} / ${quiz.total}`;
   document.getElementById('result-percent').textContent = `${pct} %`;
-  const starSVG = (filled) => `<svg class="icon icon-star${filled ? ' icon-star-filled' : ''}" aria-hidden="true"><use href="#icon-star"/></svg>`;
+  const starSVG = (filled) => `<svg class="icon${filled ? ' icon-star-filled' : ''}" aria-hidden="true"><use href="${filled ? '#icon-star-full' : '#icon-star'}"/></svg>`;
   document.getElementById('result-stars').innerHTML = starSVG(true).repeat(stars) + starSVG(false).repeat(5 - stars);
   document.getElementById('result-correct').innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-check-circle"/></svg> Správně: ${quiz.score}`;
   document.getElementById('result-wrong').innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-x-circle"/></svg> Špatně: ${quiz.total - quiz.score}`;
