@@ -1102,6 +1102,13 @@ button:active {
   border-color: var(--wrong);
 }
 
+.loop-btn { margin-left: 6px; border-left: 1px solid rgba(255,255,255,0.25); }
+.loop-btn.active {
+  background: var(--blue-light);
+  color: var(--white);
+  border-color: var(--blue-light);
+}
+
 .audio-stop-list-container {
   flex: 1;
   overflow-y: auto;

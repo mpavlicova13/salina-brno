@@ -37,7 +37,8 @@ const AppState = {
     stopIndex: 0,
     isPlaying: false,
     utterance: null,
-    speed: 1.0
+    speed: 1.0,
+    loop: false
   },
 
   // Streak
@@ -513,12 +514,25 @@ function updateAudioPlayBtn() {
 }
 
 function onAudioFinished() {
+  if (AppState.audio.loop) {
+    // Smyčka – krátká pauza a znovu od začátku
+    setTimeout(() => {
+      AudioPlayer.play(AppState.audio.line, AppState.audio.speed);
+    }, 1000);
+    return;
+  }
   updateAudioPlayBtn();
   const finishedBanner = document.getElementById('audio-finished-banner');
   if (finishedBanner) finishedBanner.style.display = 'block';
   if (AppState.audio.thenQuiz) {
     setTimeout(() => startPracticeQuiz(AppState.audio.line), 1500);
   }
+}
+
+function toggleAudioLoop() {
+  AppState.audio.loop = !AppState.audio.loop;
+  const btn = document.getElementById('audio-loop-btn');
+  if (btn) btn.classList.toggle('active', AppState.audio.loop);
 }
 
 function toggleAudioPlayback() {
@@ -929,9 +943,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // === Audio ===
   document.getElementById('audio-back').addEventListener('click', () => {
     AudioPlayer.stop();
+    AppState.audio.loop = false;
+    const loopBtn = document.getElementById('audio-loop-btn');
+    if (loopBtn) loopBtn.classList.remove('active');
     showScreen('section-c');
   });
   document.getElementById('audio-play-btn').addEventListener('click', toggleAudioPlayback);
+  document.getElementById('audio-loop-btn').addEventListener('click', toggleAudioLoop);
   document.getElementById('audio-restart-btn').addEventListener('click', () => {
     AudioPlayer.stop();
     setTimeout(() => {
