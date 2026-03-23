@@ -958,6 +958,7 @@ function showResults() {
   if (isPerfect) setTimeout(launchConfetti, 400);
   // ────────────────────────────────────────────────────────
 
+  updateGamUI();
   showScreen('results');
 }
 
@@ -1166,7 +1167,7 @@ function updateGamUI() {
   const setText = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
   setText('home-level-name', lv.name);
   setText('home-level-num', lv.level);
-  setText('home-quizzes', g.quizzes || 0);
+  setText('home-quizzes', g.stats?.totalQuizzes || 0);
   setText('home-xp-text', `${g.xp} XP`);
   const fill = document.getElementById('home-xp-fill');
   if (fill) fill.style.width = pct + '%';
