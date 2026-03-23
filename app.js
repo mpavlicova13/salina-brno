@@ -1263,6 +1263,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('tab-btn-home').addEventListener('click', () => switchHomeTab('home'));
   document.getElementById('tab-btn-stats').addEventListener('click', () => switchHomeTab('stats'));
+  document.getElementById('stats-panel-back').addEventListener('click', () => switchHomeTab('home'));
   document.getElementById('btn-switch-profile').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
   document.getElementById('btn-switch-profile-stats').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
   document.getElementById('stats-switch-btn').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
