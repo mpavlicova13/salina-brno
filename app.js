@@ -142,14 +142,8 @@ const AudioPlayer = {
 
       if (this.cancelled) return;
 
-      if (this.isTurtleMode()) {
-        // Pomalý režim: počkej na manuální posun uživatele
-        showTurtleControls(true);
-        await this.waitForAdvance();
-        showTurtleControls(false);
-      } else {
-        await this.pause(300);
-      }
+      // Pauza mezi zastávkami: v pomalém režimu delší, aby si člověk stihl zopakovat
+      await this.pause(this.isTurtleMode() ? 2500 : 300);
     }
 
     if (!this.cancelled) {
@@ -157,24 +151,6 @@ const AudioPlayer = {
       renderAudioHighlight(-1);
       onAudioFinished();
     }
-  },
-
-  /** Vrátí Promise, který se vyřeší až uživatel klikne na "Další" nebo "Zopakovat" (po opakování). */
-  waitForAdvance() {
-    return new Promise(resolve => { this._advanceResolve = resolve; });
-  },
-
-  /** Voláno tlačítkem "▶ Další zastávka". */
-  advance() {
-    if (this._advanceResolve) { this._advanceResolve(); this._advanceResolve = null; }
-  },
-
-  /** Voláno tlačítkem "🔁 Zopakovat" – přečte znovu aktuální zastávku a počká znovu. */
-  async repeat() {
-    if (!this.currentLine) return;
-    const stopText = cleanStopForTTS(this.currentLine.stops[this.currentIdx]);
-    await TTS.speak(stopText, this.speed);
-    // po zopakování zůstaň v pauze (nevolej advance)
   },
 
   async sayWithHighlight(idx, text) {
@@ -190,9 +166,6 @@ const AudioPlayer = {
     this.cancelled = true;
     this.playing = false;
     TTS.stop();
-    // Odblokuj případné čekání na advance
-    if (this._advanceResolve) { this._advanceResolve(); this._advanceResolve = null; }
-    showTurtleControls(false);
   },
 
   togglePause() {
@@ -537,11 +510,6 @@ function updateAudioPlayBtn() {
     btn.innerHTML = '▶ Přehrát';
     btn.className = 'btn-play';
   }
-}
-
-function showTurtleControls(visible) {
-  const el = document.getElementById('audio-turtle-controls');
-  if (el) el.style.display = visible ? 'flex' : 'none';
 }
 
 function onAudioFinished() {
@@ -960,8 +928,6 @@ document.addEventListener('DOMContentLoaded', () => {
     showScreen('section-c');
   });
   document.getElementById('audio-play-btn').addEventListener('click', toggleAudioPlayback);
-  document.getElementById('audio-repeat-btn').addEventListener('click', () => AudioPlayer.repeat());
-  document.getElementById('audio-next-btn').addEventListener('click', () => AudioPlayer.advance());
   document.getElementById('audio-restart-btn').addEventListener('click', () => {
     AudioPlayer.stop();
     setTimeout(() => {
