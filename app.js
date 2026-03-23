@@ -52,6 +52,31 @@ const AppState = {
    TTS – TEXT TO SPEECH
 ======================================================== */
 
+/* ========================================================
+   AUDIO SOUBORY – přehrávání předgenerovaných .m4a souborů
+======================================================== */
+
+/** Převede název zastávky na název souboru (stejná logika jako generate-audio.js). */
+function stopToFilename(text) {
+  return text
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '_')
+    .replace(/[^a-zA-Z0-9_,.\-]/g, '')
+    .substring(0, 80);
+}
+
+/** Přehraje soubor audio/NAME.m4a, vrátí Promise. Při chybě odmítne. */
+function playAudioFile(filename, speed = 1.0) {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio(`audio/${filename}.m4a`);
+    audio.playbackRate = Math.min(Math.max(speed, 0.5), 2.0);
+    audio.onended = resolve;
+    audio.onerror = reject;
+    AudioPlayer._currentAudio = audio;
+    audio.play().catch(reject);
+  });
+}
+
 const TTS = {
   synth: window.speechSynthesis,
   czechVoice: null,
@@ -128,7 +153,8 @@ const AudioPlayer = {
   playing: false,
   speed: 1.0,
   cancelled: false,
-  _advanceResolve: null,   // resolver pro manuální posun v pomalém režimu
+  _currentAudio: null,     // aktuálně přehrávaný HTML Audio element
+  _advanceResolve: null,
 
   isTurtleMode() { return this.speed <= 0.5; },
 
@@ -141,8 +167,13 @@ const AudioPlayer = {
     this.speed = speed;
 
     // Oznámení linky
-    const intro = `Linka číslo ${line.number}. Trasa z ${cleanStopForTTS(line.stops[0])} do ${cleanStopForTTS(line.stops[line.stops.length - 1])}.`;
-    await this.sayWithHighlight(-1, intro);
+    renderAudioHighlight(-1);
+    try {
+      await playAudioFile(`_linka_${line.number}`, this.speed);
+    } catch {
+      const intro = `Linka číslo ${line.number}. Trasa z ${cleanStopForTTS(line.stops[0])} do ${cleanStopForTTS(line.stops[line.stops.length - 1])}.`;
+      await TTS.speak(intro, this.speed);
+    }
 
     if (this.cancelled) return;
 
@@ -151,8 +182,11 @@ const AudioPlayer = {
       if (this.cancelled) return;
       this.currentIdx = i;
       renderAudioHighlight(i);
-      const stopText = cleanStopForTTS(line.stops[i]);
-      await TTS.speak(stopText, this.speed);
+      try {
+        await playAudioFile(stopToFilename(line.stops[i]), this.speed);
+      } catch {
+        await TTS.speak(cleanStopForTTS(line.stops[i]), this.speed);
+      }
 
       if (this.cancelled) return;
 
@@ -179,12 +213,26 @@ const AudioPlayer = {
   stop() {
     this.cancelled = true;
     this.playing = false;
+    if (this._currentAudio) {
+      this._currentAudio.pause();
+      this._currentAudio = null;
+    }
     TTS.stop();
   },
 
   togglePause() {
-    TTS.pauseResume();
-    this.playing = !TTS.synth.paused;
+    if (this._currentAudio) {
+      if (this._currentAudio.paused) {
+        this._currentAudio.play();
+        this.playing = true;
+      } else {
+        this._currentAudio.pause();
+        this.playing = false;
+      }
+    } else {
+      TTS.pauseResume();
+      this.playing = !TTS.synth.paused;
+    }
     updateAudioPlayBtn();
   },
 
