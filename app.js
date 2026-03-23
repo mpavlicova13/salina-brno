@@ -584,6 +584,14 @@ function renderQuizQuestion() {
   questionEl.textContent = q.question;
   container.appendChild(questionEl);
 
+  // Tlačítko nahlásit chybu
+  const reportBtn = document.createElement('button');
+  reportBtn.className = 'btn-report-inline';
+  reportBtn.id = 'quiz-report-btn';
+  reportBtn.textContent = '⚠️ Nahlásit chybu v otázce';
+  reportBtn.onclick = openReportModal;
+  container.appendChild(reportBtn);
+
   // Možnosti podle typu
   if (q.isOrdering) {
     renderOrderingQuestion(container, q, quiz);
@@ -944,7 +952,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('result-home').addEventListener('click', () => showScreen('home'));
 
   // === Nahlásit chybu ===
-  document.getElementById('quiz-report-btn').addEventListener('click', openReportModal);
+  document.getElementById('quiz-container').addEventListener('click', e => {
+    if (e.target.id === 'quiz-report-btn') openReportModal();
+  });
   document.getElementById('report-modal-close').addEventListener('click', closeReportModal);
   document.getElementById('report-modal').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeReportModal();
