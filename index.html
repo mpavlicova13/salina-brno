@@ -270,6 +270,7 @@
         <span class="quiz-counter" id="quiz-counter">Otázka 1 z 10</span>
         <span class="quiz-streak-display" id="quiz-streak"></span>
         <span class="quiz-score-display" id="quiz-score">✅ 0</span>
+        <button class="btn-report-quiz" id="quiz-report-btn" title="Nahlásit chybu v otázce">⚠️</button>
       </div>
       <div class="quiz-progress-track">
         <div id="quiz-progress-bar" style="width: 0%"></div>
@@ -426,6 +427,38 @@
   </div>
 
 </div><!-- /#app -->
+
+<!-- ====================================================
+     MODAL: Nahlásit chybu
+==================================================== -->
+<div id="report-modal" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>⚠️ Nahlásit chybu</h3>
+      <button class="modal-close" id="report-modal-close" aria-label="Zavřít">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="report-question-preview" id="report-question-preview"></div>
+
+      <p class="report-label">Co je za problém?</p>
+      <div class="report-categories" id="report-categories">
+        <button class="report-cat" data-cat="Faktická chyba">❌ Faktická chyba</button>
+        <button class="report-cat" data-cat="Špatně formulovaná otázka">✏️ Špatně formulovaná otázka</button>
+        <button class="report-cat" data-cat="Chybná správná odpověď">🔄 Chybná správná odpověď</button>
+        <button class="report-cat" data-cat="Chybí zastávka nebo linka">🗺️ Chybí zastávka nebo linka</button>
+        <button class="report-cat" data-cat="Jiné">💬 Jiné</button>
+      </div>
+
+      <p class="report-label">Popis (nepovinné):</p>
+      <textarea id="report-desc" placeholder="Napiš co přesně je špatně..." rows="3"></textarea>
+
+      <button class="btn-primary btn-report-send" id="report-send-btn">📨 Odeslat hlášení</button>
+      <div id="report-status" class="report-status" style="display:none"></div>
+
+    </div>
+  </div>
+</div>
 
 <!-- Skripty (pořadí záleží!) -->
 <script src="data.js"></script>

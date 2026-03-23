@@ -943,6 +943,99 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('result-home').addEventListener('click', () => showScreen('home'));
 
+  // === Nahlásit chybu ===
+  document.getElementById('quiz-report-btn').addEventListener('click', openReportModal);
+  document.getElementById('report-modal-close').addEventListener('click', closeReportModal);
+  document.getElementById('report-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeReportModal();
+  });
+  document.getElementById('report-send-btn').addEventListener('click', sendReport);
+  document.querySelectorAll('.report-cat').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.report-cat').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+  });
+
   // Inicializuj domovskou obrazovku
   showScreen('home');
 });
+
+/* ========================================================
+   NAHLÁSIT CHYBU – MODAL + FORMSPREE
+======================================================== */
+
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mojkozzn';
+
+function openReportModal() {
+  const q = AppState.quiz && AppState.quiz.current;
+  const preview = document.getElementById('report-question-preview');
+  preview.textContent = q ? q.question : '(otázka není k dispozici)';
+
+  // Reset formuláře
+  document.querySelectorAll('.report-cat').forEach(b => b.classList.remove('selected'));
+  document.getElementById('report-desc').value = '';
+  const status = document.getElementById('report-status');
+  status.style.display = 'none';
+  status.className = 'report-status';
+  document.getElementById('report-send-btn').disabled = false;
+  document.getElementById('report-send-btn').textContent = '📨 Odeslat hlášení';
+
+  document.getElementById('report-modal').style.display = 'flex';
+}
+
+function closeReportModal() {
+  document.getElementById('report-modal').style.display = 'none';
+}
+
+async function sendReport() {
+  const q = AppState.quiz && AppState.quiz.current;
+  const category = document.querySelector('.report-cat.selected')?.dataset.cat;
+  const desc = document.getElementById('report-desc').value.trim();
+  const status = document.getElementById('report-status');
+  const sendBtn = document.getElementById('report-send-btn');
+
+  if (!category) {
+    status.textContent = '⚠️ Vyber prosím typ problému.';
+    status.className = 'report-status error';
+    status.style.display = 'block';
+    return;
+  }
+
+  sendBtn.disabled = true;
+  sendBtn.textContent = '⏳ Odesílám...';
+  status.style.display = 'none';
+
+  const payload = {
+    kategorie: category,
+    otazka: q ? q.question : '(neznámá)',
+    spravna_odpoved: q ? (Array.isArray(q.correct) ? q.correct.join(', ') : q.correct) : '(neznámá)',
+    popis: desc || '(bez popisu)',
+    linka: AppState.practiceLineNum ? `Linka ${AppState.practiceLineNum}` : 'mix',
+    cas: new Date().toLocaleString('cs-CZ')
+  };
+
+  try {
+    const res = await fetch(FORMSPREE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      status.textContent = '✅ Hlášení odesláno, díky!';
+      status.className = 'report-status success';
+      status.style.display = 'block';
+      sendBtn.textContent = '✅ Odesláno';
+      setTimeout(closeReportModal, 2000);
+    } else {
+      throw new Error('server error');
+    }
+  } catch {
+    status.textContent = '❌ Odeslání se nezdařilo. Zkus to znovu.';
+    status.className = 'report-status error';
+    status.style.display = 'block';
+    sendBtn.disabled = false;
+    sendBtn.textContent = '📨 Odeslat hlášení';
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(brew upgrade:*)",
+      "Bash(cd \"/Users/mpavlicova/Desktop/Moje projekty/Mamka - MHD appka\" && python3 -c \"\nimport openpyxl\nwb = openpyxl.load_workbook\\('DPMB - tramvaje.xlsx'\\)\nprint\\('Listy:', wb.sheetnames\\)\n\")",
+      "Bash(pip3 install:*)",
+      "Bash(cd \"/Users/mpavlicova/Desktop/Moje projekty/Mamka - MHD appka\" && python3 -c \"\nimport openpyxl\nwb = openpyxl.load_workbook\\('DPMB - tramvaje.xlsx'\\)\n\nfor sheet_name in wb.sheetnames[1:]:\n    ws = wb[sheet_name]\n    print\\(f'=== {sheet_name} ==='\\)\n    for row in ws.iter_rows\\(values_only=True\\):\n        if any\\(cell is not None for cell in row\\):\n            print\\(row\\)\n    print\\(\\)\n\")",
+      "Bash(node --check \"/Users/mpavlicova/Desktop/Moje projekty/Mamka - MHD appka/app.js\" && echo \"app.js OK\")",
+      "Bash(node -e \"\nconst fs = require\\('fs'\\);\nconst code = fs.readFileSync\\('/Users/mpavlicova/Desktop/Moje projekty/Mamka - MHD appka/data.js', 'utf8'\\);\nconst vm = require\\('vm'\\);\nconst ctx = vm.createContext\\({}\\);\nvm.runInContext\\(code, ctx\\);\nconsole.log\\('Pocet linek:', ctx.TRAM_DATA.lines.length\\);\nctx.TRAM_DATA.lines.forEach\\(l => console.log\\('Linka ' + l.number + ': ' + l.stops.length + ' zastavek'\\)\\);\n\")",
+      "Bash(node -e \"\nconst fs = require\\('fs'\\);\nconst code = fs.readFileSync\\('/Users/mpavlicova/Desktop/Moje projekty/Mamka - MHD appka/data.js', 'utf8'\\);\n// Wrap in function to capture const declarations\nconst wrapped = '\\(function\\(\\) { ' + code + '; return TRAM_DATA; }\\)\\(\\)';\nconst result = eval\\(wrapped\\);\nconsole.log\\('Pocet linek:', result.lines.length\\);\nresult.lines.forEach\\(l => console.log\\('Linka ' + l.number + ': ' + l.stops.length + ' zastavek'\\)\\);\n\")",
+      "Bash(node -e \"\nconst fs = require\\('fs'\\);\nconst code = fs.readFileSync\\('/Users/mpavlicova/Desktop/Moje projekty/Mamka - MHD appka/data.js', 'utf8'\\);\nconst wrapped = '\\(function\\(\\) { ' + code + '; return TRAM_DATA; }\\)\\(\\)';\nconst d = eval\\(wrapped\\);\n// Check first/last stops match spec\nconst checks = [\n  [1, 'Řečkovice', 'Bystrc Rakovecká'],\n  [2, 'Židenice Stará osada', 'Modřice smyčka'],\n  [12, 'Komárov', 'Technologický park'],\n  [8, 'Líšeň Mifkova', 'Nemocnice Bohunice \\(terminál tramvaj\\)'],\n];\nchecks.forEach\\(\\([num, first, last]\\) => {\n  const l = d.lines.find\\(x => x.number === num\\);\n  const ok = l.stops[0] === first && l.stops[l.stops.length-1] === last;\n  console.log\\('Linka ' + num + ': ' + \\(ok ? 'OK' : 'CHYBA'\\) + \n    ' | ' + l.stops[0] + ' ... ' + l.stops[l.stops.length-1]\\);\n}\\);\n\")",
+      "Bash(open \"/Users/mpavlicova/Desktop/Moje projekty/Mamka - MHD appka/index.html\")",
+      "Bash(brew install:*)"
+    ]
+  }
+}
