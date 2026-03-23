@@ -196,6 +196,7 @@ const AudioPlayer = {
 
     if (!this.cancelled) {
       this.playing = false;
+      this._currentAudio = null;
       renderAudioHighlight(-1);
       onAudioFinished();
     }
@@ -592,16 +593,19 @@ function updateAudioProgress(current, total) {
 function updateAudioPlayBtn() {
   const btn = document.getElementById('audio-play-btn');
   if (!btn) return;
-  const isPaused = TTS.synth.paused;
-  const isSpeaking = TTS.synth.speaking;
-  if (isSpeaking && !isPaused) {
-    btn.innerHTML = '⏸ Pozastavit';
+  const isPlaying = AudioPlayer.playing;
+  const isPaused = AudioPlayer._currentAudio
+    ? AudioPlayer._currentAudio.paused
+    : TTS.synth.paused;
+
+  if (isPlaying && !isPaused) {
+    btn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-pause"/></svg> Pozastavit';
     btn.className = 'btn-play playing';
   } else if (isPaused) {
-    btn.innerHTML = '▶ Pokračovat';
+    btn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-play"/></svg> Pokračovat';
     btn.className = 'btn-play paused';
   } else {
-    btn.innerHTML = '▶ Přehrát';
+    btn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-play"/></svg> Přehrát';
     btn.className = 'btn-play';
   }
 }
@@ -629,8 +633,9 @@ function toggleAudioLoop() {
 }
 
 function toggleAudioPlayback() {
-  if (!TTS.synth.speaking && !TTS.synth.paused) {
-    // Znovu spustit
+  if (!AudioPlayer.playing && !AudioPlayer._currentAudio?.paused && !TTS.synth.paused) {
+    // Přehrávání nespuštěno – spusť od začátku
+    document.getElementById('audio-finished-banner').style.display = 'none';
     AudioPlayer.play(AppState.audio.line, AppState.audio.speed);
   } else {
     AudioPlayer.togglePause();
