@@ -578,8 +578,8 @@ function renderQuizQuestion() {
   const streakEl = document.getElementById('quiz-streak');
 
   counterEl.textContent = `Otázka ${quiz.currentIndex + 1} z ${quiz.total}`;
-  scoreEl.textContent = `✅ ${quiz.score}`;
-  streakEl.textContent = quiz.streak >= 3 ? `🔥 ${quiz.streak}` : '';
+  scoreEl.innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg> ${quiz.score}`;
+  streakEl.innerHTML = quiz.streak >= 3 ? `<svg class="icon" aria-hidden="true"><use href="#icon-zap"/></svg> ${quiz.streak}` : '';
   progressBar.style.width = `${quiz.progressPercent}%`;
 
   container.innerHTML = '';
@@ -594,7 +594,7 @@ function renderQuizQuestion() {
   const reportBtn = document.createElement('button');
   reportBtn.className = 'btn-report-inline';
   reportBtn.id = 'quiz-report-btn';
-  reportBtn.textContent = '⚠️ Nahlásit chybu v otázce';
+  reportBtn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-alert"/></svg> Nahlásit chybu v otázce';
   reportBtn.onclick = openReportModal;
   container.appendChild(reportBtn);
 
@@ -772,7 +772,8 @@ function highlightOptions(container, chosen, correct, isCorrect) {
 function showExplanation(container, text, isCorrect) {
   const el = document.createElement('div');
   el.className = `quiz-explanation ${isCorrect ? 'correct' : 'wrong'}`;
-  el.innerHTML = `${isCorrect ? '✅' : '❌'} ${text}`;
+  const iconId = isCorrect ? 'check-circle' : 'x-circle';
+  el.innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-${iconId}"/></svg> ${text}`;
   container.appendChild(el);
 }
 
@@ -780,7 +781,9 @@ function showExplanation(container, text, isCorrect) {
 function showNextButton(container) {
   const btn = document.createElement('button');
   btn.className = 'btn-next';
-  btn.textContent = AppState.quiz.currentIndex + 1 >= AppState.quiz.total ? '🏆 Zobrazit výsledky' : 'Další otázka →';
+  btn.innerHTML = AppState.quiz.currentIndex + 1 >= AppState.quiz.total
+    ? '<svg class="icon" aria-hidden="true"><use href="#icon-award"/></svg> Zobrazit výsledky'
+    : 'Další otázka →';
   btn.onclick = () => {
     AppState.quiz.next();
     renderQuizQuestion();
@@ -800,17 +803,18 @@ function showResults() {
 
   document.getElementById('result-score').textContent = `${quiz.score} / ${quiz.total}`;
   document.getElementById('result-percent').textContent = `${pct} %`;
-  document.getElementById('result-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
-  document.getElementById('result-correct').textContent = `✅ Správně: ${quiz.score}`;
-  document.getElementById('result-wrong').textContent = `❌ Špatně: ${quiz.total - quiz.score}`;
-  document.getElementById('result-streak').textContent = `🔥 Nejlepší série: ${quiz.maxStreak}`;
+  const starSVG = (filled) => `<svg class="icon icon-star${filled ? ' icon-star-filled' : ''}" aria-hidden="true"><use href="#icon-star"/></svg>`;
+  document.getElementById('result-stars').innerHTML = starSVG(true).repeat(stars) + starSVG(false).repeat(5 - stars);
+  document.getElementById('result-correct').innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-check-circle"/></svg> Správně: ${quiz.score}`;
+  document.getElementById('result-wrong').innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-x-circle"/></svg> Špatně: ${quiz.total - quiz.score}`;
+  document.getElementById('result-streak').innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-zap"/></svg> Nejlepší série: ${quiz.maxStreak}`;
 
   // Seznam chybných odpovědí
   const wrongList = document.getElementById('result-wrong-list');
   wrongList.innerHTML = '';
   const wrongs = quiz.results.filter(r => !r.isCorrect);
   if (wrongs.length === 0) {
-    wrongList.innerHTML = '<p class="all-correct">🎉 Všechno správně! Perfektní výkon!</p>';
+    wrongList.innerHTML = '<p class="all-correct">Všechno správně! Perfektní výkon!</p>';
   } else {
     wrongs.forEach(r => {
       const item = document.createElement('div');
@@ -995,7 +999,7 @@ function openReportModal() {
   status.style.display = 'none';
   status.className = 'report-status';
   document.getElementById('report-send-btn').disabled = false;
-  document.getElementById('report-send-btn').textContent = '📨 Odeslat hlášení';
+  document.getElementById('report-send-btn').innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-send"/></svg> Odeslat hlášení';
 
   document.getElementById('report-modal').style.display = 'flex';
 }
@@ -1012,14 +1016,14 @@ async function sendReport() {
   const sendBtn = document.getElementById('report-send-btn');
 
   if (!category) {
-    status.textContent = '⚠️ Vyber prosím typ problému.';
+    status.textContent = 'Vyber prosím typ problému.';
     status.className = 'report-status error';
     status.style.display = 'block';
     return;
   }
 
   sendBtn.disabled = true;
-  sendBtn.textContent = '⏳ Odesílám...';
+  sendBtn.textContent = 'Odesílám...';
   status.style.display = 'none';
 
   const payload = {
@@ -1039,19 +1043,19 @@ async function sendReport() {
     });
 
     if (res.ok) {
-      status.textContent = '✅ Hlášení odesláno, díky!';
+      status.textContent = 'Hlášení odesláno, díky!';
       status.className = 'report-status success';
       status.style.display = 'block';
-      sendBtn.textContent = '✅ Odesláno';
+      sendBtn.textContent = 'Odesláno';
       setTimeout(closeReportModal, 2000);
     } else {
       throw new Error('server error');
     }
   } catch {
-    status.textContent = '❌ Odeslání se nezdařilo. Zkus to znovu.';
+    status.textContent = 'Odeslání se nezdařilo. Zkus to znovu.';
     status.className = 'report-status error';
     status.style.display = 'block';
     sendBtn.disabled = false;
-    sendBtn.textContent = '📨 Odeslat hlášení';
+    sendBtn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-send"/></svg> Odeslat hlášení';
   }
 }
