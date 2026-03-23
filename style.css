@@ -1116,7 +1116,7 @@ button:active {
   font-weight: 700;
 }
 
-.loop-btn { margin-left: 4px; border-left: 1px solid rgba(255,255,255,0.25); }
+.loop-btn {}
 .loop-btn.active {
   background: var(--blue-light);
   color: var(--white);
