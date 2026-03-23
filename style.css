@@ -474,6 +474,7 @@ button:active {
   transform: rotateY(180deg);
 }
 
+#fc-front-text,
 #fc-back-text {
   display: flex;
   flex-direction: column;
