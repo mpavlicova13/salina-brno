@@ -1702,56 +1702,144 @@ button:active {
 .btn-turtle-next:hover { opacity: 0.9; }
 
 /* ============================================================
+   PROFILY
+============================================================ */
+
+.profiles-header {
+  text-align: center;
+  padding: 24px 0 16px;
+}
+.profiles-header h2 {
+  font-size: 1.6rem;
+  color: var(--blue);
+  margin-top: 8px;
+}
+.profiles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 14px;
+  padding: 8px 0 24px;
+}
+.profile-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow);
+  border: 3px solid transparent;
+  transition: all var(--transition);
+  cursor: pointer;
+}
+.profile-card:hover { border-color: var(--blue-light); transform: translateY(-3px); }
+.profile-card-active { border-color: var(--blue); }
+.profile-card-avatar { font-size: 2.8rem; line-height: 1; }
+.profile-card-name { font-size: 1rem; font-weight: 700; color: var(--blue); }
+.profile-card-level { font-size: 0.72rem; color: var(--gray-dark); }
+.profile-card-add {
+  background: var(--gray-light);
+  border: 3px dashed var(--gray-mid);
+  color: var(--gray-dark);
+}
+.profile-card-add:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-pale); }
+.profile-card-plus { font-size: 2.2rem; font-weight: 300; line-height: 1; }
+
+.profile-create-form {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-top: 8px;
+}
+.profile-create-form h3 { font-size: 1.2rem; color: var(--blue); margin-bottom: 16px; text-align: center; }
+.avatar-picker {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.avatar-option {
+  font-size: 1.8rem;
+  padding: 6px;
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background: var(--gray-light);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.avatar-option:hover { background: var(--blue-pale); }
+.avatar-option.selected { border-color: var(--blue); background: var(--blue-pale); }
+.profile-name-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--gray-mid);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-family: var(--font);
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+.profile-name-input:focus { outline: none; border-color: var(--blue); }
+.profile-create-btns { display: flex; gap: 10px; }
+.profile-create-btns .btn-secondary,
+.profile-create-btns .btn-primary { flex: 1; }
+
+/* ============================================================
    GAMIFIKACE
 ============================================================ */
 
 .gamification-bar {
   background: var(--white);
   border-radius: var(--radius);
-  padding: 12px 16px;
+  padding: 10px 14px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   box-shadow: var(--shadow);
   margin-bottom: 16px;
 }
-.gam-level {
+.gam-profile-btn {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 3px;
-  min-width: 52px;
+  gap: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
 }
+.gam-profile-btn:hover .gam-avatar { transform: scale(1.15); }
+.gam-avatar { font-size: 2.2rem; line-height: 1; transition: transform 0.2s; }
+.gam-profile-details { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.gam-name { font-size: 0.85rem; font-weight: 700; color: var(--blue); }
+.gam-level-row { display: flex; align-items: center; gap: 5px; }
 .gam-level-badge {
   background: var(--red);
   color: var(--white);
-  width: 36px;
-  height: 36px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 900;
-  font-size: 1rem;
+  font-size: 0.72rem;
   flex-shrink: 0;
 }
-.gam-level-name {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--blue);
-  text-align: center;
-  line-height: 1.2;
-}
-.gam-xp-wrap {
+.gam-level-name { font-size: 0.7rem; color: var(--gray-dark); }
+.gam-xp-section {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 .gam-xp-bar {
   background: var(--gray-mid);
   border-radius: 100px;
-  height: 10px;
+  height: 8px;
   overflow: hidden;
 }
 .gam-xp-fill {
@@ -1760,11 +1848,7 @@ button:active {
   border-radius: 100px;
   transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.gam-xp-text {
-  font-size: 0.72rem;
-  color: var(--gray-dark);
-  text-align: right;
-}
+.gam-xp-text { font-size: 0.68rem; color: var(--gray-dark); text-align: right; }
 .result-xp-earned {
   background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
   color: var(--white);
