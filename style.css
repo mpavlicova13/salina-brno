@@ -1821,7 +1821,6 @@ button:active {
 
 /* Home screen s bottom tabem */
 .screen-with-tabs {
-  display: flex;
   flex-direction: column;
   padding-bottom: 0 !important;
 }
