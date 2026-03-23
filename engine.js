@@ -188,11 +188,8 @@ const questionTypesB = [
   'B_neniNaLince',
   'B_naJakeLince',
   'B_jakeLinkySdili',
-  'B_kolikataZastavka',
-  'B_nZastavka',
   'B_seradZastavky',
-  'B_konecna',
-  'B_pocetZastavek'
+  'B_konecna'
 ];
 
 /**
@@ -374,58 +371,6 @@ function generateB_jakeLinkySdili(lines) {
 }
 
 /**
- * B8: "Kolikátá zastávka je [stop] na lince X od [endpoint]?"
- */
-function generateB_kolikataZastavka(lines) {
-  const line = pick(lines);
-  // Obousměrná linka – náhodně vybereme směr
-  const stops = Math.random() < 0.5 ? line.stops : [...line.stops].reverse();
-  const idx = Math.floor(Math.random() * stops.length);
-  const stop = stops[idx];
-  const fromTerminus = stops[0];
-  const correct = `${idx + 1}.`;
-  // Generujeme 3 špatné číselné možnosti (blízké hodnoty)
-  const wrongNums = new Set();
-  while (wrongNums.size < 3) {
-    const offset = Math.floor(Math.random() * 6) - 3;
-    const candidate = idx + 1 + offset;
-    if (candidate !== idx + 1 && candidate >= 1 && candidate <= stops.length) {
-      wrongNums.add(candidate);
-    }
-  }
-  const options = shuffle([correct, ...[...wrongNums].map(n => `${n}.`)]);
-  return {
-    type: 'B_kolikataZastavka',
-    question: `🚋 Linka ${line.number} – kolikátá zastávka je ${stop}\nod zastávky ${fromTerminus}?`,
-    options,
-    correct,
-    explanation: `Zastávka ${stop} je ${idx + 1}. zastávka linky ${line.number} od ${fromTerminus}.`
-  };
-}
-
-/**
- * B9: "Jaká je [N]. zastávka na lince X ve směru [terminus]?"
- */
-function generateB_nZastavka(lines) {
-  const line = pick(lines);
-  // Obousměrná linka – náhodně vybereme směr
-  const stops = Math.random() < 0.5 ? line.stops : [...line.stops].reverse();
-  const idx = Math.floor(Math.random() * stops.length);
-  const correct = stops[idx];
-  const n = idx + 1;
-  const direction = stops[stops.length - 1];
-  const candidates = stops.filter((_, i) => i !== idx);
-  const options = buildOptions(correct, candidates);
-  return {
-    type: 'B_nZastavka',
-    question: `🚋 Linka ${line.number} – jaká je ${n}. zastávka\nve směru ${direction}?`,
-    options,
-    correct,
-    explanation: `${n}. zastávka linky ${line.number} ve směru ${direction} je ${correct}.`
-  };
-}
-
-/**
  * B10: "Seřaď tyto zastávky ve správném pořadí ve směru [terminus]"
  * Vrací 5 po sobě jdoucích zastávek v náhodném pořadí.
  */
@@ -469,28 +414,6 @@ function generateB_konecna(lines) {
   };
 }
 
-/**
- * B12: "Kolik zastávek má linka X?"
- */
-function generateB_pocetZastavek(lines) {
-  const line = pick(lines);
-  const correct = `${line.stops.length}`;
-  // Špatné možnosti: blízká čísla
-  const wrongNums = new Set();
-  while (wrongNums.size < 3) {
-    const offset = Math.floor(Math.random() * 8) - 4;
-    const candidate = line.stops.length + offset;
-    if (String(candidate) !== correct && candidate > 0) wrongNums.add(candidate);
-  }
-  const options = shuffle([correct, ...[...wrongNums].map(String)]);
-  return {
-    type: 'B_pocetZastavek',
-    question: `🚋 Kolik zastávek má linka ${line.number}?`,
-    options,
-    correct,
-    explanation: `Linka ${line.number} má celkem ${line.stops.length} zastávek.`
-  };
-}
 
 /* ========================================================
    HLAVNÍ GENERÁTOR SEZENÍ
@@ -522,11 +445,8 @@ function generateSession(section, selectedLineNumbers, count, enabledTypes) {
     'B_neniNaLince': generateB_neniNaLince,
     'B_naJakeLince': generateB_naJakeLince,
     'B_jakeLinkySdili': generateB_jakeLinkySdili,
-    'B_kolikataZastavka': generateB_kolikataZastavka,
-    'B_nZastavka': generateB_nZastavka,
     'B_seradZastavky': generateB_seradZastavky,
-    'B_konecna': generateB_konecna,
-    'B_pocetZastavek': generateB_pocetZastavek
+    'B_konecna': generateB_konecna
   };
 
   // Filtrujeme dostupné typy
