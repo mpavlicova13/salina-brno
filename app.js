@@ -1006,14 +1006,14 @@ function toggleAllLines(arrRef, allNums, containerSelector) {
 ======================================================== */
 
 const LEVELS = [
-  { level: 1, name: 'Nováček',          xpRequired: 0     },
-  { level: 2, name: 'Cestující',         xpRequired: 500   },
-  { level: 3, name: 'Pravidelný host',   xpRequired: 1500  },
-  { level: 4, name: 'Znalec MHD',        xpRequired: 3500  },
-  { level: 5, name: 'Průvodčí',          xpRequired: 6500  },
-  { level: 6, name: 'Řidič tramvaje',    xpRequired: 10500 },
-  { level: 7, name: 'Dispečer',          xpRequired: 16000 },
-  { level: 8, name: 'Legenda Brna',      xpRequired: 24000 },
+  { level: 1, name: 'Nováček',          xpRequired: 0      },  // start
+  { level: 2, name: 'Cestující',         xpRequired: 3000   },  // ~20 kvízů
+  { level: 3, name: 'Pravidelný host',   xpRequired: 9000   },  // ~60 kvízů
+  { level: 4, name: 'Znalec MHD',        xpRequired: 20000  },  // ~133 kvízů
+  { level: 5, name: 'Průvodčí',          xpRequired: 35000  },  // ~233 kvízů
+  { level: 6, name: 'Řidič tramvaje',    xpRequired: 52000  },  // ~347 kvízů
+  { level: 7, name: 'Dispečer',          xpRequired: 65000  },  // ~433 kvízů
+  { level: 8, name: 'Legenda Brna',      xpRequired: 75000  },  // ~500 kvízů
 ];
 
 const ACHIEVEMENTS = [
