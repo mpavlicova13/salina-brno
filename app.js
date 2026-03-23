@@ -415,7 +415,7 @@ function showFlashcard() {
   const card = document.getElementById('fc-card');
 
   counter.textContent = `${flashcardIndex + 1} / ${flashcardLines.length}`;
-  front.innerHTML = `<span class="fc-line-num">${line.number}</span><span class="fc-hint">Klikni pro otočení</span>`;
+  front.innerHTML = `<span class="fc-line-num">${line.number}</span>`;
   back.innerHTML = `
     <div class="fc-line-num">${line.number}</div>
     <div class="fc-route">
