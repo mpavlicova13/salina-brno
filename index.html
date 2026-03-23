@@ -4,13 +4,117 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <meta name="theme-color" content="#0d1b2a" />
-  <title>Šalina Brno 🚋 – Procvičuj tramvaje DPMB</title>
+  <title>Šalina Brno – Procvičuj tramvaje DPMB</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+<!-- ====================================================
+     SVG SPRITE – ikony (inline, neviditelné)
+==================================================== -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="icon-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+    <line x1="8" y1="2" x2="8" y2="18"/>
+    <line x1="16" y1="6" x2="16" y2="22"/>
+  </symbol>
+  <symbol id="icon-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+    <circle cx="12" cy="10" r="3"/>
+  </symbol>
+  <symbol id="icon-headphones" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+  </symbol>
+  <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </symbol>
+  <symbol id="icon-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+    <polyline points="2 17 12 22 22 17"/>
+    <polyline points="2 12 12 17 22 12"/>
+  </symbol>
+  <symbol id="icon-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 20h9"/>
+    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+  </symbol>
+  <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="23 4 23 10 17 10"/>
+    <polyline points="1 20 1 14 7 14"/>
+    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+  </symbol>
+  <symbol id="icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    <polyline points="9 22 9 12 15 12 15 22"/>
+  </symbol>
+  <symbol id="icon-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+    <line x1="12" y1="9" x2="12" y2="13"/>
+    <line x1="12" y1="17" x2="12.01" y2="17"/>
+  </symbol>
+  <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </symbol>
+  <symbol id="icon-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+    <polyline points="22 4 12 14.01 9 11.01"/>
+  </symbol>
+  <symbol id="icon-x-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="15" y1="9" x2="9" y2="15"/>
+    <line x1="9" y1="9" x2="15" y2="15"/>
+  </symbol>
+  <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/>
+    <line x1="6" y1="6" x2="18" y2="18"/>
+  </symbol>
+  <symbol id="icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+  </symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <polyline points="12 6 12 12 16 14"/>
+  </symbol>
+  <symbol id="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="5 3 19 12 5 21 5 3"/>
+  </symbol>
+  <symbol id="icon-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="22" y1="2" x2="11" y2="13"/>
+    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+  </symbol>
+  <symbol id="icon-award" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="8" r="7"/>
+    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+  </symbol>
+  <symbol id="icon-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+  </symbol>
+  <symbol id="icon-bar-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="20" x2="18" y2="10"/>
+    <line x1="12" y1="20" x2="12" y2="4"/>
+    <line x1="6" y1="20" x2="6" y2="14"/>
+  </symbol>
+  <symbol id="icon-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </symbol>
+  <symbol id="icon-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+  </symbol>
+  <symbol id="icon-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+    <polyline points="17 21 17 13 7 13 7 21"/>
+    <polyline points="7 3 7 8 15 8"/>
+  </symbol>
+  <symbol id="icon-thumbs-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
+    <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+  </symbol>
+</svg>
+
 <div id="app">
 
   <!-- ====================================================
@@ -24,7 +128,9 @@
 
     <div class="home-cards">
       <button class="section-card card-a" id="btn-section-a">
-        <div class="section-card-icon">🗺️</div>
+        <div class="section-card-icon">
+          <svg class="icon icon-section" aria-hidden="true"><use href="#icon-map"/></svg>
+        </div>
         <div class="section-card-text">
           <h3>Odkud → Kam</h3>
           <p>Nauč se trasy linek – kartičky i kvíz</p>
@@ -32,7 +138,9 @@
       </button>
 
       <button class="section-card card-b" id="btn-section-b">
-        <div class="section-card-icon">🛑</div>
+        <div class="section-card-icon">
+          <svg class="icon icon-section" aria-hidden="true"><use href="#icon-pin"/></svg>
+        </div>
         <div class="section-card-text">
           <h3>Zastávky</h3>
           <p>Procvičuj pořadí a názvy zastávek</p>
@@ -40,7 +148,9 @@
       </button>
 
       <button class="section-card card-c" id="btn-section-c">
-        <div class="section-card-icon">🎧</div>
+        <div class="section-card-icon">
+          <svg class="icon icon-section" aria-hidden="true"><use href="#icon-headphones"/></svg>
+        </div>
         <div class="section-card-text">
           <h3>Procvič linku</h3>
           <p>Poslechni si zastávky a udělej kvíz</p>
@@ -49,7 +159,9 @@
     </div>
 
     <div class="home-settings-row">
-      <button class="btn-settings" id="btn-settings">⚙️ Nastavení</button>
+      <button class="btn-settings" id="btn-settings">
+        <svg class="icon" aria-hidden="true"><use href="#icon-settings"/></svg> Nastavení
+      </button>
     </div>
   </div>
 
@@ -59,7 +171,7 @@
   <div id="screen-section-a" class="screen">
     <div class="screen-header">
       <button class="btn-back" id="a-back" aria-label="Zpět">←</button>
-      <h2>🗺️ Odkud → Kam</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
+      <h2><svg class="icon icon-lg" aria-hidden="true"><use href="#icon-map"/></svg> Odkud → Kam</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
     </div>
     <div class="screen-content">
 
@@ -76,14 +188,18 @@
       <div class="mode-section">
         <h3>Zvol režim</h3>
         <div class="info-box">
-          🃏 <strong>Kartičky</strong> – přelistuj všechny vybrané linky, otočením uvidíš trasu.<br>
-          📝 <strong>Kvíz</strong> – odpovídej na otázky a získávej body.
+          <svg class="icon" aria-hidden="true"><use href="#icon-layers"/></svg> <strong>Kartičky</strong> – přelistuj všechny vybrané linky, otočením uvidíš trasu.<br>
+          <svg class="icon" aria-hidden="true"><use href="#icon-edit"/></svg> <strong>Kvíz</strong> – odpovídej na otázky a získávej body.
         </div>
       </div>
 
       <div class="start-section">
-        <button class="btn-primary" id="a-start-flashcards">🃏 Spustit kartičky</button>
-        <button class="btn-secondary" id="a-start-quiz">📝 Spustit kvíz</button>
+        <button class="btn-primary" id="a-start-flashcards">
+          <svg class="icon" aria-hidden="true"><use href="#icon-layers"/></svg> Spustit kartičky
+        </button>
+        <button class="btn-secondary" id="a-start-quiz">
+          <svg class="icon" aria-hidden="true"><use href="#icon-edit"/></svg> Spustit kvíz
+        </button>
       </div>
 
     </div>
@@ -95,7 +211,7 @@
   <div id="screen-flashcards" class="screen">
     <div class="screen-header">
       <button class="btn-back" id="fc-back" aria-label="Zpět">←</button>
-      <h2>🃏 Kartičky – trasy linek</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
+      <h2><svg class="icon icon-lg" aria-hidden="true"><use href="#icon-layers"/></svg> Kartičky – trasy linek</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
     </div>
 
     <div class="flashcard-container">
@@ -116,7 +232,7 @@
         </div>
       </div>
 
-      <p class="fc-flip-hint">👆 Klikni na kartičku pro otočení</p>
+      <p class="fc-flip-hint">Klikni na kartičku pro otočení</p>
 
       <!-- Navigace -->
       <div class="fc-nav">
@@ -132,7 +248,7 @@
   <div id="screen-section-b" class="screen">
     <div class="screen-header">
       <button class="btn-back" id="b-back" aria-label="Zpět">←</button>
-      <h2>🛑 Zastávky</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
+      <h2><svg class="icon icon-lg" aria-hidden="true"><use href="#icon-pin"/></svg> Zastávky</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
     </div>
     <div class="screen-content">
 
@@ -146,11 +262,13 @@
       </div>
 
       <div class="info-box">
-        🧠 Otázky budou různého typu – pořadí zastávek, sousedé, chybějící zastávka, počty a další. Čím víc linek vyberesh, tím pestřejší kvíz!
+        Otázky budou různého typu – pořadí zastávek, sousedé, chybějící zastávka, počty a další. Čím víc linek vyberesh, tím pestřejší kvíz!
       </div>
 
       <div class="start-section">
-        <button class="btn-primary" id="b-start-quiz">📝 Spustit kvíz o zastávkách</button>
+        <button class="btn-primary" id="b-start-quiz">
+          <svg class="icon" aria-hidden="true"><use href="#icon-edit"/></svg> Spustit kvíz o zastávkách
+        </button>
       </div>
 
     </div>
@@ -162,7 +280,7 @@
   <div id="screen-section-c" class="screen">
     <div class="screen-header">
       <button class="btn-back" id="c-back" aria-label="Zpět">←</button>
-      <h2>🎧 Procvič linku</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
+      <h2><svg class="icon icon-lg" aria-hidden="true"><use href="#icon-headphones"/></svg> Procvič linku</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
     </div>
     <div class="screen-content">
 
@@ -187,21 +305,28 @@
       <!-- Výběr režimu -->
       <div class="practice-modes">
         <button class="btn-mode btn-mode-audio" id="practice-mode-audio">
-          <span class="btn-mode-icon">🎧</span>
+          <span class="btn-mode-icon">
+            <svg class="icon icon-lg" aria-hidden="true"><use href="#icon-headphones"/></svg>
+          </span>
           <span class="btn-mode-text">
             <h4>Audio</h4>
             <p>Poslechni si všechny zastávky s hlasem</p>
           </span>
         </button>
         <button class="btn-mode btn-mode-quiz" id="practice-mode-quiz">
-          <span class="btn-mode-icon">📝</span>
+          <span class="btn-mode-icon">
+            <svg class="icon icon-lg" aria-hidden="true"><use href="#icon-edit"/></svg>
+          </span>
           <span class="btn-mode-text">
             <h4>Kvíz</h4>
             <p>Procvičuj zastávky formou otázek</p>
           </span>
         </button>
         <button class="btn-mode btn-mode-audioquiz" id="practice-mode-audioquiz">
-          <span class="btn-mode-icon">🎧📝</span>
+          <span class="btn-mode-icon">
+            <svg class="icon icon-lg" aria-hidden="true"><use href="#icon-headphones"/></svg>
+            <svg class="icon icon-lg" aria-hidden="true"><use href="#icon-edit"/></svg>
+          </span>
           <span class="btn-mode-text">
             <h4>Audio + Kvíz</h4>
             <p>Nejdřív poslechni, pak kvíz</p>
@@ -218,7 +343,7 @@
   <div id="screen-audio" class="screen">
     <div class="screen-header">
       <button class="btn-back" id="audio-back" aria-label="Zpět">←</button>
-      <h2>🎧 Přehrávání zastávek</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
+      <h2><svg class="icon icon-lg" aria-hidden="true"><use href="#icon-headphones"/></svg> Přehrávání zastávek</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
     </div>
 
     <!-- Info o lince -->
@@ -236,18 +361,26 @@
         <div id="audio-progress-text">Zastávka 0 / 0</div>
       </div>
       <div class="audio-btns-row">
-        <button class="btn-play" id="audio-play-btn">▶ Přehrát</button>
+        <button class="btn-play" id="audio-play-btn">
+          <svg class="icon" aria-hidden="true"><use href="#icon-play"/></svg> Přehrát
+        </button>
         <div class="speed-controls">
-          <button class="speed-btn" data-speed="0.5">🐢</button>
-          <button class="speed-btn active" data-speed="1.0">▶</button>
-          <button class="speed-btn" data-speed="1.2">⚡</button>
+          <button class="speed-btn" data-speed="0.5">
+            <svg class="icon" aria-hidden="true"><use href="#icon-clock"/></svg>
+          </button>
+          <button class="speed-btn active" data-speed="1.0">
+            <svg class="icon" aria-hidden="true"><use href="#icon-play"/></svg>
+          </button>
+          <button class="speed-btn" data-speed="1.2">
+            <svg class="icon" aria-hidden="true"><use href="#icon-zap"/></svg>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Banner po dokončení -->
     <div id="audio-finished-banner">
-      ✅ Hotovo! Všechny zastávky byly přečteny.
+      <svg class="icon" aria-hidden="true"><use href="#icon-check-circle"/></svg> Hotovo! Všechny zastávky byly přečteny.
     </div>
 
     <!-- Seznam zastávek -->
@@ -257,8 +390,12 @@
 
     <!-- Akce dole -->
     <div class="audio-footer">
-      <button class="btn-audio-action btn-audio-restart" id="audio-restart-btn">🔄 Znovu</button>
-      <button class="btn-audio-action btn-audio-quiz" id="audio-quiz-btn">📝 Spustit kvíz</button>
+      <button class="btn-audio-action btn-audio-restart" id="audio-restart-btn">
+        <svg class="icon" aria-hidden="true"><use href="#icon-refresh"/></svg> Znovu
+      </button>
+      <button class="btn-audio-action btn-audio-quiz" id="audio-quiz-btn">
+        <svg class="icon" aria-hidden="true"><use href="#icon-edit"/></svg> Spustit kvíz
+      </button>
     </div>
   </div>
 
@@ -271,7 +408,9 @@
         <button class="btn-back" id="quiz-back" aria-label="Zpět">←</button>
         <span class="quiz-counter" id="quiz-counter">Otázka 1 z 10</span>
         <span class="quiz-streak-display" id="quiz-streak"></span>
-        <span class="quiz-score-display" id="quiz-score">✅ 0</span>
+        <span class="quiz-score-display" id="quiz-score">
+          <svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg> 0
+        </span>
       </div>
       <div class="quiz-progress-track">
         <div id="quiz-progress-bar" style="width: 0%"></div>
@@ -288,33 +427,41 @@
   ==================================================== -->
   <div id="screen-results" class="screen">
     <div class="screen-header">
-      <h2>🏆 Výsledky</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
+      <h2><svg class="icon icon-lg" aria-hidden="true"><use href="#icon-award"/></svg> Výsledky</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
     </div>
 
     <div class="results-container">
-      <div class="result-trophy">🏆</div>
+      <div class="result-trophy">
+        <svg class="icon icon-xl" aria-hidden="true"><use href="#icon-award"/></svg>
+      </div>
 
       <div class="result-score-big">
         <div class="score-num" id="result-score">0 / 0</div>
         <div class="score-pct" id="result-percent">0 %</div>
       </div>
 
-      <div class="result-stars" id="result-stars">☆☆☆☆☆</div>
+      <div class="result-stars" id="result-stars"></div>
 
       <div class="result-stats">
-        <div class="result-stat" id="result-correct">✅ Správně: 0</div>
-        <div class="result-stat" id="result-wrong">❌ Špatně: 0</div>
-        <div class="result-stat" id="result-streak">🔥 Nejlepší série: 0</div>
+        <div class="result-stat" id="result-correct"></div>
+        <div class="result-stat" id="result-wrong"></div>
+        <div class="result-stat" id="result-streak"></div>
       </div>
 
       <div class="result-wrong-section">
-        <h3>❌ Chybné odpovědi:</h3>
+        <h3>
+          <svg class="icon" aria-hidden="true"><use href="#icon-x-circle"/></svg> Chybné odpovědi:
+        </h3>
         <div id="result-wrong-list"></div>
       </div>
 
       <div class="result-buttons">
-        <button class="btn-primary" id="result-retry">🔄 Zkusit znovu</button>
-        <button class="btn-secondary" id="result-home">🏠 Zpět domů</button>
+        <button class="btn-primary" id="result-retry">
+          <svg class="icon" aria-hidden="true"><use href="#icon-refresh"/></svg> Zkusit znovu
+        </button>
+        <button class="btn-secondary" id="result-home">
+          <svg class="icon" aria-hidden="true"><use href="#icon-home"/></svg> Zpět domů
+        </button>
       </div>
     </div>
   </div>
@@ -325,13 +472,15 @@
   <div id="screen-settings" class="screen">
     <div class="screen-header">
       <button class="btn-back" id="settings-back" aria-label="Zpět">←</button>
-      <h2>⚙️ Nastavení</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
+      <h2><svg class="icon icon-lg" aria-hidden="true"><use href="#icon-settings"/></svg> Nastavení</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
     </div>
     <div class="screen-content">
 
       <!-- Délka sezení -->
       <div class="settings-section">
-        <h3>📊 Délka kvízu</h3>
+        <h3>
+          <svg class="icon" aria-hidden="true"><use href="#icon-bar-chart"/></svg> Délka kvízu
+        </h3>
         <div class="session-length-row">
           <button class="session-btn" data-val="5">5</button>
           <button class="session-btn active" data-val="10">10</button>
@@ -342,7 +491,9 @@
 
       <!-- Typy otázek A -->
       <div class="settings-section">
-        <h3>🗺️ Typy otázek – Odkud → Kam</h3>
+        <h3>
+          <svg class="icon" aria-hidden="true"><use href="#icon-map"/></svg> Typy otázek – Odkud → Kam
+        </h3>
         <div class="type-toggle-list">
           <label class="type-toggle-item">
             <input type="checkbox" class="type-toggle" data-section="A" data-type="A_odkudKam" checked>
@@ -369,7 +520,9 @@
 
       <!-- Typy otázek B -->
       <div class="settings-section">
-        <h3>🛑 Typy otázek – Zastávky</h3>
+        <h3>
+          <svg class="icon" aria-hidden="true"><use href="#icon-pin"/></svg> Typy otázek – Zastávky
+        </h3>
         <div class="type-toggle-list">
           <label class="type-toggle-item">
             <input type="checkbox" class="type-toggle" data-section="B" data-type="B_nasleduje" checked>
@@ -422,7 +575,9 @@
         </div>
       </div>
 
-      <button class="btn-primary" id="settings-save">💾 Uložit nastavení</button>
+      <button class="btn-primary" id="settings-save">
+        <svg class="icon" aria-hidden="true"><use href="#icon-save"/></svg> Uložit nastavení
+      </button>
 
     </div>
   </div>
@@ -435,8 +590,12 @@
 <div id="report-modal" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
   <div class="modal-box">
     <div class="modal-header">
-      <h3>⚠️ Nahlásit chybu</h3>
-      <button class="modal-close" id="report-modal-close" aria-label="Zavřít">✕</button>
+      <h3>
+        <svg class="icon" aria-hidden="true"><use href="#icon-alert"/></svg> Nahlásit chybu
+      </h3>
+      <button class="modal-close" id="report-modal-close" aria-label="Zavřít">
+        <svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg>
+      </button>
     </div>
     <div class="modal-body">
 
@@ -444,17 +603,29 @@
 
       <p class="report-label">Co je za problém?</p>
       <div class="report-categories" id="report-categories">
-        <button class="report-cat" data-cat="Faktická chyba">❌ Faktická chyba</button>
-        <button class="report-cat" data-cat="Špatně formulovaná otázka">✏️ Špatně formulovaná otázka</button>
-        <button class="report-cat" data-cat="Chybná správná odpověď">🔄 Chybná správná odpověď</button>
-        <button class="report-cat" data-cat="Chybí zastávka nebo linka">🗺️ Chybí zastávka nebo linka</button>
-        <button class="report-cat" data-cat="Jiné">💬 Jiné</button>
+        <button class="report-cat" data-cat="Faktická chyba">
+          <svg class="icon" aria-hidden="true"><use href="#icon-x-circle"/></svg> Faktická chyba
+        </button>
+        <button class="report-cat" data-cat="Špatně formulovaná otázka">
+          <svg class="icon" aria-hidden="true"><use href="#icon-pencil"/></svg> Špatně formulovaná otázka
+        </button>
+        <button class="report-cat" data-cat="Chybná správná odpověď">
+          <svg class="icon" aria-hidden="true"><use href="#icon-refresh"/></svg> Chybná správná odpověď
+        </button>
+        <button class="report-cat" data-cat="Chybí zastávka nebo linka">
+          <svg class="icon" aria-hidden="true"><use href="#icon-map"/></svg> Chybí zastávka nebo linka
+        </button>
+        <button class="report-cat" data-cat="Jiné">
+          <svg class="icon" aria-hidden="true"><use href="#icon-message"/></svg> Jiné
+        </button>
       </div>
 
       <p class="report-label">Popis (nepovinné):</p>
       <textarea id="report-desc" placeholder="Napiš co přesně je špatně..." rows="3"></textarea>
 
-      <button class="btn-primary btn-report-send" id="report-send-btn">📨 Odeslat hlášení</button>
+      <button class="btn-primary btn-report-send" id="report-send-btn">
+        <svg class="icon" aria-hidden="true"><use href="#icon-send"/></svg> Odeslat hlášení
+      </button>
       <div id="report-status" class="report-status" style="display:none"></div>
 
     </div>

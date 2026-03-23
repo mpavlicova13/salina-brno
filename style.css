@@ -62,6 +62,35 @@ button:active {
   transform: scale(0.97);
 }
 
+/* ---- SVG Icon System ---- */
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+  overflow: visible;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-lg {
+  width: 1.3em;
+  height: 1.3em;
+  vertical-align: -0.2em;
+}
+.icon-section {
+  width: 2.2em;
+  height: 2.2em;
+}
+.icon-xl {
+  width: 3.5em;
+  height: 3.5em;
+}
+.icon-star-filled { fill: currentColor; }
+
 /* ---- App Container ---- */
 #app {
   max-width: 640px;
@@ -1179,7 +1208,7 @@ button:active {
 }
 
 .result-trophy {
-  font-size: 4rem;
+  color: var(--blue);
 }
 
 .result-score-big {
@@ -1199,8 +1228,19 @@ button:active {
 }
 
 .result-stars {
+  display: flex;
+  gap: 6px;
   font-size: 2rem;
-  letter-spacing: 4px;
+  color: var(--gray-mid);
+}
+.result-stars .icon-star-filled {
+  color: var(--orange);
+  stroke: var(--orange);
+  fill: var(--orange);
+}
+.result-stars .icon {
+  width: 2rem;
+  height: 2rem;
 }
 
 .result-stats {
@@ -1219,7 +1259,13 @@ button:active {
   font-weight: 600;
   padding: 8px 0;
   border-bottom: 1px solid var(--gray-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+#result-correct .icon { color: var(--green); }
+#result-wrong .icon   { color: var(--red); }
+#result-streak .icon  { color: var(--orange); }
 
 .result-stat:last-child {
   border-bottom: none;
