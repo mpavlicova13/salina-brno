@@ -533,8 +533,6 @@ function startPracticeMode(mode) {
     startAudio(line);
   } else if (mode === 'quiz') {
     startPracticeQuiz(line);
-  } else if (mode === 'audioquiz') {
-    startAudio(line, true);
   }
 }
 
@@ -542,9 +540,8 @@ function startPracticeMode(mode) {
    AUDIO PŘEHRÁVAČ
 ======================================================== */
 
-function startAudio(line, thenQuiz = false) {
+function startAudio(line) {
   AppState.audio.line = line;
-  AppState.audio.thenQuiz = thenQuiz;
   AppState.audio.speed = AppState.settings.ttsSpeed;
 
   renderAudioScreen(line);
@@ -618,9 +615,6 @@ function onAudioFinished() {
   updateAudioPlayBtn();
   const finishedBanner = document.getElementById('audio-finished-banner');
   if (finishedBanner) finishedBanner.style.display = 'block';
-  if (AppState.audio.thenQuiz) {
-    setTimeout(() => startPracticeQuiz(AppState.audio.line), 1500);
-  }
 }
 
 function toggleAudioLoop() {
@@ -1035,7 +1029,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('c-back').addEventListener('click', () => showScreen('home'));
   document.getElementById('practice-mode-audio').addEventListener('click', () => startPracticeMode('audio'));
   document.getElementById('practice-mode-quiz').addEventListener('click', () => startPracticeMode('quiz'));
-  document.getElementById('practice-mode-audioquiz').addEventListener('click', () => startPracticeMode('audioquiz'));
 
   // === Audio ===
   document.getElementById('audio-back').addEventListener('click', () => {
@@ -1054,10 +1047,6 @@ document.addEventListener('DOMContentLoaded', () => {
       AudioPlayer.play(AppState.audio.line, AppState.audio.speed);
       updateAudioPlayBtn();
     }, 300);
-  });
-  document.getElementById('audio-quiz-btn').addEventListener('click', () => {
-    AudioPlayer.stop();
-    startPracticeQuiz(AppState.audio.line);
   });
   document.querySelectorAll('.speed-btn[data-speed]').forEach(btn => {
     btn.addEventListener('click', () => setAudioSpeed(parseFloat(btn.dataset.speed)));
