@@ -1153,11 +1153,23 @@ function getLevelForXP(xp) {
 function updateGamUI() {
   const profile = getCurrentProfile();
   if (!profile) return;
-  const avatar = profile.avatar;
-  ['gam-avatar'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = avatar;
-  });
+  const el = document.getElementById('gam-avatar');
+  if (el) el.textContent = profile.avatar;
+
+  const g = loadGamState();
+  const lv = getLevelForXP(g.xp);
+  const next = LEVELS.find(l => l.level === lv.level + 1) || null;
+  const xpInLv = g.xp - lv.xpRequired;
+  const xpNeeded = next ? next.xpRequired - lv.xpRequired : 1;
+  const pct = next ? Math.min(100, Math.round(xpInLv / xpNeeded * 100)) : 100;
+
+  const setText = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+  setText('home-level-name', lv.name);
+  setText('home-level-num', lv.level);
+  setText('home-quizzes', g.quizzes || 0);
+  setText('home-xp-text', `${g.xp} XP`);
+  const fill = document.getElementById('home-xp-fill');
+  if (fill) fill.style.width = pct + '%';
 }
 function switchHomeTab(tab) {
   document.getElementById('panel-home').classList.toggle('active', tab === 'home');
