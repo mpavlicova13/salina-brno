@@ -69,7 +69,7 @@ const questionTypesA = [
 function generateA_odkudKam(lines) {
   const line = pick(lines);
   const correct = `${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}`;
-  const wrongLines = lines.filter(l => l.number !== line.number);
+  const wrongLines = TRAM_DATA.lines.filter(l => l.number !== line.number);
   const wrongs = pickN(wrongLines, 3).map(l => `${l.stops[0]} ↔ ${l.stops[l.stops.length - 1]}`);
   const options = shuffle([correct, ...wrongs]);
   return {
@@ -89,7 +89,7 @@ function generateA_ktaraLinkaJede(lines) {
   const from = line.stops[0];
   const to = line.stops[line.stops.length - 1];
   const correct = `Linka ${line.number}`;
-  const wrongLines = lines.filter(l => l.number !== line.number);
+  const wrongLines = TRAM_DATA.lines.filter(l => l.number !== line.number);
   const wrongs = pickN(wrongLines, 3).map(l => `Linka ${l.number}`);
   const options = shuffle([correct, ...wrongs]);
   return {
@@ -110,7 +110,7 @@ function generateA_zacina(lines) {
   const terminus = useFirst ? line.stops[0] : line.stops[line.stops.length - 1];
   const verb = useFirst ? 'začíná' : 'končí';
   const correct = `Linka ${line.number}`;
-  const wrongLines = lines.filter(l => l.number !== line.number);
+  const wrongLines = TRAM_DATA.lines.filter(l => l.number !== line.number);
   const wrongs = pickN(wrongLines, 3).map(l => `Linka ${l.number}`);
   const options = shuffle([correct, ...wrongs]);
   return {
@@ -136,8 +136,8 @@ function generateA_pravdaLez(lines) {
     // Linka je obousměrná – oba směry jsou správná odpověď
     [statedFrom, statedTo] = Math.random() < 0.5 ? [first, last] : [last, first];
   } else {
-    // Lž = OBĚ konečné zastávky patří jiné lince (nikdy neobracej stejnou linku!)
-    const wrongLine = pick(lines.filter(l => l.number !== line.number));
+    // Lž = OBĚ konečné zastávky patří jiné lince (vždy ze všech linek)
+    const wrongLine = pick(TRAM_DATA.lines.filter(l => l.number !== line.number));
     statedFrom = wrongLine.stops[0];
     statedTo = wrongLine.stops[wrongLine.stops.length - 1];
   }
@@ -164,7 +164,7 @@ function generateA_konecne(lines) {
   const from = line.stops[0];
   const to = line.stops[line.stops.length - 1];
   const correct = `Linka ${line.number}`;
-  const wrongLines = lines.filter(l => l.number !== line.number);
+  const wrongLines = TRAM_DATA.lines.filter(l => l.number !== line.number);
   const wrongs = pickN(wrongLines, 3).map(l => `Linka ${l.number}`);
   const options = shuffle([correct, ...wrongs]);
   return {
@@ -331,8 +331,9 @@ function generateB_naJakeLince(lines) {
   if (uniqueStops.length === 0) return generateB_neniNaLince(lines);
   const { stop, lineNum } = pick(uniqueStops);
   const correct = `Linka ${lineNum}`;
-  const wrongLines = lines.filter(l => l.number !== lineNum);
-  const wrongs = pickN(wrongLines, 3).map(l => `Linka ${l.number}`);
+  // Špatné možnosti: nejdřív ze zvolených, pak doplní ze všech linek (vždy 3 distractory)
+  const wrongPool = TRAM_DATA.lines.filter(l => l.number !== lineNum);
+  const wrongs = pickN(wrongPool, 3).map(l => `Linka ${l.number}`);
   const options = shuffle([correct, ...wrongs]);
   return {
     type: 'B_naJakeLince',
@@ -450,8 +451,8 @@ function generateB_konecna(lines) {
   const useLast = Math.random() < 0.5;
   const correct = useLast ? line.stops[line.stops.length - 1] : line.stops[0];
   const direction = useLast ? 'konečná' : 'první (výchozí)';
-  // Špatné možnosti: konečné zastávky jiných linek
-  const wrongLines = lines.filter(l => l.number !== line.number);
+  // Špatné možnosti: konečné zastávky jiných linek (vždy ze všech linek)
+  const wrongLines = TRAM_DATA.lines.filter(l => l.number !== line.number);
   const wrongs = pickN(wrongLines, 3).map(l => useLast ? l.stops[l.stops.length - 1] : l.stops[0]);
   const options = shuffle([correct, ...wrongs]);
   return {
