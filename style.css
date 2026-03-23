@@ -1064,8 +1064,8 @@ button:active {
 
 .btn-play {
   flex: 1;
-  background: var(--wrong);
-  color: var(--blue);
+  background: var(--green);
+  color: var(--white);
   border-radius: var(--radius-sm);
   padding: 12px;
   font-size: 1rem;
