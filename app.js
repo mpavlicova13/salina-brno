@@ -1110,6 +1110,30 @@ function showProfileCreateForm() {
     document.getElementById('profiles-grid').style.display = 'grid';
   };
 }
+function showProfileModal() {
+  const overlay = document.getElementById('profile-modal-overlay');
+  if (!overlay) return;
+  overlay.style.display = 'flex';
+  document.getElementById('modal-profile-name').value = '';
+  const picker = document.getElementById('modal-avatar-picker');
+  picker.innerHTML = '';
+  let selectedAvatar = AVATARS[0];
+  AVATARS.forEach(emoji => {
+    const btn = document.createElement('button');
+    btn.className = 'avatar-option';
+    btn.textContent = emoji;
+    btn.onclick = () => { picker.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); selectedAvatar = emoji; };
+    picker.appendChild(btn);
+  });
+  picker.querySelector('.avatar-option').classList.add('selected');
+  document.getElementById('btn-modal-confirm').onclick = () => {
+    const name = document.getElementById('modal-profile-name').value.trim();
+    if (!name) { document.getElementById('modal-profile-name').focus(); return; }
+    createProfile(name, selectedAvatar);
+    updateGamUI();
+    overlay.style.display = 'none';
+  };
+}
 
 function loadGamState() {
   const p = getCurrentProfile();
@@ -1195,13 +1219,11 @@ function launchConfetti() {
 document.addEventListener('DOMContentLoaded', () => {
   TTS.init();
 
-  // Profil flow: první spuštění nebo přepnutí hráče
+  // Profil flow
   const profileData = loadProfiles();
   if (profileData.list.length === 0) {
-    showScreen('profiles');
-    showProfileCreateForm();
-    const cancelBtn = document.getElementById('btn-cancel-profile');
-    if (cancelBtn) cancelBtn.style.display = 'none';
+    showScreen('home');
+    showProfileModal();
   } else if (!profileData.current || !profileData.list.find(p => p.id === profileData.current)) {
     showScreen('profiles');
     renderProfilesScreen();
