@@ -378,7 +378,8 @@ function generateB_jakeLinkySdili(lines) {
  */
 function generateB_kolikataZastavka(lines) {
   const line = pick(lines);
-  const stops = line.stops;
+  // Obousměrná linka – náhodně vybereme směr
+  const stops = Math.random() < 0.5 ? line.stops : [...line.stops].reverse();
   const idx = Math.floor(Math.random() * stops.length);
   const stop = stops[idx];
   const fromTerminus = stops[0];
@@ -403,43 +404,47 @@ function generateB_kolikataZastavka(lines) {
 }
 
 /**
- * B9: "Jaká je [N]. zastávka na lince X?"
+ * B9: "Jaká je [N]. zastávka na lince X ve směru [terminus]?"
  */
 function generateB_nZastavka(lines) {
   const line = pick(lines);
-  const stops = line.stops;
+  // Obousměrná linka – náhodně vybereme směr
+  const stops = Math.random() < 0.5 ? line.stops : [...line.stops].reverse();
   const idx = Math.floor(Math.random() * stops.length);
   const correct = stops[idx];
   const n = idx + 1;
+  const direction = stops[stops.length - 1];
   const candidates = stops.filter((_, i) => i !== idx);
   const options = buildOptions(correct, candidates);
   return {
     type: 'B_nZastavka',
-    question: `🚋 Linka ${line.number} – jaká je ${n}. zastávka?`,
+    question: `🚋 Linka ${line.number} – jaká je ${n}. zastávka\nve směru "${direction}"?`,
     options,
     correct,
-    explanation: `${n}. zastávka linky ${line.number} je ${correct}.`
+    explanation: `${n}. zastávka linky ${line.number} ve směru ${direction} je ${correct}.`
   };
 }
 
 /**
- * B10: "Seřaď tyto zastávky ve správném pořadí na lince X"
+ * B10: "Seřaď tyto zastávky ve správném pořadí ve směru [terminus]"
  * Vrací 5 po sobě jdoucích zastávek v náhodném pořadí.
  */
 function generateB_seradZastavky(lines) {
   const line = pick(lines);
-  const stops = line.stops;
+  // Obousměrná linka – náhodně vybereme směr
+  const stops = Math.random() < 0.5 ? line.stops : [...line.stops].reverse();
   if (stops.length < 5) return generateB_nasleduje(lines);
   const startIdx = Math.floor(Math.random() * (stops.length - 4));
   const consecutive = stops.slice(startIdx, startIdx + 5);
+  const direction = stops[stops.length - 1];
   const shuffled = shuffle(consecutive);
   return {
     type: 'B_seradZastavky',
-    question: `🚋 Linka ${line.number} – seřaď zastávky ve správném pořadí:`,
+    question: `🚋 Linka ${line.number} – seřaď zastávky ve směru "${direction}":`,
     options: shuffled,      // zobrazíme jako přetahovací / klikací
     correct: consecutive,   // správné pořadí
     isOrdering: true,
-    explanation: `Správné pořadí na lince ${line.number}: ${consecutive.join(' → ')}`
+    explanation: `Správné pořadí na lince ${line.number} ve směru ${direction}: ${consecutive.join(' → ')}`
   };
 }
 
