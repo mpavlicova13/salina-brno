@@ -474,6 +474,15 @@ button:active {
   transform: rotateY(180deg);
 }
 
+#fc-back-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+}
+
 .fc-line-num {
   font-size: 5rem;
   font-weight: 900;
