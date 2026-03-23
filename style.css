@@ -333,7 +333,7 @@ button:active {
 
 .line-filter-btn.selected {
   background: var(--wrong);
-  color: var(--blue);
+  color: var(--white);
   border-color: var(--red-dark);
 }
 
