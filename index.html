@@ -153,24 +153,11 @@
     <div class="home-header">
       <img src="logo_dpmb.png" alt="DPMB logo" class="home-logo-img">
       <p class="home-subtitle">Procvičuj brněnské tramvaje</p>
-    </div>
-
-    <!-- Gamifikace: profil + level + XP bar -->
-    <div class="gamification-bar" id="gamification-bar">
-      <button class="gam-profile-btn" id="btn-switch-profile" title="Přepnout hráče">
-        <span class="gam-avatar" id="gam-avatar">❓</span>
-        <div class="gam-profile-details">
-          <span class="gam-name" id="gam-name">---</span>
-          <div class="gam-level-row">
-            <span class="gam-level-badge" id="gam-level-num">1</span>
-            <span class="gam-level-name" id="gam-level-name">Nováček</span>
-          </div>
-        </div>
+      <button class="home-stats-badge" id="btn-open-stats">
+        <span class="hsb-avatar" id="gam-avatar">❓</span>
+        <span class="hsb-xp" id="gam-xp-display">0 XP</span>
+        <span class="hsb-level" id="gam-level-num">1</span>
       </button>
-      <div class="gam-xp-section">
-        <div class="gam-xp-bar"><div class="gam-xp-fill" id="gam-xp-fill" style="width:0%"></div></div>
-        <span class="gam-xp-text" id="gam-xp-text">0 / 500 XP</span>
-      </div>
     </div>
 
     <div class="home-cards">
@@ -674,6 +661,55 @@
 </div>
 
 <!-- Konfety -->
+<!-- ====================================================
+     STATISTIKY
+==================================================== -->
+<div id="screen-stats" class="screen">
+  <div class="screen-header">
+    <button class="btn-back" id="stats-back">←</button>
+    <h2>Statistiky</h2><img src="logo_dpmb.png" alt="DPMB" class="header-logo">
+  </div>
+
+  <!-- Profil -->
+  <div class="stats-profile-row">
+    <span class="stats-profile-avatar" id="stats-avatar">❓</span>
+    <div class="stats-profile-info">
+      <span class="stats-profile-name" id="stats-name">---</span>
+      <button class="btn-link" id="stats-switch-btn">Přepnout hráče</button>
+    </div>
+  </div>
+
+  <!-- Level + progress -->
+  <div class="stats-level-card">
+    <div class="stats-level-top">
+      <span class="stats-level-badge" id="stats-level-num">1</span>
+      <div class="stats-level-labels">
+        <span class="stats-level-name" id="stats-level-name">Nováček</span>
+        <span class="stats-xp-total" id="stats-xp-total">0 XP celkem</span>
+      </div>
+    </div>
+    <div class="gam-xp-bar" style="height:14px;margin:12px 0 6px">
+      <div class="gam-xp-fill" id="stats-xp-fill" style="width:0%"></div>
+    </div>
+    <div class="stats-level-footer">
+      <span id="stats-xp-progress">0 / 500 XP</span>
+      <span id="stats-next-level">→ Level 2: Cestující</span>
+    </div>
+  </div>
+
+  <!-- Čísla -->
+  <div class="stats-grid">
+    <div class="stats-num-card"><div class="stats-big-num" id="stats-correct">0</div><div class="stats-num-label">Správně</div></div>
+    <div class="stats-num-card"><div class="stats-big-num" id="stats-quizzes">0</div><div class="stats-num-label">Kvízy</div></div>
+    <div class="stats-num-card"><div class="stats-big-num" id="stats-perfect">0</div><div class="stats-num-label">Perfektní</div></div>
+    <div class="stats-num-card"><div class="stats-big-num" id="stats-streak">0</div><div class="stats-num-label">Max série</div></div>
+  </div>
+
+  <!-- Milníky -->
+  <h3 class="stats-section-title">Milníky</h3>
+  <div id="stats-achievements" class="stats-achievements"></div>
+</div>
+
 <div id="confetti-container"></div>
 
 <!-- Modal: první spuštění / vytvoření profilu -->
