@@ -1154,7 +1154,7 @@ function updateGamUI() {
   const profile = getCurrentProfile();
   if (!profile) return;
   const avatar = profile.avatar;
-  ['gam-avatar', 'gam-avatar-stats'].forEach(id => {
+  ['gam-avatar'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = avatar;
   });
@@ -1265,7 +1265,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('tab-btn-stats').addEventListener('click', () => switchHomeTab('stats'));
   document.getElementById('stats-panel-back').addEventListener('click', () => switchHomeTab('home'));
   document.getElementById('btn-switch-profile').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
-  document.getElementById('btn-switch-profile-stats').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
   document.getElementById('stats-switch-btn').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
 
   // === Domovská obrazovka ===
