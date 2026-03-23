@@ -503,10 +503,7 @@ function renderLineButtons() {
   TRAM_DATA.lines.forEach(line => {
     const btn = document.createElement('button');
     btn.className = 'line-big-btn';
-    btn.innerHTML = `
-      <span class="line-num">${line.number}</span>
-      <span class="line-info">${line.stops[0]}<br>↕<br>${line.stops[line.stops.length - 1]}</span>
-    `;
+    btn.innerHTML = `<span class="line-num">${line.number}</span>`;
     btn.onclick = () => selectPracticeLine(line.number);
     container.appendChild(btn);
   });
