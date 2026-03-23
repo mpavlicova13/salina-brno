@@ -1083,26 +1083,40 @@ button:active {
 
 .speed-controls {
   display: flex;
+  align-items: center;
   gap: 6px;
+  flex-wrap: wrap;
+}
+
+.speed-label {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  white-space: nowrap;
+  margin-right: 2px;
 }
 
 .speed-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   background: rgba(255,255,255,0.1);
   color: rgba(255,255,255,0.7);
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: 7px 11px;
   font-size: 0.8rem;
-  font-weight: 700;
-  border: 1px solid rgba(255,255,255,0.15);
+  font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.2);
+  white-space: nowrap;
 }
 
 .speed-btn.active {
-  background: var(--wrong);
+  background: rgba(255,255,255,0.9);
   color: var(--blue);
-  border-color: var(--wrong);
+  border-color: transparent;
+  font-weight: 700;
 }
 
-.loop-btn { margin-left: 6px; border-left: 1px solid rgba(255,255,255,0.25); }
+.loop-btn { margin-left: 4px; border-left: 1px solid rgba(255,255,255,0.25); }
 .loop-btn.active {
   background: var(--blue-light);
   color: var(--white);
