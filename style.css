@@ -989,9 +989,9 @@ button:active {
 }
 
 .btn-mode-quiz {
-  background: linear-gradient(135deg, var(--red) 0%, #ffb700 100%);
-  color: var(--blue);
-  box-shadow: 0 4px 16px rgba(255,209,0,0.3);
+  background: var(--red);
+  color: var(--white);
+  box-shadow: 0 4px 16px rgba(218,33,39,0.3);
 }
 
 .btn-mode-audioquiz {
