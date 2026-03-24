@@ -678,79 +678,81 @@ function renderOrderingQuestion(container, q, quiz) {
   const orderingDiv = document.createElement('div');
   orderingDiv.className = 'ordering-container';
 
-  const userOrder = [...q.options]; // začínáme s promíchaným pořadím
-  quiz.orderingAnswer = [...userOrder];
+  // Stav: placedStops[i] = název zastávky nebo null
+  const placedStops = new Array(q.correct.length).fill(null);
 
-  const renderList = () => {
-    orderingDiv.innerHTML = '<p class="ordering-hint">Klikni na zastávky ve správném pořadí od první po poslední:</p>';
-    const selected = [];
-    const available = [...userOrder];
+  const render = () => {
+    orderingDiv.innerHTML = '';
 
-    const selectedDiv = document.createElement('div');
-    selectedDiv.className = 'ordering-selected';
-    selectedDiv.innerHTML = '<div class="ordering-label">Tvoje pořadí:</div>';
-    const selectedList = document.createElement('div');
-    selectedList.className = 'ordering-slots';
-    for (let i = 0; i < q.correct.length; i++) {
-      const slot = document.createElement('div');
-      slot.className = 'ordering-slot empty';
-      slot.dataset.idx = i;
-      slot.textContent = `${i + 1}.`;
-      selectedList.appendChild(slot);
-    }
-    selectedDiv.appendChild(selectedList);
-    orderingDiv.appendChild(selectedDiv);
-
-    const availableDiv = document.createElement('div');
-    availableDiv.className = 'ordering-available';
-    availableDiv.innerHTML = '<div class="ordering-label">Dostupné zastávky:</div>';
-    const chips = document.createElement('div');
-    chips.className = 'ordering-chips';
-
-    let clickOrder = [];
-
-    available.forEach((stop, i) => {
-      const chip = document.createElement('button');
-      chip.className = 'ordering-chip';
-      chip.textContent = stop;
-      chip.dataset.stop = stop;
-      chip.onclick = () => {
-        if (quiz.answered) return;
-        if (clickOrder.includes(stop)) return;
-        clickOrder.push(stop);
-        chip.classList.add('used');
-        chip.disabled = true;
-
-        // Vlož do slotu
-        const slotIdx = clickOrder.length - 1;
-        const slot = selectedList.children[slotIdx];
-        if (slot) {
-          slot.textContent = `${slotIdx + 1}. ${stop}`;
-          slot.classList.remove('empty');
-          slot.classList.add('filled');
-        }
-
-        // Pokud jsou všechny vybrány, vyhodnoť
-        if (clickOrder.length === q.correct.length) {
-          const result = quiz.answer(clickOrder);
-          // Obarvi sloty
-          clickOrder.forEach((s, idx) => {
-            const sl = selectedList.children[idx];
-            if (sl) {
-              sl.classList.add(s === q.correct[idx] ? 'correct' : 'wrong');
-            }
-          });
-          showExplanation(container, q.explanation, result.isCorrect);
-          showNextButton(container);
-        }
-      };
-      chips.appendChild(chip);
+    // Sloty
+    const slotsDiv = document.createElement('div');
+    slotsDiv.className = 'ordering-slots';
+    placedStops.forEach((stop, i) => {
+      const slot = document.createElement('button');
+      slot.className = stop ? 'ordering-slot filled' : 'ordering-slot empty';
+      slot.innerHTML = stop
+        ? `<span class="slot-num">${i + 1}.</span><span class="slot-stop">${stop}</span><span class="slot-remove">✕</span>`
+        : `<span class="slot-num">${i + 1}.</span><span class="slot-placeholder">—</span>`;
+      if (stop) {
+        slot.onclick = () => {
+          if (quiz.answered) return;
+          placedStops[i] = null;
+          render();
+        };
+      }
+      slotsDiv.appendChild(slot);
     });
-    availableDiv.appendChild(chips);
-    orderingDiv.appendChild(availableDiv);
+    orderingDiv.appendChild(slotsDiv);
+
+    // Dostupné chipy (ty, co ještě nejsou v slotech)
+    const used = new Set(placedStops.filter(Boolean));
+    const available = q.options.filter(s => !used.has(s));
+
+    if (available.length > 0) {
+      const hint = document.createElement('p');
+      hint.className = 'ordering-hint';
+      hint.textContent = 'Klikni na zastávku pro přidání. Vybrané zastávky ✕ pro odebrání.';
+      orderingDiv.appendChild(hint);
+
+      const chipsDiv = document.createElement('div');
+      chipsDiv.className = 'ordering-chips';
+      available.forEach(stop => {
+        const chip = document.createElement('button');
+        chip.className = 'ordering-chip';
+        chip.textContent = stop;
+        chip.onclick = () => {
+          if (quiz.answered) return;
+          const firstEmpty = placedStops.indexOf(null);
+          if (firstEmpty === -1) return;
+          placedStops[firstEmpty] = stop;
+          render();
+        };
+        chipsDiv.appendChild(chip);
+      });
+      orderingDiv.appendChild(chipsDiv);
+    }
+
+    // Všechny sloty obsazeny → tlačítko potvrdit
+    if (!placedStops.includes(null) && !quiz.answered) {
+      const confirmBtn = document.createElement('button');
+      confirmBtn.className = 'btn-primary ordering-confirm';
+      confirmBtn.textContent = 'Potvrdit pořadí';
+      confirmBtn.onclick = () => {
+        const result = quiz.answer([...placedStops]);
+        // Obarvi sloty
+        Array.from(slotsDiv.children).forEach((slot, idx) => {
+          slot.classList.add(placedStops[idx] === q.correct[idx] ? 'correct' : 'wrong');
+          slot.onclick = null;
+        });
+        confirmBtn.remove();
+        showExplanation(container, q.explanation, result.isCorrect);
+        showNextButton(container);
+      };
+      orderingDiv.appendChild(confirmBtn);
+    }
   };
 
-  renderList();
+  render();
   container.appendChild(orderingDiv);
 }
 
