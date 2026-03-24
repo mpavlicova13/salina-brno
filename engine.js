@@ -436,8 +436,9 @@ function generateB_konecna(lines) {
 const typeLabels = { tramvaje: 'tramvaj', trolejbusy: 'trolejbus', autobusy: 'autobus' };
 const typeEmojis = { tramvaje: '🚋', trolejbusy: '🚎', autobusy: '🚌' };
 
-/** HUB1: Která linka daného typu zastavuje v uzlu X? */
+/** HUB1: Která linka daného typu zastavuje v uzlu X? (jen při výběru více uzlů) */
 function generateHUB_ktereZastavuje(hubs, types) {
+  if (hubs.length < 2) return null;
   const hub = pick(hubs);
   const type = pick(types.filter(t => hub[t] && hub[t].length > 0));
   const correct = pick(hub[type]);
