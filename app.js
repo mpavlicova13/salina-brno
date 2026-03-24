@@ -52,31 +52,6 @@ const AppState = {
    TTS – TEXT TO SPEECH
 ======================================================== */
 
-/* ========================================================
-   AUDIO SOUBORY – přehrávání předgenerovaných .m4a souborů
-======================================================== */
-
-/** Převede název zastávky na název souboru (stejná logika jako generate-audio.js). */
-function stopToFilename(text) {
-  return text
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s+/g, '_')
-    .replace(/[^a-zA-Z0-9_,.\-]/g, '')
-    .substring(0, 80);
-}
-
-/** Přehraje soubor audio/NAME.m4a, vrátí Promise. Při chybě odmítne. */
-function playAudioFile(filename, speed = 1.0) {
-  return new Promise((resolve, reject) => {
-    const audio = new Audio(`audio/${filename}.m4a`);
-    audio.playbackRate = Math.min(Math.max(speed, 0.5), 2.0);
-    audio.onended = resolve;
-    audio.onerror = reject;
-    AudioPlayer._currentAudio = audio;
-    audio.play().catch(reject);
-  });
-}
-
 const TTS = {
   synth: window.speechSynthesis,
   czechVoice: null,
@@ -153,13 +128,11 @@ const AudioPlayer = {
   playing: false,
   paused: false,
   speed: 1.0,
-  _gen: 0,           // generační čítač – zruší stará přehrávání okamžitě
-  _currentAudio: null,
+  _gen: 0,
 
   isTurtleMode() { return this.speed <= 0.5; },
 
   async play(line, speed = 1.0) {
-    // Nová generace zruší jakýkoli předchozí loop
     this._gen++;
     const gen = this._gen;
 
@@ -168,24 +141,17 @@ const AudioPlayer = {
     this.playing = true;
     this.paused = false;
     this.speed = speed;
-    if (this._currentAudio) { this._currentAudio.pause(); this._currentAudio = null; }
     TTS.stop();
     updateAudioPlayBtn();
 
     // Oznámení linky
     renderAudioHighlight(-1);
     const introRate = this.isTurtleMode() ? 1.0 : this.speed;
-    try {
-      await playAudioFile(`_linka_${line.number}`, introRate);
-    } catch {
-      const intro = `Linka číslo ${line.number}.`;
-      await TTS.speak(intro, introRate).catch(() => {});
-    }
+    await TTS.speak(`Linka číslo ${line.number}.`, introRate).catch(() => {});
     if (this._gen !== gen) return;
 
     // Čtení zastávek
     for (let i = 0; i < line.stops.length; i++) {
-      // Čekej pokud je pozastaveno
       while (this.paused && this._gen === gen) {
         await new Promise(r => setTimeout(r, 100));
       }
@@ -195,42 +161,23 @@ const AudioPlayer = {
       renderAudioHighlight(i);
 
       const rate = this.isTurtleMode() ? 1.0 : this.speed;
-      try {
-        await this._playFile(stopToFilename(line.stops[i]), rate);
-      } catch {
-        await TTS.speak(cleanStopForTTS(line.stops[i]), rate).catch(() => {});
-      }
+      await TTS.speak(cleanStopForTTS(line.stops[i]), rate).catch(() => {});
       if (this._gen !== gen) return;
 
-      // Pauza mezi zastávkami
-      this._currentAudio = null;
       await new Promise(r => setTimeout(r, this.isTurtleMode() ? 3000 : 300));
       if (this._gen !== gen) return;
     }
 
     this.playing = false;
-    this._currentAudio = null;
     renderAudioHighlight(-1);
     updateAudioPlayBtn();
     onAudioFinished();
   },
 
-  _playFile(filename, speed) {
-    return new Promise((resolve, reject) => {
-      const audio = new Audio(`audio/${filename}.m4a`);
-      audio.playbackRate = Math.min(Math.max(speed, 0.5), 2.0);
-      this._currentAudio = audio;
-      audio.onended = resolve;
-      audio.onerror = reject;
-      audio.play().catch(reject);
-    });
-  },
-
   stop() {
-    this._gen++;     // zruší aktivní loop
+    this._gen++;
     this.playing = false;
     this.paused = false;
-    if (this._currentAudio) { this._currentAudio.pause(); this._currentAudio = null; }
     TTS.stop();
     updateAudioPlayBtn();
   },
@@ -238,10 +185,7 @@ const AudioPlayer = {
   togglePause() {
     if (!this.playing) return;
     this.paused = !this.paused;
-    if (this._currentAudio) {
-      if (this.paused) this._currentAudio.pause();
-      else this._currentAudio.play();
-    }
+    TTS.pauseResume();
     updateAudioPlayBtn();
   },
 
@@ -944,6 +888,17 @@ function showResults() {
   if (isPerfect) gam.stats.perfectQuizzes += 1;
   if (quiz.maxStreak > gam.stats.maxStreak) gam.stats.maxStreak = quiz.maxStreak;
 
+  // Per-linka statistiky
+  if (!gam.stats.lineStats) gam.stats.lineStats = {};
+  quiz.results.forEach(r => {
+    const ln = r.question.line;
+    if (!ln) return;
+    const key = String(ln);
+    if (!gam.stats.lineStats[key]) gam.stats.lineStats[key] = { correct: 0, total: 0 };
+    gam.stats.lineStats[key].total += 1;
+    if (r.isCorrect) gam.stats.lineStats[key].correct += 1;
+  });
+
   addXPAndLevel(xpEarned, gam);
   checkAchievements(gam);
 
@@ -1202,6 +1157,32 @@ function renderStatsScreen() {
   document.getElementById('stats-quizzes').textContent = g.stats.totalQuizzes;
   document.getElementById('stats-perfect').textContent = g.stats.perfectQuizzes;
   document.getElementById('stats-streak').textContent = g.stats.maxStreak;
+
+  // Per-linka výkon
+  const lineEl = document.getElementById('stats-line-performance');
+  if (lineEl) {
+    const ls = g.stats.lineStats || {};
+    const entries = Object.entries(ls)
+      .filter(([, v]) => v.total >= 3)
+      .map(([k, v]) => ({ line: k, pct: Math.round(v.correct / v.total * 100), correct: v.correct, total: v.total }))
+      .sort((a, b) => a.line - b.line);
+
+    if (entries.length === 0) {
+      lineEl.innerHTML = '<p class="stats-empty">Zatím žádná data – udělej pár kvízů!</p>';
+    } else {
+      lineEl.innerHTML = entries.map(e => {
+        const color = e.pct >= 80 ? 'var(--green)' : e.pct >= 50 ? 'var(--orange,#f59e0b)' : 'var(--red)';
+        return `<div class="line-stat-row">
+          <span class="line-stat-badge" style="background:${color}">🚋 ${e.line}</span>
+          <div class="line-stat-bar-wrap">
+            <div class="line-stat-bar" style="width:${e.pct}%;background:${color}"></div>
+          </div>
+          <span class="line-stat-pct">${e.pct}%</span>
+          <span class="line-stat-count">${e.correct}/${e.total}</span>
+        </div>`;
+      }).join('');
+    }
+  }
 
   const achEl = document.getElementById('stats-achievements');
   achEl.innerHTML = '';
