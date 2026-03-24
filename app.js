@@ -1383,8 +1383,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // === Výsledky ===
   document.getElementById('result-retry').addEventListener('click', () => {
-    // Zpět na domov, uživatel si vybere znovu
-    showScreen('home');
+    retryQuiz();
   });
   document.getElementById('result-home').addEventListener('click', () => showScreen('home'));
 
