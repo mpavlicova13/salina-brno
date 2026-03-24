@@ -45,7 +45,10 @@ const AppState = {
   // Streak
   streak: 0,
   totalScore: 0,
-  totalAnswered: 0
+  totalAnswered: 0,
+
+  // Ze které sekce byl kvíz spuštěn (pro správný návrat)
+  quizSource: 'home'
 };
 
 /* ========================================================
@@ -336,6 +339,7 @@ function startQuizA() {
   if (questions.length === 0) { alert('Nepodařilo se vygenerovat otázky.'); return; }
   AppState.quiz = new QuizState(questions);
   AppState.lastQuizQuestions = questions;
+  AppState.quizSource = 'section-a';
   renderQuizQuestion();
   showScreen('quiz');
 }
@@ -430,6 +434,7 @@ function startQuizB() {
   if (questions.length === 0) { alert('Nepodařilo se vygenerovat otázky.'); return; }
   AppState.quiz = new QuizState(questions);
   AppState.lastQuizQuestions = questions;
+  AppState.quizSource = 'section-b';
   renderQuizQuestion();
   showScreen('quiz');
 }
@@ -484,9 +489,11 @@ function renderHubButtons() {
 
 function updateHubQuizBtn() {
   const btn = document.getElementById('d-start-quiz');
+  const hint = document.getElementById('hub-start-hint');
   const ok = HubState.selectedHubs.length > 0 && HubState.activeTypes.length > 0;
   btn.disabled = !ok;
   btn.style.opacity = ok ? '1' : '0.4';
+  if (hint) hint.style.display = ok ? 'none' : 'block';
 }
 
 function startHubQuiz() {
@@ -497,6 +504,7 @@ function startHubQuiz() {
   if (questions.length === 0) { alert('Nepodařilo se vygenerovat otázky.'); return; }
   AppState.quiz = new QuizState(questions);
   AppState.lastQuizQuestions = questions;
+  AppState.quizSource = 'section-d';
   renderQuizQuestion();
   showScreen('quiz');
 }
@@ -662,6 +670,7 @@ function startPracticeQuiz(line) {
   }
   AppState.quiz = new QuizState(questions);
   AppState.lastQuizQuestions = questions;
+  AppState.quizSource = 'section-c';
   renderQuizQuestion();
   showScreen('quiz');
 }
@@ -682,7 +691,7 @@ function renderQuizQuestion() {
   const streakEl = document.getElementById('quiz-streak');
 
   counterEl.textContent = `Otázka ${quiz.currentIndex + 1} z ${quiz.total}`;
-  scoreEl.innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg> ${quiz.score}`;
+  scoreEl.innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg> ${quiz.score}/${quiz.total}`;
   streakEl.innerHTML = quiz.streak >= 3 ? `<svg class="icon" aria-hidden="true"><use href="#icon-zap"/></svg> ${quiz.streak}` : '';
   progressBar.style.width = `${quiz.progressPercent}%`;
 
@@ -1458,8 +1467,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // === Kvíz ===
   document.getElementById('quiz-back').addEventListener('click', () => {
+    if (!confirm('Opravdu chceš odejít? Postup v kvízu se ztratí.')) return;
     AudioPlayer.stop();
-    showScreen('home');
+    showScreen(AppState.quizSource || 'home');
   });
 
   // === Výsledky ===
