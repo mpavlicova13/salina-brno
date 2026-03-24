@@ -453,6 +453,9 @@ const HubState = {
 };
 
 function openSectionD() {
+  HubState.selectedHubs = [];
+  HubState.activeTypes = [];
+  document.querySelectorAll('.hub-type-btn').forEach(btn => btn.classList.remove('active'));
   renderHubButtons();
   updateHubQuizBtn();
   showScreen('section-d');
