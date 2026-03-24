@@ -979,14 +979,47 @@ button:active {
 }
 
 /* Dopravní uzly */
+.hub-filter-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.hub-filter-header h3 { margin: 0; font-size: 0.95rem; }
+.hub-step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: var(--white);
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.hub-filter-hint {
+  font-size: 0.75rem;
+  color: var(--gray-dark);
+  margin: 1px 0 0;
+}
+.hub-selection-summary {
+  font-size: 0.8rem;
+  color: var(--blue);
+  font-weight: 600;
+  margin-top: 8px;
+  min-height: 1.2em;
+}
+.hub-selection-summary.empty { color: var(--gray-dark); font-weight: 400; }
+
 .hub-type-filter {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 4px;
 }
 .hub-type-btn {
-  padding: 8px 14px;
+  padding: 9px 16px;
   border-radius: 20px;
   border: 2px solid var(--gray-mid);
   background: var(--white);
@@ -995,11 +1028,22 @@ button:active {
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hub-type-btn::before {
+  content: '☐';
+  font-size: 1rem;
+  line-height: 1;
 }
 .hub-type-btn.active {
   border-color: var(--blue);
   background: var(--blue);
   color: var(--white);
+}
+.hub-type-btn.active::before {
+  content: '☑';
 }
 .hub-start-hint {
   font-size: 0.85rem;
@@ -1025,11 +1069,22 @@ button:active {
   color: var(--blue);
   cursor: pointer;
   transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hub-node-btn .hub-node-check {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  color: var(--gray-dark);
 }
 .hub-node-btn.active {
   border-color: var(--blue);
-  background: var(--blue);
-  color: var(--white);
+  background: var(--blue-pale);
+  color: var(--blue);
+}
+.hub-node-btn.active .hub-node-check {
+  color: var(--blue);
 }
 .hub-info {
   background: var(--white);
