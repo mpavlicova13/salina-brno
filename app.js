@@ -823,6 +823,7 @@ function renderMultiSelectQuestion(container, q, quiz) {
       if (isCorrect) lbl.classList.add('correct');
       else if (isSelected) lbl.classList.add('wrong');
     });
+    confirmBtn.remove();
     showExplanation(container, q.explanation, result.isCorrect);
     showNextButton(container);
   };
