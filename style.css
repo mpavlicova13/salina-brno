@@ -1989,6 +1989,36 @@ button:active {
 }
 .profile-avatar-btn:hover { transform: scale(1.1); }
 
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+  overflow: hidden;
+  z-index: 200;
+  min-width: 180px;
+  animation: popIn 0.15s ease;
+}
+.profile-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 16px;
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--blue);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition);
+}
+.profile-dropdown-item:hover { background: var(--blue-pale); }
+.profile-dropdown-item + .profile-dropdown-item { border-top: 1px solid var(--gray-mid); }
+
 /* Stats screen */
 .stats-profile-row {
   display: flex;
