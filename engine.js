@@ -430,6 +430,129 @@ function generateB_konecna(lines) {
 
 
 /* ========================================================
+   DOPRAVNÍ UZLY – generátory otázek
+======================================================== */
+
+const typeLabels = { tramvaje: 'tramvaj', trolejbusy: 'trolejbus', autobusy: 'autobus' };
+const typeEmojis = { tramvaje: '🚋', trolejbusy: '🚎', autobusy: '🚌' };
+
+/** HUB1: Která linka daného typu zastavuje v uzlu X? */
+function generateHUB_ktereZastavuje(hubs, types) {
+  const hub = pick(hubs);
+  const type = pick(types.filter(t => hub[t] && hub[t].length > 0));
+  const correct = pick(hub[type]);
+  // Distractors: linky stejného typu z jiných uzlů, které v tomto uzlu NEJSOU
+  const otherLines = hubs.flatMap(h => h !== hub ? (h[type] || []) : [])
+    .filter(l => !hub[type].includes(l));
+  const wrongs = pickN([...new Set(otherLines)], 3);
+  if (wrongs.length < 3) return generateHUB_nezastavuje(hubs, types);
+  const options = shuffle([correct, ...wrongs]);
+  return {
+    type: 'HUB_ktereZastavuje',
+    question: `${typeEmojis[type]} Která ${typeLabels[type]}ová linka zastavuje v uzlu\n${hub.name}?`,
+    options,
+    correct,
+    explanation: `V uzlu ${hub.name} zastavují ${type}: ${hub[type].join(', ')}.`
+  };
+}
+
+/** HUB2: Která linka daného typu NEZASTAVUJE v uzlu X? */
+function generateHUB_nezastavuje(hubs, types) {
+  const hub = pick(hubs);
+  const type = pick(types.filter(t => hub[t] && hub[t].length >= 3));
+  if (!type) return generateHUB_jakemUzlu(hubs, types);
+  const realOnes = pickN(hub[type], 3);
+  const allOtherLines = hubs.flatMap(h => h !== hub ? (h[type] || []) : [])
+    .filter(l => !hub[type].includes(l));
+  const fake = pick([...new Set(allOtherLines)]);
+  if (!fake) return generateHUB_jakemUzlu(hubs, types);
+  const options = shuffle([fake, ...realOnes]);
+  return {
+    type: 'HUB_nezastavuje',
+    question: `${typeEmojis[type]} Která ${typeLabels[type]}ová linka NEZASTAVUJE v uzlu\n${hub.name}?`,
+    options,
+    correct: fake,
+    explanation: `${fake} nejezdí přes ${hub.name}. Tamní ${type}: ${hub[type].join(', ')}.`
+  };
+}
+
+/** HUB3: V jakém uzlu zastavuje linka X? */
+function generateHUB_jakemUzlu(hubs, types) {
+  const hub = pick(hubs);
+  const type = pick(types.filter(t => hub[t] && hub[t].length > 0));
+  const line = pick(hub[type]);
+  const correct = hub.name;
+  // Špatné: jiné uzly, kde tato linka nejezdí
+  const wrongHubs = hubs.filter(h => !(h[type] || []).includes(line));
+  const wrongs = pickN(wrongHubs, 3).map(h => h.name);
+  if (wrongs.length < 3) return generateHUB_zastavujeAnoNe(hubs, types);
+  const options = shuffle([correct, ...wrongs]);
+  return {
+    type: 'HUB_jakemUzlu',
+    question: `${typeEmojis[type]} V jakém dopravním uzlu zastavuje ${typeLabels[type]} č. ${line}?`,
+    options,
+    correct,
+    explanation: `${typeLabels[type].charAt(0).toUpperCase() + typeLabels[type].slice(1)} ${line} zastavuje v uzlu ${hub.name}.`
+  };
+}
+
+/** HUB4: Zastavuje linka X v uzlu Y? (Ano/Ne) */
+function generateHUB_zastavujeAnoNe(hubs, types) {
+  const hub = pick(hubs);
+  const type = pick(types.filter(t => hub[t] && hub[t].length > 0));
+  const isTrue = Math.random() < 0.5;
+  let line;
+  if (isTrue) {
+    line = pick(hub[type]);
+  } else {
+    const foreign = hubs.flatMap(h => h !== hub ? (h[type] || []) : [])
+      .filter(l => !hub[type].includes(l));
+    if (foreign.length === 0) { line = pick(hub[type]); return generateHUB_zastavujeAnoNe(hubs, types); }
+    line = pick([...new Set(foreign)]);
+  }
+  const correct = isTrue ? 'Ano ✅' : 'Ne ❌';
+  return {
+    type: 'HUB_zastavujeAnoNe',
+    question: `${typeEmojis[type]} Zastavuje ${typeLabels[type]} č. ${line} v uzlu\n${hub.name}?`,
+    options: ['Ano ✅', 'Ne ❌'],
+    correct,
+    isTrueFalse: true,
+    explanation: isTrue
+      ? `Ano, ${typeLabels[type]} ${line} zastavuje v uzlu ${hub.name}.`
+      : `Ne, ${typeLabels[type]} ${line} v uzlu ${hub.name} nezastavuje.`
+  };
+}
+
+/**
+ * Generuje pole otázek pro dopravní uzly.
+ * @param {string[]} hubNames - vybrané uzly ([] = všechny)
+ * @param {string[]} types - ['tramvaje','trolejbusy','autobusy'] nebo podmnožina
+ * @param {number} count - počet otázek
+ */
+function generateHubSession(hubNames, types, count) {
+  const hubs = hubNames.length > 0
+    ? HUB_DATA.filter(h => hubNames.includes(h.name))
+    : HUB_DATA;
+  const generators = [
+    generateHUB_ktereZastavuje,
+    generateHUB_nezastavuje,
+    generateHUB_jakemUzlu,
+    generateHUB_zastavujeAnoNe
+  ];
+  const questions = [];
+  const max = count === 0 ? 999 : count;
+  let attempts = 0;
+  while (questions.length < max && attempts < max * 10) {
+    attempts++;
+    try {
+      const q = pick(generators)(hubs, types);
+      if (q) questions.push(q);
+    } catch(e) { /* skip */ }
+  }
+  return questions.slice(0, max);
+}
+
+/* ========================================================
    HLAVNÍ GENERÁTOR SEZENÍ
 ======================================================== */
 

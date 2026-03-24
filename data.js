@@ -199,3 +199,70 @@ function buildStopToLinesMap() {
 
 // Předvypočítaná mapa zastávek → linek
 const STOP_TO_LINES = buildStopToLinesMap();
+
+/* ========================================================
+   DOPRAVNÍ UZLY
+======================================================== */
+
+const HUB_DATA = [
+  {
+    name: 'Mendlovo náměstí',
+    tramvaje:   ['1','5','6'],
+    trolejbusy: ['25','26','35','37'],
+    autobusy:   ['44','52','62','84','N97','N98']
+  },
+  {
+    name: 'Česká – Komenského náměstí',
+    tramvaje:   ['3','4','5','6','9','10','12'],
+    trolejbusy: ['32','34','36','38','39'],
+    autobusy:   ['80','N89','N92','N93','N95','N99']
+  },
+  {
+    name: 'Hlavní nádraží',
+    tramvaje:   ['1','2','4','7','8','9','10','12'],
+    trolejbusy: ['31','33'],
+    autobusy:   ['47','49','67','E76','N89','N90','N91','N92','N93','N94','N95','N96','N97','N98','N99']
+  },
+  {
+    name: 'Stará osada',
+    tramvaje:   ['2','3'],
+    trolejbusy: ['27'],
+    autobusy:   ['44','55','58','64','75','E75','78','84','N97','N99','201']
+  },
+  {
+    name: 'Starý Lískovce a Bohunice',
+    tramvaje:   ['6','7','8'],
+    trolejbusy: ['25','37'],
+    autobusy:   ['40','50','E50','E56','69','N90','N91','N96','161','401','402','403','404','405','406','502']
+  },
+  {
+    name: 'Lesná',
+    tramvaje:   ['5','7','9'],
+    trolejbusy: ['25','26'],
+    autobusy:   ['44','46','57','66','72','84','N92','N93']
+  },
+  {
+    name: 'Konečného náměstí',
+    tramvaje:   ['3','10','12'],
+    trolejbusy: ['25','26'],
+    autobusy:   ['N92','N93','N99']
+  },
+  {
+    name: 'Bystrc – ZOO',
+    tramvaje:   ['1','3','10'],
+    trolejbusy: ['30'],
+    autobusy:   ['50','52','54','N92','N98','161','302','303']
+  },
+  {
+    name: 'Královo Pole – Semilasso',
+    tramvaje:   ['1','6'],
+    trolejbusy: ['30'],
+    autobusy:   ['41','42','44','E56','70','72','84','N90','N91','301','304']
+  },
+  {
+    name: 'Líšeň',
+    tramvaje:   ['8','10'],
+    trolejbusy: ['25','27'],
+    autobusy:   ['55','58','78','N97','N98','N99','151']
+  }
+];
