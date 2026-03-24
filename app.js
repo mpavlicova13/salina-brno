@@ -335,7 +335,7 @@ function startQuizA() {
   const questions = generateSession('A', AppState.selectedLinesA, count, AppState.settings.enabledTypesA);
   if (questions.length === 0) { alert('Nepodařilo se vygenerovat otázky.'); return; }
   AppState.quiz = new QuizState(questions);
-  AppState.lastQuizStarter = startQuizA;
+  AppState.lastQuizQuestions = questions;
   renderQuizQuestion();
   showScreen('quiz');
 }
@@ -429,7 +429,7 @@ function startQuizB() {
   const questions = generateSession('B', AppState.selectedLinesB, count, AppState.settings.enabledTypesB);
   if (questions.length === 0) { alert('Nepodařilo se vygenerovat otázky.'); return; }
   AppState.quiz = new QuizState(questions);
-  AppState.lastQuizStarter = startQuizB;
+  AppState.lastQuizQuestions = questions;
   renderQuizQuestion();
   showScreen('quiz');
 }
@@ -603,7 +603,7 @@ function startPracticeQuiz(line) {
     return;
   }
   AppState.quiz = new QuizState(questions);
-  AppState.lastQuizStarter = () => startPracticeQuiz(line);
+  AppState.lastQuizQuestions = questions;
   renderQuizQuestion();
   showScreen('quiz');
 }
@@ -958,8 +958,10 @@ function showResults() {
 }
 
 function retryQuiz() {
-  if (AppState.lastQuizStarter) {
-    AppState.lastQuizStarter();
+  if (AppState.lastQuizQuestions) {
+    AppState.quiz = new QuizState([...AppState.lastQuizQuestions]);
+    renderQuizQuestion();
+    showScreen('quiz');
   } else {
     showScreen('home');
   }
