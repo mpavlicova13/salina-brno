@@ -1042,11 +1042,6 @@ button:active {
 .hub-info-row:last-child { border-bottom: none; }
 .hub-info-label { font-weight: 700; white-space: nowrap; min-width: 100px; }
 .hub-info-lines { color: var(--gray-dark); }
-.hub-quiz-btn {
-  background: var(--red);
-  color: var(--white);
-  width: 100%;
-}
 
 .btn-mode-audioquiz {
   background: linear-gradient(135deg, #6c3483 0%, #8e44ad 100%);
