@@ -245,6 +245,8 @@ button:active {
 .card-a .section-card-icon { background: var(--blue-pale); }
 .card-b .section-card-icon { background: var(--red-light); }
 .card-c .section-card-icon { background: var(--blue-pale); }
+.card-d .section-card-icon { background: #fef3c7; }
+.card-d .section-card-icon .icon { stroke: #d97706; }
 
 .section-card-text h3 {
   font-size: 1.1rem;
@@ -974,6 +976,76 @@ button:active {
   background: var(--red);
   color: var(--white);
   box-shadow: 0 4px 16px rgba(218,33,39,0.3);
+}
+
+/* Dopravní uzly */
+.hub-type-filter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.hub-type-btn {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 2px solid var(--gray-mid);
+  background: var(--white);
+  color: var(--gray-dark);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.hub-type-btn.active {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: var(--white);
+}
+.hub-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.hub-node-btn {
+  padding: 11px 16px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--gray-mid);
+  background: var(--white);
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--blue);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.hub-node-btn.active {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: var(--white);
+}
+.hub-info {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.hub-info h3 { margin: 0 0 10px; color: var(--blue); font-size: 1rem; }
+.hub-info-row {
+  display: flex;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--gray-mid);
+  font-size: 0.85rem;
+}
+.hub-info-row:last-child { border-bottom: none; }
+.hub-info-label { font-weight: 700; white-space: nowrap; min-width: 100px; }
+.hub-info-lines { color: var(--gray-dark); }
+.hub-quiz-btn {
+  background: var(--red);
+  color: var(--white);
+  width: 100%;
 }
 
 .btn-mode-audioquiz {

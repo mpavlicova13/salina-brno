@@ -196,6 +196,16 @@
           </div>
         </button>
 
+        <button class="section-card card-d" id="btn-section-d">
+          <div class="section-card-icon">
+            <svg class="icon icon-section" aria-hidden="true"><use href="#icon-zap"/></svg>
+          </div>
+          <div class="section-card-text">
+            <h3>Dopravní uzly</h3>
+            <p>Nauč se linky v přestupních uzlech</p>
+          </div>
+        </button>
+
         <button class="section-card card-c" id="btn-section-c">
           <div class="section-card-icon">
             <svg class="icon icon-section" aria-hidden="true"><use href="#icon-headphones"/></svg>
@@ -272,6 +282,48 @@
         <span>Statistiky</span>
       </button>
     </nav>
+  </div>
+
+  <!-- ====================================================
+       SEKCE D – DOPRAVNÍ UZLY
+  ==================================================== -->
+  <div id="screen-section-d" class="screen">
+    <div class="screen-header">
+      <button class="btn-back" id="d-back" aria-label="Zpět">←</button>
+      <h2><svg class="icon icon-lg" aria-hidden="true"><use href="#icon-zap"/></svg> Dopravní uzly</h2>
+      <img src="logo_dpmb.png" alt="DPMB" class="header-logo">
+    </div>
+    <div class="screen-content">
+
+      <!-- Filtr dopravního prostředku -->
+      <div class="filter-section">
+        <h3>Typ dopravy</h3>
+        <div class="hub-type-filter">
+          <button class="hub-type-btn active" data-type="tramvaje">🚋 Tramvaje</button>
+          <button class="hub-type-btn active" data-type="trolejbusy">🚎 Trolejbusy</button>
+          <button class="hub-type-btn active" data-type="autobusy">🚌 Autobusy</button>
+        </div>
+      </div>
+
+      <!-- Výběr uzlu -->
+      <div class="filter-section">
+        <h3>Vyber uzel</h3>
+        <div id="hub-buttons" class="hub-buttons"></div>
+      </div>
+
+      <!-- Přehled vybraného uzlu -->
+      <div id="hub-info" class="hub-info" style="display:none">
+        <h3 id="hub-info-name"></h3>
+        <div id="hub-info-lines"></div>
+      </div>
+
+      <div class="start-section">
+        <button class="btn-quiz hub-quiz-btn" id="d-start-quiz">
+          <svg class="icon" aria-hidden="true"><use href="#icon-edit"/></svg> Spustit kvíz
+        </button>
+      </div>
+
+    </div>
   </div>
 
   <!-- ====================================================

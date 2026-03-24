@@ -443,6 +443,70 @@ function openSectionC() {
   showScreen('section-c');
 }
 
+/* ========================================================
+   SEKCE D – DOPRAVNÍ UZLY
+======================================================== */
+
+const HubState = {
+  selectedHub: null,   // null = všechny uzly
+  activeTypes: ['tramvaje', 'trolejbusy', 'autobusy']
+};
+
+function openSectionD() {
+  renderHubButtons();
+  showScreen('section-d');
+}
+
+function renderHubButtons() {
+  const container = document.getElementById('hub-buttons');
+  container.innerHTML = '';
+
+  // Tlačítko "Všechny uzly"
+  const allBtn = document.createElement('button');
+  allBtn.className = 'hub-node-btn' + (HubState.selectedHub === null ? ' active' : '');
+  allBtn.textContent = '🗺️ Všechny uzly';
+  allBtn.onclick = () => { HubState.selectedHub = null; renderHubButtons(); updateHubInfo(); };
+  container.appendChild(allBtn);
+
+  HUB_DATA.forEach(hub => {
+    const btn = document.createElement('button');
+    btn.className = 'hub-node-btn' + (HubState.selectedHub === hub.name ? ' active' : '');
+    btn.textContent = hub.name;
+    btn.onclick = () => { HubState.selectedHub = hub.name; renderHubButtons(); updateHubInfo(); };
+    container.appendChild(btn);
+  });
+}
+
+function updateHubInfo() {
+  const infoEl = document.getElementById('hub-info');
+  if (!HubState.selectedHub) { infoEl.style.display = 'none'; return; }
+  const hub = HUB_DATA.find(h => h.name === HubState.selectedHub);
+  if (!hub) return;
+  infoEl.style.display = 'block';
+  document.getElementById('hub-info-name').textContent = hub.name;
+  const linesEl = document.getElementById('hub-info-lines');
+  linesEl.innerHTML = [
+    { key: 'tramvaje', emoji: '🚋', label: 'Tramvaje' },
+    { key: 'trolejbusy', emoji: '🚎', label: 'Trolejbusy' },
+    { key: 'autobusy', emoji: '🚌', label: 'Autobusy' }
+  ].map(({ key, emoji, label }) =>
+    `<div class="hub-info-row"><span class="hub-info-label">${emoji} ${label}:</span><span class="hub-info-lines">${hub[key].join(', ')}</span></div>`
+  ).join('');
+}
+
+function startHubQuiz() {
+  const hubNames = HubState.selectedHub ? [HubState.selectedHub] : [];
+  const types = HubState.activeTypes;
+  if (types.length === 0) { alert('Vyber alespoň jeden typ dopravy.'); return; }
+  const count = AppState.settings.sessionLength;
+  const questions = generateHubSession(hubNames, types, count);
+  if (questions.length === 0) { alert('Nepodařilo se vygenerovat otázky.'); return; }
+  AppState.quiz = new QuizState(questions);
+  AppState.lastQuizQuestions = questions;
+  renderQuizQuestion();
+  showScreen('quiz');
+}
+
 function renderLineButtons() {
   const container = document.getElementById('line-buttons');
   container.innerHTML = '';
@@ -1306,6 +1370,22 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-section-a').addEventListener('click', openSectionA);
   document.getElementById('btn-section-b').addEventListener('click', openSectionB);
   document.getElementById('btn-section-c').addEventListener('click', openSectionC);
+  document.getElementById('btn-section-d').addEventListener('click', openSectionD);
+  document.getElementById('d-back').addEventListener('click', () => showScreen('home'));
+  document.getElementById('d-start-quiz').addEventListener('click', startHubQuiz);
+  document.querySelectorAll('.hub-type-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.dataset.type;
+      if (HubState.activeTypes.includes(type)) {
+        if (HubState.activeTypes.length === 1) return; // nech aspoň jeden
+        HubState.activeTypes = HubState.activeTypes.filter(t => t !== type);
+        btn.classList.remove('active');
+      } else {
+        HubState.activeTypes.push(type);
+        btn.classList.add('active');
+      }
+    });
+  });
   document.getElementById('btn-settings').addEventListener('click', openSettings);
 
   // === Nastavení ===
