@@ -441,11 +441,11 @@ function generateHUB_ktereZastavuje(hubs, types) {
   const hub = pick(hubs);
   const type = pick(types.filter(t => hub[t] && hub[t].length > 0));
   const correct = pick(hub[type]);
-  // Distractors: linky stejného typu z jiných uzlů, které v tomto uzlu NEJSOU
-  const otherLines = hubs.flatMap(h => h !== hub ? (h[type] || []) : [])
+  // Distractors: linky stejného typu z CELÉHO HUB_DATA, které v tomto uzlu NEJSOU
+  const otherLines = HUB_DATA.flatMap(h => h !== hub ? (h[type] || []) : [])
     .filter(l => !hub[type].includes(l));
   const wrongs = pickN([...new Set(otherLines)], 3);
-  if (wrongs.length < 3) return generateHUB_nezastavuje(hubs, types);
+  if (wrongs.length < 3) return null;
   const options = shuffle([correct, ...wrongs]);
   return {
     type: 'HUB_ktereZastavuje',
@@ -460,12 +460,13 @@ function generateHUB_ktereZastavuje(hubs, types) {
 function generateHUB_nezastavuje(hubs, types) {
   const hub = pick(hubs);
   const type = pick(types.filter(t => hub[t] && hub[t].length >= 3));
-  if (!type) return generateHUB_jakemUzlu(hubs, types);
+  if (!type) return null;
   const realOnes = pickN(hub[type], 3);
-  const allOtherLines = hubs.flatMap(h => h !== hub ? (h[type] || []) : [])
+  // Fake: linka z CELÉHO HUB_DATA, která v tomto uzlu nejezdí
+  const allOtherLines = HUB_DATA.flatMap(h => h !== hub ? (h[type] || []) : [])
     .filter(l => !hub[type].includes(l));
   const fake = pick([...new Set(allOtherLines)]);
-  if (!fake) return generateHUB_jakemUzlu(hubs, types);
+  if (!fake) return null;
   const options = shuffle([fake, ...realOnes]);
   return {
     type: 'HUB_nezastavuje',
@@ -482,10 +483,10 @@ function generateHUB_jakemUzlu(hubs, types) {
   const type = pick(types.filter(t => hub[t] && hub[t].length > 0));
   const line = pick(hub[type]);
   const correct = hub.name;
-  // Špatné: jiné uzly, kde tato linka nejezdí
-  const wrongHubs = hubs.filter(h => !(h[type] || []).includes(line));
+  // Špatné: jiné uzly z CELÉHO HUB_DATA, kde tato linka nejezdí
+  const wrongHubs = HUB_DATA.filter(h => h !== hub && !(h[type] || []).includes(line));
   const wrongs = pickN(wrongHubs, 3).map(h => h.name);
-  if (wrongs.length < 3) return generateHUB_zastavujeAnoNe(hubs, types);
+  if (wrongs.length < 3) return null;
   const options = shuffle([correct, ...wrongs]);
   return {
     type: 'HUB_jakemUzlu',
@@ -505,9 +506,10 @@ function generateHUB_zastavujeAnoNe(hubs, types) {
   if (isTrue) {
     line = pick(hub[type]);
   } else {
-    const foreign = hubs.flatMap(h => h !== hub ? (h[type] || []) : [])
-      .filter(l => !hub[type].includes(l));
-    if (foreign.length === 0) { line = pick(hub[type]); return generateHUB_zastavujeAnoNe(hubs, types); }
+    // Falešná linka: z CELÉHO HUB_DATA, která v tomto uzlu nejezdí
+    const foreign = HUB_DATA.flatMap(h => h !== hub ? (h[type] || []) : [])
+      .filter(l => !(hub[type] || []).includes(l));
+    if (foreign.length === 0) return null;
     line = pick([...new Set(foreign)]);
   }
   const correct = isTrue ? 'Ano ✅' : 'Ne ❌';
@@ -540,13 +542,17 @@ function generateHubSession(hubNames, types, count) {
     generateHUB_zastavujeAnoNe
   ];
   const questions = [];
+  const seenQuestions = new Set();
   const max = count === 0 ? 999 : count;
   let attempts = 0;
-  while (questions.length < max && attempts < max * 10) {
+  while (questions.length < max && attempts < max * 30) {
     attempts++;
     try {
       const q = pick(generators)(hubs, types);
-      if (q) questions.push(q);
+      if (q && !seenQuestions.has(q.question)) {
+        seenQuestions.add(q.question);
+        questions.push(q);
+      }
     } catch(e) { /* skip */ }
   }
   return questions.slice(0, max);

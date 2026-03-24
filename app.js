@@ -1375,18 +1375,18 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-section-d').addEventListener('click', openSectionD);
   document.getElementById('d-back').addEventListener('click', () => showScreen('home'));
   document.getElementById('d-start-quiz').addEventListener('click', startHubQuiz);
-  document.querySelectorAll('.hub-type-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const type = btn.dataset.type;
-      if (HubState.activeTypes.includes(type)) {
-        HubState.activeTypes = HubState.activeTypes.filter(t => t !== type);
-        btn.classList.remove('active');
-      } else {
-        HubState.activeTypes.push(type);
-        btn.classList.add('active');
-      }
-      updateHubQuizBtn();
-    });
+  document.querySelector('.hub-type-filter').addEventListener('click', (e) => {
+    const btn = e.target.closest('.hub-type-btn');
+    if (!btn) return;
+    const type = btn.dataset.type;
+    if (HubState.activeTypes.includes(type)) {
+      HubState.activeTypes = HubState.activeTypes.filter(t => t !== type);
+      btn.classList.remove('active');
+    } else {
+      HubState.activeTypes.push(type);
+      btn.classList.add('active');
+    }
+    updateHubQuizBtn();
   });
 
   // === Nastavení ===
