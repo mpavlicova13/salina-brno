@@ -1050,10 +1050,9 @@ function toggleLineSelection(arr, num) {
 }
 
 /** Vybere/odebere všechny linky v filtru. */
-function toggleAllLines(arrRef, allNums, containerSelector) {
+function toggleAllLines(arrRef, allNums, containerSelector, btnId) {
   const allSelected = allNums.every(n => arrRef.includes(n));
   if (allSelected) {
-    // Odeber vše kromě první
     arrRef.length = 0;
     arrRef.push(allNums[0]);
   } else {
@@ -1063,6 +1062,10 @@ function toggleAllLines(arrRef, allNums, containerSelector) {
   document.querySelectorAll(containerSelector + ' .line-filter-btn').forEach((btn, i) => {
     btn.classList.toggle('selected', arrRef.includes(TRAM_DATA.lines[i].number));
   });
+  if (btnId) {
+    const btn = document.getElementById(btnId);
+    if (btn) btn.textContent = allNums.every(n => arrRef.includes(n)) ? 'Zrušit výběr' : 'Vybrat vše';
+  }
 }
 
 /* ========================================================
@@ -1298,7 +1301,8 @@ function renderStatsScreen() {
     const unlocked = g.achievements.includes(a.id);
     const item = document.createElement('div');
     item.className = 'achievement-item' + (unlocked ? ' achievement-unlocked' : ' achievement-locked');
-    item.innerHTML = `<span class="ach-icon">${a.icon}</span><div class="ach-info"><strong>${a.name}</strong><span>${a.desc}</span></div>${unlocked ? '<span class="ach-check">✓</span>' : '<span class="ach-lock">🔒</span>'}`;
+    const lockHint = unlocked ? '' : `<span class="ach-unlock-hint">K odemčení: ${a.desc}</span>`;
+    item.innerHTML = `<span class="ach-icon">${a.icon}</span><div class="ach-info"><strong>${a.name}</strong>${unlocked ? `<span>${a.desc}</span>` : lockHint}</div>${unlocked ? '<span class="ach-check">✓</span>' : '<span class="ach-lock">🔒</span>'}`;
     achEl.appendChild(item);
   });
 }
@@ -1409,8 +1413,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('settings-back').addEventListener('click', () => showScreen('home'));
   document.querySelectorAll('.session-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.session-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      const val = parseInt(btn.dataset.val);
+      AppState.settings.sessionLength = val;
+      document.querySelectorAll('.session-btn').forEach(b => {
+        b.classList.toggle('active', parseInt(b.dataset.val) === val);
+      });
     });
   });
 
@@ -1419,7 +1426,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('a-start-flashcards').addEventListener('click', startFlashcards);
   document.getElementById('a-start-quiz').addEventListener('click', startQuizA);
   document.getElementById('a-select-all').addEventListener('click', () => {
-    toggleAllLines(AppState.selectedLinesA, TRAM_DATA.lines.map(l => l.number), '#filter-a');
+    toggleAllLines(AppState.selectedLinesA, TRAM_DATA.lines.map(l => l.number), '#filter-a', 'a-select-all');
   });
 
   // === Flashkarty ===
@@ -1435,7 +1442,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('b-back').addEventListener('click', () => showScreen('home'));
   document.getElementById('b-start-quiz').addEventListener('click', startQuizB);
   document.getElementById('b-select-all').addEventListener('click', () => {
-    toggleAllLines(AppState.selectedLinesB, TRAM_DATA.lines.map(l => l.number), '#filter-b');
+    toggleAllLines(AppState.selectedLinesB, TRAM_DATA.lines.map(l => l.number), '#filter-b', 'b-select-all');
   });
 
   // === Sekce C ===
@@ -1473,6 +1480,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // === Výsledky ===
+  document.getElementById('results-back').addEventListener('click', () => showScreen(AppState.quizSource || 'home'));
   document.getElementById('result-retry').addEventListener('click', () => {
     retryQuiz();
   });
