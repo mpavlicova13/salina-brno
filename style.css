@@ -740,9 +740,7 @@ button:active {
 }
 
 /* Ordering question */
-.ordering-container {
-  margin-top: 8px;
-}
+.ordering-container { margin-top: 8px; }
 
 .ordering-hint {
   font-size: 0.82rem;
@@ -750,86 +748,61 @@ button:active {
   margin: 0 0 10px;
 }
 
-.ordering-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.ordering-chip {
-  background: var(--blue);
-  color: var(--white);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border: 2px solid transparent;
-  transition: all var(--transition);
-  cursor: pointer;
-}
-
-.ordering-chip:hover {
-  opacity: 0.85;
-}
-
-.ordering-slots {
+.ordering-dnd-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
-.ordering-slot {
+.ordering-dnd-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--white);
+  border: 2px solid var(--blue-light);
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
   font-weight: 600;
-  border: 2px dashed var(--gray-mid);
-  color: var(--gray-dark);
-  min-height: 44px;
-  background: none;
-  width: 100%;
-  text-align: left;
-  cursor: default;
-}
-
-.ordering-slot.filled {
-  border-style: solid;
-  border-color: var(--blue-light);
-  background: var(--white);
   color: var(--blue);
-  cursor: pointer;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: background 0.15s, box-shadow 0.15s;
 }
 
-.ordering-slot.filled:hover { background: #f0f4ff; }
+.ordering-dnd-item:active { cursor: grabbing; }
 
-.slot-num { font-size: 0.75rem; color: var(--gray-dark); min-width: 18px; }
-.slot-stop { flex: 1; }
-.slot-placeholder { flex: 1; color: var(--gray-mid); font-weight: 400; }
-.slot-remove { font-size: 0.75rem; color: var(--red); font-weight: 700; margin-left: auto; }
+.ordering-dnd-item.dragging {
+  opacity: 0.45;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+}
 
-.ordering-slot.correct {
+.ordering-dnd-item.drag-over {
+  border-color: var(--blue);
+  background: #e8f0ff;
+}
+
+.ordering-dnd-item.correct {
   background: var(--green-light);
   border-color: var(--green);
   color: #1a6e3a;
   cursor: default;
 }
 
-.ordering-slot.wrong {
+.ordering-dnd-item.wrong {
   background: var(--wrong-light);
   border-color: var(--wrong);
   color: #922b21;
   cursor: default;
 }
 
-.ordering-confirm {
-  width: 100%;
-  margin-top: 4px;
-}
+.dnd-handle { color: var(--gray-dark); font-size: 1rem; flex-shrink: 0; }
+.dnd-num { font-size: 0.75rem; color: var(--gray-dark); min-width: 20px; flex-shrink: 0; }
+.dnd-stop { flex: 1; }
+
+.ordering-confirm { width: 100%; margin-top: 4px; }
 
 /* Multi-select */
 .multiselect-container {

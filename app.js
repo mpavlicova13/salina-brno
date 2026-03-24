@@ -678,81 +678,115 @@ function renderOrderingQuestion(container, q, quiz) {
   const orderingDiv = document.createElement('div');
   orderingDiv.className = 'ordering-container';
 
-  // Stav: placedStops[i] = název zastávky nebo null
-  const placedStops = new Array(q.correct.length).fill(null);
+  // Pořadí zastávek – začínáme s promíchaným pořadím
+  const order = [...q.options];
+  let dragSrcIdx = null;
 
-  const render = () => {
-    orderingDiv.innerHTML = '';
+  const hint = document.createElement('p');
+  hint.className = 'ordering-hint';
+  hint.textContent = '↕ Přetáhni zastávky do správného pořadí, pak potvrď.';
+  orderingDiv.appendChild(hint);
 
-    // Sloty
-    const slotsDiv = document.createElement('div');
-    slotsDiv.className = 'ordering-slots';
-    placedStops.forEach((stop, i) => {
-      const slot = document.createElement('button');
-      slot.className = stop ? 'ordering-slot filled' : 'ordering-slot empty';
-      slot.innerHTML = stop
-        ? `<span class="slot-num">${i + 1}.</span><span class="slot-stop">${stop}</span><span class="slot-remove">✕</span>`
-        : `<span class="slot-num">${i + 1}.</span><span class="slot-placeholder">—</span>`;
-      if (stop) {
-        slot.onclick = () => {
-          if (quiz.answered) return;
-          placedStops[i] = null;
-          render();
-        };
-      }
-      slotsDiv.appendChild(slot);
-    });
-    orderingDiv.appendChild(slotsDiv);
+  const list = document.createElement('div');
+  list.className = 'ordering-dnd-list';
+  orderingDiv.appendChild(list);
 
-    // Dostupné chipy (ty, co ještě nejsou v slotech)
-    const used = new Set(placedStops.filter(Boolean));
-    const available = q.options.filter(s => !used.has(s));
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className = 'btn-primary ordering-confirm';
+  confirmBtn.textContent = 'Potvrdit pořadí';
+  orderingDiv.appendChild(confirmBtn);
 
-    if (available.length > 0) {
-      const hint = document.createElement('p');
-      hint.className = 'ordering-hint';
-      hint.textContent = 'Klikni na zastávku pro přidání. Vybrané zastávky ✕ pro odebrání.';
-      orderingDiv.appendChild(hint);
+  const renderItems = () => {
+    list.innerHTML = '';
+    order.forEach((stop, i) => {
+      const item = document.createElement('div');
+      item.className = 'ordering-dnd-item';
+      item.draggable = true;
+      item.dataset.idx = i;
+      item.innerHTML = `<span class="dnd-handle">☰</span><span class="dnd-num">${i + 1}.</span><span class="dnd-stop">${stop}</span>`;
 
-      const chipsDiv = document.createElement('div');
-      chipsDiv.className = 'ordering-chips';
-      available.forEach(stop => {
-        const chip = document.createElement('button');
-        chip.className = 'ordering-chip';
-        chip.textContent = stop;
-        chip.onclick = () => {
-          if (quiz.answered) return;
-          const firstEmpty = placedStops.indexOf(null);
-          if (firstEmpty === -1) return;
-          placedStops[firstEmpty] = stop;
-          render();
-        };
-        chipsDiv.appendChild(chip);
+      // ── Desktop drag ──
+      item.addEventListener('dragstart', e => {
+        dragSrcIdx = i;
+        item.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
       });
-      orderingDiv.appendChild(chipsDiv);
-    }
+      item.addEventListener('dragend', () => {
+        item.classList.remove('dragging');
+        list.querySelectorAll('.ordering-dnd-item').forEach(el => el.classList.remove('drag-over'));
+      });
+      item.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        list.querySelectorAll('.ordering-dnd-item').forEach(el => el.classList.remove('drag-over'));
+        item.classList.add('drag-over');
+      });
+      item.addEventListener('drop', e => {
+        e.preventDefault();
+        if (dragSrcIdx === null || dragSrcIdx === i) return;
+        const moved = order.splice(dragSrcIdx, 1)[0];
+        order.splice(i, 0, moved);
+        dragSrcIdx = null;
+        renderItems();
+      });
 
-    // Všechny sloty obsazeny → tlačítko potvrdit
-    if (!placedStops.includes(null) && !quiz.answered) {
-      const confirmBtn = document.createElement('button');
-      confirmBtn.className = 'btn-primary ordering-confirm';
-      confirmBtn.textContent = 'Potvrdit pořadí';
-      confirmBtn.onclick = () => {
-        const result = quiz.answer([...placedStops]);
-        // Obarvi sloty
-        Array.from(slotsDiv.children).forEach((slot, idx) => {
-          slot.classList.add(placedStops[idx] === q.correct[idx] ? 'correct' : 'wrong');
-          slot.onclick = null;
+      // ── Touch drag ──
+      let touchStartY = 0;
+      item.addEventListener('touchstart', e => {
+        dragSrcIdx = i;
+        touchStartY = e.touches[0].clientY;
+        item.classList.add('dragging');
+      }, { passive: true });
+      item.addEventListener('touchmove', e => {
+        e.preventDefault();
+        const y = e.touches[0].clientY;
+        const items = [...list.querySelectorAll('.ordering-dnd-item')];
+        items.forEach(el => el.classList.remove('drag-over'));
+        // Najdi položku pod prstem
+        const target = items.find(el => {
+          const r = el.getBoundingClientRect();
+          return y >= r.top && y <= r.bottom;
         });
-        confirmBtn.remove();
-        showExplanation(container, q.explanation, result.isCorrect);
-        showNextButton(container);
-      };
-      orderingDiv.appendChild(confirmBtn);
-    }
+        if (target && target !== item) target.classList.add('drag-over');
+      }, { passive: false });
+      item.addEventListener('touchend', e => {
+        item.classList.remove('dragging');
+        const y = e.changedTouches[0].clientY;
+        const items = [...list.querySelectorAll('.ordering-dnd-item')];
+        items.forEach(el => el.classList.remove('drag-over'));
+        const target = items.find(el => {
+          const r = el.getBoundingClientRect();
+          return y >= r.top && y <= r.bottom;
+        });
+        if (target) {
+          const targetIdx = parseInt(target.dataset.idx);
+          if (targetIdx !== dragSrcIdx) {
+            const moved = order.splice(dragSrcIdx, 1)[0];
+            order.splice(targetIdx, 0, moved);
+            renderItems();
+          }
+        }
+        dragSrcIdx = null;
+      });
+
+      list.appendChild(item);
+    });
   };
 
-  render();
+  confirmBtn.onclick = () => {
+    if (quiz.answered) return;
+    const result = quiz.answer([...order]);
+    // Obarvi položky
+    list.querySelectorAll('.ordering-dnd-item').forEach((item, idx) => {
+      item.draggable = false;
+      item.classList.add(order[idx] === q.correct[idx] ? 'correct' : 'wrong');
+    });
+    confirmBtn.remove();
+    showExplanation(container, q.explanation, result.isCorrect);
+    showNextButton(container);
+  };
+
+  renderItems();
   container.appendChild(orderingDiv);
 }
 
