@@ -335,6 +335,7 @@ function startQuizA() {
   const questions = generateSession('A', AppState.selectedLinesA, count, AppState.settings.enabledTypesA);
   if (questions.length === 0) { alert('Nepodařilo se vygenerovat otázky.'); return; }
   AppState.quiz = new QuizState(questions);
+  AppState.lastQuizStarter = startQuizA;
   renderQuizQuestion();
   showScreen('quiz');
 }
@@ -428,6 +429,7 @@ function startQuizB() {
   const questions = generateSession('B', AppState.selectedLinesB, count, AppState.settings.enabledTypesB);
   if (questions.length === 0) { alert('Nepodařilo se vygenerovat otázky.'); return; }
   AppState.quiz = new QuizState(questions);
+  AppState.lastQuizStarter = startQuizB;
   renderQuizQuestion();
   showScreen('quiz');
 }
@@ -601,6 +603,7 @@ function startPracticeQuiz(line) {
     return;
   }
   AppState.quiz = new QuizState(questions);
+  AppState.lastQuizStarter = () => startPracticeQuiz(line);
   renderQuizQuestion();
   showScreen('quiz');
 }
@@ -955,12 +958,11 @@ function showResults() {
 }
 
 function retryQuiz() {
-  // Regeneruj stejný typ sezení
-  AppState.quiz = new QuizState(shuffle(AppState.quiz.questions));
-  AppState.quiz.questions.forEach(q => { /* reset */ });
-  // Jednodušeji: generuj nové sezení
-  startQuizB(); // fallback – vrátí na sekci B
-  showScreen('home');
+  if (AppState.lastQuizStarter) {
+    AppState.lastQuizStarter();
+  } else {
+    showScreen('home');
+  }
 }
 
 /* ========================================================
