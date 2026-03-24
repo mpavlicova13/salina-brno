@@ -184,13 +184,23 @@
       </div>
 
       <div class="home-cards">
+        <button class="section-card card-c" id="btn-section-c">
+          <div class="section-card-icon">
+            <svg class="icon icon-section" aria-hidden="true"><use href="#icon-headphones"/></svg>
+          </div>
+          <div class="section-card-text">
+            <h3>Procvič linku</h3>
+            <p>Vyber linku, poslechni si zastávky a procvičuj je kvízem</p>
+          </div>
+        </button>
+
         <button class="section-card card-a" id="btn-section-a">
           <div class="section-card-icon">
             <svg class="icon icon-section" aria-hidden="true"><use href="#icon-map"/></svg>
           </div>
           <div class="section-card-text">
             <h3>Odkud → Kam</h3>
-            <p>Nauč se trasy linek – kartičky i kvíz</p>
+            <p>Trasy linek: odkud kam jedou, kde začínají a končí</p>
           </div>
         </button>
 
@@ -200,7 +210,7 @@
           </div>
           <div class="section-card-text">
             <h3>Zastávky</h3>
-            <p>Procvičuj pořadí a názvy zastávek</p>
+            <p>Která zastávka následuje? Která linka tudy nejezdí?</p>
           </div>
         </button>
 
@@ -210,17 +220,7 @@
           </div>
           <div class="section-card-text">
             <h3>Dopravní uzly</h3>
-            <p>Nauč se linky v přestupních uzlech</p>
-          </div>
-        </button>
-
-        <button class="section-card card-c" id="btn-section-c">
-          <div class="section-card-icon">
-            <svg class="icon icon-section" aria-hidden="true"><use href="#icon-headphones"/></svg>
-          </div>
-          <div class="section-card-text">
-            <h3>Procvič linku</h3>
-            <p>Poslechni si zastávky a udělej kvíz</p>
+            <p>Jaké linky se potkávají na Hlavním nádraží nebo Mendláku?</p>
           </div>
         </button>
       </div>
@@ -315,6 +315,7 @@
       </div>
 
       <div class="start-section">
+        <p class="hub-start-hint" id="hub-start-hint">Vyber alespoň jeden typ dopravy a jeden uzel.</p>
         <button class="btn-secondary" id="d-start-quiz">
           <svg class="icon" aria-hidden="true"><use href="#icon-edit"/></svg> Spustit kvíz
         </button>
@@ -544,7 +545,7 @@
         <span class="quiz-counter" id="quiz-counter">Otázka 1 z 10</span>
         <span class="quiz-streak-display" id="quiz-streak"></span>
         <span class="quiz-score-display" id="quiz-score">
-          <svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg> 0
+          <svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg> <span id="quiz-score-num">0</span>/<span id="quiz-score-total">0</span>
         </span>
       </div>
       <div class="quiz-progress-track">

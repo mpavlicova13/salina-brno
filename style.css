@@ -1001,6 +1001,13 @@ button:active {
   background: var(--blue);
   color: var(--white);
 }
+.hub-start-hint {
+  font-size: 0.85rem;
+  color: var(--gray-dark);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
 .hub-buttons {
   display: flex;
   flex-direction: column;
