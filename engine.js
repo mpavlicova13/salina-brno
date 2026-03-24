@@ -477,8 +477,9 @@ function generateHUB_nezastavuje(hubs, types) {
   };
 }
 
-/** HUB3: V jakém uzlu zastavuje linka X? */
+/** HUB3: V jakém uzlu zastavuje linka X? (jen při výběru více uzlů) */
 function generateHUB_jakemUzlu(hubs, types) {
+  if (hubs.length < 2) return null;
   const hub = pick(hubs);
   const type = pick(types.filter(t => hub[t] && hub[t].length > 0));
   const line = pick(hub[type]);
