@@ -461,6 +461,7 @@ function openSectionD() {
   HubState.selectedHubs = [];
   HubState.activeTypes = [];
   document.querySelectorAll('.hub-type-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('d-select-all').textContent = 'Vybrat vše';
   renderHubButtons();
   updateHubQuizBtn();
   showScreen('section-d');
@@ -473,7 +474,7 @@ function renderHubButtons() {
     const btn = document.createElement('button');
     const active = HubState.selectedHubs.includes(hub.name);
     btn.className = 'hub-node-btn' + (active ? ' active' : '');
-    btn.textContent = hub.name;
+    btn.innerHTML = `<span class="hub-node-check">${active ? '☑' : '☐'}</span>${hub.name}`;
     btn.onclick = () => {
       if (HubState.selectedHubs.includes(hub.name)) {
         HubState.selectedHubs = HubState.selectedHubs.filter(n => n !== hub.name);
@@ -485,6 +486,7 @@ function renderHubButtons() {
     };
     container.appendChild(btn);
   });
+  updateNodeSummary();
 }
 
 function updateHubQuizBtn() {
@@ -494,6 +496,34 @@ function updateHubQuizBtn() {
   btn.disabled = !ok;
   btn.style.opacity = ok ? '1' : '0.4';
   if (hint) hint.style.display = ok ? 'none' : 'block';
+  updateTypeSummary();
+}
+
+const TYPE_LABELS = { tramvaje: 'Tramvaje', trolejbusy: 'Trolejbusy', autobusy: 'Autobusy' };
+
+function updateTypeSummary() {
+  const el = document.getElementById('hub-type-summary');
+  if (!el) return;
+  if (HubState.activeTypes.length === 0) {
+    el.textContent = 'Nic nevybráno';
+    el.className = 'hub-selection-summary empty';
+  } else {
+    el.textContent = 'Vybráno: ' + HubState.activeTypes.map(t => TYPE_LABELS[t]).join(', ');
+    el.className = 'hub-selection-summary';
+  }
+}
+
+function updateNodeSummary() {
+  const el = document.getElementById('hub-node-summary');
+  if (!el) return;
+  const n = HubState.selectedHubs.length;
+  if (n === 0) {
+    el.textContent = 'Nic nevybráno';
+    el.className = 'hub-selection-summary empty';
+  } else {
+    el.textContent = `Vybráno: ${n} ${n === 1 ? 'uzel' : n < 5 ? 'uzly' : 'uzlů'}`;
+    el.className = 'hub-selection-summary';
+  }
 }
 
 function startHubQuiz() {
@@ -1388,6 +1418,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-section-d').addEventListener('click', openSectionD);
   document.getElementById('d-back').addEventListener('click', () => showScreen('home'));
   document.getElementById('d-start-quiz').addEventListener('click', startHubQuiz);
+  document.getElementById('d-select-all').addEventListener('click', () => {
+    const allSelected = HubState.selectedHubs.length === HUB_DATA.length;
+    HubState.selectedHubs = allSelected ? [] : HUB_DATA.map(h => h.name);
+    document.getElementById('d-select-all').textContent = allSelected ? 'Vybrat vše' : 'Zrušit výběr';
+    renderHubButtons();
+    updateHubQuizBtn();
+  });
   document.querySelector('.hub-type-filter').addEventListener('click', (e) => {
     const btn = e.target.closest('.hub-type-btn');
     if (!btn) return;
