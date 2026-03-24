@@ -1363,7 +1363,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('tab-btn-home').addEventListener('click', () => switchHomeTab('home'));
   document.getElementById('tab-btn-stats').addEventListener('click', () => switchHomeTab('stats'));
   document.getElementById('stats-panel-back').addEventListener('click', () => switchHomeTab('home'));
-  document.getElementById('btn-switch-profile').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
+  const profileDropdown = document.getElementById('profile-dropdown');
+  document.getElementById('btn-switch-profile').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const visible = profileDropdown.style.display !== 'none';
+    profileDropdown.style.display = visible ? 'none' : 'block';
+  });
+  document.addEventListener('click', () => { profileDropdown.style.display = 'none'; });
+  document.getElementById('dropdown-switch').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
+  document.getElementById('dropdown-settings').addEventListener('click', () => { profileDropdown.style.display = 'none'; openSettings(); });
   document.getElementById('stats-switch-btn').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
 
   // === Domovská obrazovka ===
@@ -1386,7 +1394,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
-  document.getElementById('btn-settings').addEventListener('click', openSettings);
 
   // === Nastavení ===
   document.getElementById('settings-save').addEventListener('click', saveSettings);
