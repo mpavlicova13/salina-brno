@@ -1094,11 +1094,6 @@ function showResults() {
   const gam = loadGamState();
   const isPerfect = quiz.score === quiz.total && quiz.total > 0;
 
-  // XP: 10 za každou správnou + 50 bonus za perfektní + streak bonus
-  let xpEarned = quiz.score * 10;
-  if (isPerfect) xpEarned += 50;
-  xpEarned += Math.min(quiz.maxStreak * 2, 20);
-
   // Statistiky
   gam.stats.totalCorrect += quiz.score;
   gam.stats.totalQuizzes += 1;
@@ -1116,15 +1111,8 @@ function showResults() {
     if (r.isCorrect) gam.stats.lineStats[key].correct += 1;
   });
 
-  addXPAndLevel(xpEarned, gam);
+  saveGamState(gam);
   checkAchievements(gam);
-
-  // Zobraz získané XP
-  const xpEl = document.getElementById('result-xp-earned');
-  if (xpEl) {
-    xpEl.textContent = `+${xpEarned} XP získáno!`;
-    xpEl.style.display = 'inline-block';
-  }
 
   // Konfety při perfektním kvízu
   if (isPerfect) setTimeout(launchConfetti, 400);
@@ -1182,17 +1170,6 @@ function toggleAllLines(arrRef, allNums, containerSelector, btnId) {
    GAMIFIKACE
 ======================================================== */
 
-const LEVELS = [
-  { level: 1, name: 'Nováček',          xpRequired: 0      },  // start
-  { level: 2, name: 'Cestující',         xpRequired: 3000   },  // ~20 kvízů
-  { level: 3, name: 'Pravidelný host',   xpRequired: 9000   },  // ~60 kvízů
-  { level: 4, name: 'Znalec MHD',        xpRequired: 20000  },  // ~133 kvízů
-  { level: 5, name: 'Průvodčí',          xpRequired: 35000  },  // ~233 kvízů
-  { level: 6, name: 'Řidič tramvaje',    xpRequired: 52000  },  // ~347 kvízů
-  { level: 7, name: 'Dispečer',          xpRequired: 65000  },  // ~433 kvízů
-  { level: 8, name: 'Legenda Brna',      xpRequired: 75000  },  // ~500 kvízů
-];
-
 const ACHIEVEMENTS = [
   { id: 'first_correct', name: 'První správná!',  desc: 'Odpověděla jsi správně poprvé',  icon: '🎯' },
   { id: 'streak_5',      name: 'Série 5!',         desc: '5× správně za sebou',            icon: '🔥' },
@@ -1200,8 +1177,6 @@ const ACHIEVEMENTS = [
   { id: 'perfect_quiz',  name: 'Perfektní kvíz!',  desc: '100 % správných odpovědí',       icon: '⭐' },
   { id: 'quizzes_5',     name: 'Vytrvalkyně',      desc: 'Dokončila jsi 5 kvízů',          icon: '💪' },
   { id: 'quizzes_10',    name: 'Maratonka',        desc: 'Dokončila jsi 10 kvízů',         icon: '🏆' },
-  { id: 'level_5',       name: 'Průvodčí!',        desc: 'Dosáhla jsi úrovně 5',           icon: '🎖️' },
-  { id: 'max_level',     name: 'Legenda Brna!',    desc: 'Dosáhla jsi nejvyšší úrovně',    icon: '👑' },
 ];
 
 const AVATARS = [
@@ -1227,7 +1202,7 @@ function getCurrentProfile() {
 function createProfile(name, avatar) {
   const data = loadProfiles();
   const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
-  const profile = { id, name: name.trim(), avatar, gam: { xp: 0, level: 1, achievements: [], stats: { totalCorrect: 0, totalQuizzes: 0, perfectQuizzes: 0, maxStreak: 0 } } };
+  const profile = { id, name: name.trim(), avatar, gam: { achievements: [], stats: { totalCorrect: 0, totalQuizzes: 0, perfectQuizzes: 0, maxStreak: 0 } } };
   data.list.push(profile);
   data.current = id;
   saveProfiles(data);
@@ -1244,10 +1219,9 @@ function renderProfilesScreen() {
   if (!grid) return;
   grid.innerHTML = '';
   data.list.forEach(profile => {
-    const lv = getLevelForXP(profile.gam.xp);
     const card = document.createElement('button');
     card.className = 'profile-card' + (profile.id === data.current ? ' profile-card-active' : '');
-    card.innerHTML = `<span class="profile-card-avatar">${profile.avatar}</span><span class="profile-card-name">${profile.name}</span><span class="profile-card-level">Lv.${lv.level} · ${lv.name}</span>`;
+    card.innerHTML = `<span class="profile-card-avatar">${profile.avatar}</span><span class="profile-card-name">${profile.name}</span>`;
     card.onclick = () => { switchToProfile(profile.id); updateGamUI(); showScreen('home'); };
     grid.appendChild(card);
   });
@@ -1315,17 +1289,12 @@ function showProfileModal() {
 function loadGamState() {
   const p = getCurrentProfile();
   if (p) return p.gam;
-  return { xp: 0, level: 1, achievements: [], stats: { totalCorrect: 0, totalQuizzes: 0, perfectQuizzes: 0, maxStreak: 0 } };
+  return { achievements: [], stats: { totalCorrect: 0, totalQuizzes: 0, perfectQuizzes: 0, maxStreak: 0 } };
 }
 function saveGamState(g) {
   const data = loadProfiles();
   const p = data.list.find(p => p.id === data.current);
   if (p) { p.gam = g; saveProfiles(data); }
-}
-function getLevelForXP(xp) {
-  let cur = LEVELS[0];
-  for (const l of LEVELS) { if (xp >= l.xpRequired) cur = l; }
-  return cur;
 }
 function updateGamUI() {
   const panel = document.getElementById('panel-profile');
@@ -1333,24 +1302,10 @@ function updateGamUI() {
 }
 function renderProfileTab() {
   const profile = getCurrentProfile();
-  const g = loadGamState();
-  const lv = getLevelForXP(g.xp);
-  const next = LEVELS.find(l => l.level === lv.level + 1) || null;
-  const xpInLv = g.xp - lv.xpRequired;
-  const xpNeeded = next ? next.xpRequired - lv.xpRequired : 1;
-  const pct = next ? Math.min(100, Math.round(xpInLv / xpNeeded * 100)) : 100;
+  if (!profile) return;
   const setText = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
-  if (profile) {
-    setText('profile-tab-avatar', profile.avatar);
-    setText('profile-tab-name', profile.name);
-  }
-  setText('profile-tab-level-num', lv.level);
-  setText('profile-tab-level-name', lv.name);
-  setText('profile-tab-xp-total', g.xp + ' XP celkem');
-  const fill = document.getElementById('profile-tab-xp-fill');
-  if (fill) fill.style.width = pct + '%';
-  setText('profile-tab-xp-progress', next ? `${xpInLv} / ${xpNeeded} XP` : 'MAX LEVEL!');
-  setText('profile-tab-next-level', next ? `→ Level ${next.level}: ${next.name}` : '🏆 Nejvyšší level!');
+  setText('profile-tab-avatar', profile.avatar);
+  setText('profile-tab-name', profile.name);
 }
 function switchHomeTab(tab) {
   AppState.activeTab = tab;
@@ -1378,22 +1333,10 @@ function goBack() {
 function renderStatsScreen() {
   const g = loadGamState();
   const profile = getCurrentProfile();
-  const lv = getLevelForXP(g.xp);
-  const next = LEVELS.find(l => l.level === lv.level + 1) || null;
-  const xpInLv = g.xp - lv.xpRequired;
-  const xpNeeded = next ? next.xpRequired - lv.xpRequired : 1;
-  const pct = next ? Math.min(100, Math.round((xpInLv / xpNeeded) * 100)) : 100;
-
   if (profile) {
     document.getElementById('stats-avatar').textContent = profile.avatar;
     document.getElementById('stats-name').textContent = profile.name;
   }
-  document.getElementById('stats-level-num').textContent = lv.level;
-  document.getElementById('stats-level-name').textContent = lv.name;
-  document.getElementById('stats-xp-total').textContent = g.xp + ' XP celkem';
-  document.getElementById('stats-xp-fill').style.width = pct + '%';
-  document.getElementById('stats-xp-progress').textContent = next ? `${xpInLv} / ${xpNeeded} XP` : 'MAX LEVEL!';
-  document.getElementById('stats-next-level').textContent = next ? `→ Level ${next.level}: ${next.name}` : '🏆 Nejvyšší level!';
   document.getElementById('stats-correct').textContent = g.stats.totalCorrect;
   document.getElementById('stats-quizzes').textContent = g.stats.totalQuizzes;
   document.getElementById('stats-perfect').textContent = g.stats.perfectQuizzes;
@@ -1436,14 +1379,6 @@ function renderStatsScreen() {
     achEl.appendChild(item);
   });
 }
-function addXPAndLevel(amount, g) {
-  const oldLv = getLevelForXP(g.xp);
-  g.xp += amount;
-  const newLv = getLevelForXP(g.xp);
-  g.level = newLv.level;
-  saveGamState(g);
-  updateGamUI();
-}
 function checkAchievements(g) {
   const unlocked = [];
   ACHIEVEMENTS.forEach(a => {
@@ -1455,8 +1390,6 @@ function checkAchievements(g) {
     if (a.id === 'perfect_quiz'  && g.stats.perfectQuizzes >= 1) earned = true;
     if (a.id === 'quizzes_5'     && g.stats.totalQuizzes >= 5)   earned = true;
     if (a.id === 'quizzes_10'    && g.stats.totalQuizzes >= 10)  earned = true;
-    if (a.id === 'level_5'       && g.level >= 5)                earned = true;
-    if (a.id === 'max_level'     && g.level >= 8)                earned = true;
     if (earned) { g.achievements.push(a.id); unlocked.push(a); }
   });
   if (unlocked.length) {
