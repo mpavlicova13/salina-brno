@@ -1474,9 +1474,9 @@ document.addEventListener('DOMContentLoaded', () => {
     showScreen('home');
   }
 
-  document.getElementById('tab-btn-home').addEventListener('click', () => switchHomeTab('home'));
-  document.getElementById('tab-btn-stats').addEventListener('click', () => switchHomeTab('stats'));
-  document.getElementById('tab-btn-profile').addEventListener('click', () => switchHomeTab('profile'));
+  document.getElementById('tab-btn-home').addEventListener('click', () => { showScreen('home'); switchHomeTab('home'); });
+  document.getElementById('tab-btn-stats').addEventListener('click', () => { showScreen('home'); switchHomeTab('stats'); });
+  document.getElementById('tab-btn-profile').addEventListener('click', () => { showScreen('home'); switchHomeTab('profile'); });
   document.getElementById('tab-btn-settings').addEventListener('click', () => {
     ['home','stats','profile'].forEach(t => document.getElementById('tab-btn-' + t)?.classList.remove('active'));
     document.getElementById('tab-btn-settings').classList.add('active');
@@ -1484,6 +1484,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('stats-switch-btn').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
   document.getElementById('profile-tab-switch-btn').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
+  document.getElementById('profiles-back').addEventListener('click', () => { showScreen('home'); switchHomeTab('home'); });
 
   // === Domovská obrazovka ===
   document.getElementById('btn-section-a').addEventListener('click', openSectionA);
