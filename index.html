@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="DPMB_favicona_2.png">
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=4" />
 </head>
 <body>
 
@@ -300,11 +300,11 @@
 
       <!-- Filtr dopravního prostředku -->
       <div class="filter-section">
-        <div class="hub-filter-header">
-          <span class="hub-step-num">1</span>
+        <div class="step-header">
+          <span class="step-num">1</span>
           <div>
             <h3>Typ dopravy</h3>
-            <p class="hub-filter-hint">Vyber jeden nebo více typů</p>
+            <p class="step-hint">Vyber jeden nebo více typů</p>
           </div>
         </div>
         <div class="hub-type-filter">
@@ -317,11 +317,11 @@
 
       <!-- Výběr uzlu -->
       <div class="filter-section">
-        <div class="hub-filter-header">
-          <span class="hub-step-num">2</span>
+        <div class="step-header">
+          <span class="step-num">2</span>
           <div>
             <h3>Dopravní uzel</h3>
-            <p class="hub-filter-hint">Vyber jeden nebo více uzlů</p>
+            <p class="step-hint">Vyber jeden nebo více uzlů</p>
           </div>
           <button class="btn-select-all" id="d-select-all" style="margin-left:auto">Vybrat vše</button>
         </div>
@@ -349,23 +349,36 @@
     </div>
     <div class="screen-content">
 
-      <!-- Filtr linek -->
+      <!-- Krok 1: Filtr linek -->
       <div class="filter-section">
-        <div class="filter-controls">
-          <h3>Vyber linky k procvičení</h3>
-          <button class="btn-select-all" id="a-select-all">Vybrat vše / nic</button>
+        <div class="step-header">
+          <span class="step-num">1</span>
+          <div>
+            <h3>Vyber linky</h3>
+            <p class="step-hint">Klikni na linky, které chceš procvičit</p>
+          </div>
+          <button class="btn-select-all" id="a-select-all" style="margin-left:auto">Vybrat vše</button>
         </div>
         <div class="line-filter-row" id="filter-a"></div>
       </div>
 
-
-      <div class="start-section">
-        <button class="btn-primary" id="a-start-flashcards">
-          <svg class="icon" aria-hidden="true"><use href="#icon-layers"/></svg> Spustit kartičky
-        </button>
-        <button class="btn-secondary" id="a-start-quiz">
-          <svg class="icon" aria-hidden="true"><use href="#icon-edit"/></svg> Spustit kvíz
-        </button>
+      <!-- Krok 2: Způsob procvičení -->
+      <div class="filter-section">
+        <div class="step-header">
+          <span class="step-num">2</span>
+          <div>
+            <h3>Zvol způsob procvičení</h3>
+            <p class="step-hint">Kartičky pro přehled, kvíz pro ověření znalostí</p>
+          </div>
+        </div>
+        <div class="start-section">
+          <button class="btn-primary" id="a-start-flashcards">
+            <svg class="icon" aria-hidden="true"><use href="#icon-layers"/></svg> Spustit kartičky
+          </button>
+          <button class="btn-secondary" id="a-start-quiz">
+            <svg class="icon" aria-hidden="true"><use href="#icon-edit"/></svg> Spustit kvíz
+          </button>
+        </div>
       </div>
 
     </div>
@@ -418,20 +431,33 @@
     </div>
     <div class="screen-content">
 
-      <!-- Filtr linek -->
+      <!-- Krok 1: Filtr linek -->
       <div class="filter-section">
-        <div class="filter-controls">
-          <h3>Vyber linky k procvičení</h3>
-          <button class="btn-select-all" id="b-select-all">Vybrat vše / nic</button>
+        <div class="step-header">
+          <span class="step-num">1</span>
+          <div>
+            <h3>Vyber linky</h3>
+            <p class="step-hint">Klikni na linky, jejichž zastávky chceš procvičit</p>
+          </div>
+          <button class="btn-select-all" id="b-select-all" style="margin-left:auto">Vybrat vše</button>
         </div>
         <div class="line-filter-row" id="filter-b"></div>
       </div>
 
-
-      <div class="start-section">
-        <button class="btn-primary" id="b-start-quiz">
-          <svg class="icon" aria-hidden="true"><use href="#icon-edit"/></svg> Spustit kvíz o zastávkách
-        </button>
+      <!-- Krok 2: Spustit kvíz -->
+      <div class="filter-section">
+        <div class="step-header">
+          <span class="step-num">2</span>
+          <div>
+            <h3>Spusť kvíz</h3>
+            <p class="step-hint">Otázky na pořadí a existenci zastávek</p>
+          </div>
+        </div>
+        <div class="start-section">
+          <button class="btn-primary" id="b-start-quiz">
+            <svg class="icon" aria-hidden="true"><use href="#icon-edit"/></svg> Spustit kvíz o zastávkách
+          </button>
+        </div>
       </div>
 
     </div>
@@ -447,9 +473,18 @@
     </div>
     <div class="screen-content">
 
-
-      <!-- Tlačítka linek -->
-      <div id="line-buttons"></div>
+      <!-- Krok 1: Výběr linky -->
+      <div class="filter-section">
+        <div class="step-header">
+          <span class="step-num">1</span>
+          <div>
+            <h3>Vyber linku</h3>
+            <p class="step-hint">Klikni na linku, kterou chceš procvičit</p>
+          </div>
+        </div>
+        <!-- Tlačítka linek -->
+        <div id="line-buttons"></div>
+      </div>
 
       <!-- Info o vybrané lince -->
       <div id="practice-line-info">
@@ -460,6 +495,17 @@
           <span class="practice-route-stop" id="practice-line-to">–</span>
         </div>
         <p class="practice-stop-count" id="practice-line-stops"></p>
+      </div>
+
+      <!-- Krok 2: Výběr režimu -->
+      <div class="filter-section">
+        <div class="step-header">
+          <span class="step-num">2</span>
+          <div>
+            <h3>Zvol způsob procvičení</h3>
+            <p class="step-hint">Audio pro poslech, kvíz pro ověření znalostí</p>
+          </div>
+        </div>
       </div>
 
       <!-- Výběr režimu -->
@@ -866,7 +912,7 @@
 
 <!-- Skripty (pořadí záleží!) -->
 <script src="data.js?v=2"></script>
-<script src="engine.js?v=3"></script>
-<script src="app.js?v=3"></script>
+<script src="engine.js?v=4"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
