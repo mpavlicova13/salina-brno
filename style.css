@@ -2343,3 +2343,23 @@ button:active {
   0%   { transform: scale(0.5); opacity: 0; }
   100% { transform: scale(1);   opacity: 1; }
 }
+
+/* Profile tab */
+.profile-tab-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+  text-align: center;
+}
+.profile-tab-avatar {
+  font-size: 5rem;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+.profile-tab-name {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--blue);
+  margin-bottom: 4px;
+}

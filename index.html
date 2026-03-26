@@ -120,6 +120,10 @@
     <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
     <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
   </symbol>
+  <symbol id="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+  </symbol>
 </svg>
 
 <div id="app">
@@ -157,30 +161,6 @@
       <div class="home-header">
         <img src="logo_dpmb.png" alt="DPMB logo" class="home-logo-img">
         <p class="home-subtitle">Procvičuj brněnské tramvaje</p>
-        <div class="home-profile-block">
-          <div class="home-profile-stats">
-            <div class="home-profile-stat"><span class="home-profile-stat-val" id="home-level-name">Nováček</span><span class="home-profile-stat-lbl">úroveň</span></div>
-            <div class="home-profile-stat"><span class="home-profile-stat-val" id="home-quizzes">0</span><span class="home-profile-stat-lbl">kvízy</span></div>
-          </div>
-          <div class="home-xp-mini">
-            <div class="home-xp-mini-labels">
-              <span id="home-xp-text">0 XP</span>
-              <span class="home-level-badge" id="home-level-num">1</span>
-            </div>
-            <div class="home-xp-track"><div class="home-xp-fill" id="home-xp-fill" style="width:0%"></div></div>
-          </div>
-          <button class="profile-avatar-btn" id="btn-switch-profile">
-            <span id="gam-avatar">❓</span>
-          </button>
-          <div id="profile-dropdown" class="profile-dropdown" style="display:none">
-            <button class="profile-dropdown-item" id="dropdown-switch">
-              <svg class="icon" aria-hidden="true"><use href="#icon-refresh"/></svg> Přepnout hráče
-            </button>
-            <button class="profile-dropdown-item" id="dropdown-settings">
-              <svg class="icon" aria-hidden="true"><use href="#icon-settings"/></svg> Nastavení
-            </button>
-          </div>
-        </div>
       </div>
 
       <div class="home-cards">
@@ -229,12 +209,6 @@
 
     <!-- Panel: Statistiky -->
     <div id="panel-stats" class="tab-panel">
-      <div class="screen-header">
-        <button class="btn-back" id="stats-panel-back" aria-label="Zpět">←</button>
-        <h2>Statistiky</h2>
-        <img src="logo_dpmb.png" alt="DPMB" class="header-logo">
-      </div>
-
       <div class="stats-profile-row">
         <span class="stats-profile-avatar" id="stats-avatar">❓</span>
         <div class="stats-profile-info">
@@ -274,6 +248,33 @@
       <div id="stats-achievements" class="stats-achievements"></div>
     </div>
 
+    <!-- Panel: Profil -->
+    <div id="panel-profile" class="tab-panel">
+      <div class="profile-tab-body">
+        <div class="profile-tab-avatar" id="profile-tab-avatar">❓</div>
+        <div class="profile-tab-name" id="profile-tab-name">---</div>
+        <div class="stats-level-card" style="margin-top:16px">
+          <div class="stats-level-top">
+            <span class="stats-level-badge" id="profile-tab-level-num">1</span>
+            <div class="stats-level-labels">
+              <span class="stats-level-name" id="profile-tab-level-name">Nováček</span>
+              <span class="stats-xp-total" id="profile-tab-xp-total">0 XP celkem</span>
+            </div>
+          </div>
+          <div class="gam-xp-bar" style="height:14px;margin:12px 0 6px">
+            <div class="gam-xp-fill" id="profile-tab-xp-fill" style="width:0%"></div>
+          </div>
+          <div class="stats-level-footer">
+            <span id="profile-tab-xp-progress">0 / 500 XP</span>
+            <span id="profile-tab-next-level">→ Level 2: Cestující</span>
+          </div>
+        </div>
+        <button class="btn-secondary profile-tab-switch-btn" id="profile-tab-switch-btn" style="margin-top:20px;width:100%">
+          <svg class="icon" aria-hidden="true"><use href="#icon-refresh"/></svg> Přepnout hráče
+        </button>
+      </div>
+    </div>
+
     <!-- Bottom tab bar -->
     <nav class="bottom-nav">
       <button class="bottom-nav-btn active" id="tab-btn-home">
@@ -283,6 +284,14 @@
       <button class="bottom-nav-btn" id="tab-btn-stats">
         <svg class="icon" aria-hidden="true"><use href="#icon-bar-chart"/></svg>
         <span>Statistiky</span>
+      </button>
+      <button class="bottom-nav-btn" id="tab-btn-profile">
+        <svg class="icon" aria-hidden="true"><use href="#icon-user"/></svg>
+        <span>Profil</span>
+      </button>
+      <button class="bottom-nav-btn" id="tab-btn-settings">
+        <svg class="icon" aria-hidden="true"><use href="#icon-settings"/></svg>
+        <span>Nastavení</span>
       </button>
     </nav>
   </div>
@@ -913,6 +922,6 @@
 <!-- Skripty (pořadí záleží!) -->
 <script src="data.js?v=2"></script>
 <script src="engine.js?v=4"></script>
-<script src="app.js?v=4"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>
