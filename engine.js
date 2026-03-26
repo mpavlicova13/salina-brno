@@ -75,7 +75,7 @@ function generateA_odkudKam(lines) {
   return {
     type: 'A_odkudKam',
     line: line.number,
-    question: `🚋 Odkud kam jede linka č. ${line.number}?`,
+    question: `🚋 Jaké jsou konečné stanice linky č. ${line.number}?`,
     options,
     correct,
     explanation: `Linka ${line.number} jede z ${line.stops[0]} do ${line.stops[line.stops.length - 1]}.`
