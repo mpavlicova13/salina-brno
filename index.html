@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="DPMB_favicona_2.png">
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
 
@@ -202,6 +202,16 @@
           <div class="section-card-text">
             <h3>Dopravní uzly</h3>
             <p>Jaké linky se potkávají na Hlavním nádraží nebo Mendláku?</p>
+          </div>
+        </button>
+
+        <button class="section-card card-e" id="btn-section-e">
+          <div class="section-card-icon">
+            <svg class="icon icon-section" aria-hidden="true"><use href="#icon-alert"/></svg>
+          </div>
+          <div class="section-card-text">
+            <h3>Značky</h3>
+            <p>Návěstní soustava DPMB – uč se signální značky pomocí kartiček a kvízu</p>
           </div>
         </button>
       </div>
@@ -766,6 +776,106 @@
     </div>
   </div>
 
+  <!-- ====================================================
+       SEKCE E – ZNAČKY
+  ==================================================== -->
+  <div id="screen-section-e" class="screen">
+    <div class="screen-header">
+      <button class="btn-back" id="e-back" aria-label="Zpět">←</button>
+      <h2><svg class="icon icon-lg" aria-hidden="true"><use href="#icon-alert"/></svg> Značky</h2>
+      <img src="logo_dpmb.png" alt="DPMB" class="header-logo">
+    </div>
+    <div class="screen-content">
+
+      <!-- Krok 1: Výběr kategorií -->
+      <div class="filter-section">
+        <div class="step-header">
+          <span class="step-num">1</span>
+          <div>
+            <h3>Vyber kategorie</h3>
+            <p class="step-hint">Klikni na kategorie, které chceš procvičit</p>
+          </div>
+          <button class="btn-select-all" id="e-select-all" style="margin-left:auto">Vybrat vše</button>
+        </div>
+        <div id="znacky-cat-filter" class="znacky-cat-filter"></div>
+        <p class="hub-selection-summary" id="znacky-cat-summary">Nic nevybráno</p>
+      </div>
+
+      <!-- Krok 2: Způsob procvičení -->
+      <div class="filter-section">
+        <div class="step-header">
+          <span class="step-num">2</span>
+          <div>
+            <h3>Způsob procvičení</h3>
+            <p class="step-hint">Kartičky pro učení, kvíz pro ověření znalostí</p>
+          </div>
+        </div>
+        <div class="practice-modes">
+          <button class="btn-mode btn-mode-cards" id="e-start-cards" disabled style="opacity:0.4">
+            <span class="btn-mode-icon">
+              <svg class="icon icon-lg" aria-hidden="true"><use href="#icon-layers"/></svg>
+            </span>
+            <span class="btn-mode-text">
+              <h4>Kartičky</h4>
+              <p>Prolistuj si značky – přední strana je obrázek, zadní strana je název a popis</p>
+            </span>
+          </button>
+          <button class="btn-mode btn-mode-quiz" id="e-start-quiz" disabled style="opacity:0.4">
+            <span class="btn-mode-icon">
+              <svg class="icon icon-lg" aria-hidden="true"><use href="#icon-edit"/></svg>
+            </span>
+            <span class="btn-mode-text">
+              <h4>Kvíz</h4>
+              <p>Otestuj znalost značek formou otázek</p>
+            </span>
+          </button>
+        </div>
+        <p id="znacky-start-hint" class="hub-selection-summary empty">Nejprve vyber alespoň jednu kategorii</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ====================================================
+       KARTIČKY – ZNAČKY
+  ==================================================== -->
+  <div id="screen-znacky-cards" class="screen">
+    <div class="screen-header">
+      <button class="btn-back" id="znacky-cards-back" aria-label="Zpět">←</button>
+      <h2><svg class="icon icon-lg" aria-hidden="true"><use href="#icon-layers"/></svg> Kartičky – Značky</h2>
+      <img src="logo_dpmb.png" alt="DPMB" class="header-logo">
+    </div>
+
+    <div class="znacky-cards-body">
+      <div class="znacky-counter-row">
+        <span id="znacky-counter">1 / 1</span>
+      </div>
+
+      <div class="znacky-card-scene">
+        <div class="znacky-card" id="znacky-card">
+          <div class="znacky-card-front">
+            <div id="znacky-card-svg" class="znacky-card-svg-area"></div>
+            <div id="znacky-card-num" class="znacky-card-number"></div>
+            <div class="znacky-card-flip-hint">
+              <svg class="icon" aria-hidden="true"><use href="#icon-refresh"/></svg> Klikni pro otočení
+            </div>
+          </div>
+          <div class="znacky-card-back">
+            <div id="znacky-back-num" class="znacky-back-number"></div>
+            <div id="znacky-back-name" class="znacky-back-name"></div>
+            <div id="znacky-back-desc" class="znacky-back-desc"></div>
+            <div id="znacky-back-cat" class="znacky-back-cat"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fc-nav znacky-nav">
+        <button class="fc-btn" id="znacky-prev">← Předchozí</button>
+        <button class="fc-btn" id="znacky-next">Další →</button>
+      </div>
+    </div>
+  </div>
+
   <nav class="bottom-nav" id="bottom-nav" style="display:none">
     <button class="bottom-nav-btn active" id="tab-btn-home">
       <svg class="icon" aria-hidden="true"><use href="#icon-home"/></svg>
@@ -899,7 +1009,8 @@
 
 <!-- Skripty (pořadí záleží!) -->
 <script src="data.js?v=2"></script>
+<script src="znacky_data.js?v=1"></script>
 <script src="engine.js?v=4"></script>
-<script src="app.js?v=8"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>

@@ -823,6 +823,14 @@ function renderQuizQuestion() {
 
   container.innerHTML = '';
 
+  // SVG obrázek značky (pouze pro kvíz o značkách)
+  if (q.svgContent) {
+    const svgWrap = document.createElement('div');
+    svgWrap.className = 'quiz-sign-display';
+    svgWrap.innerHTML = q.svgContent;
+    container.appendChild(svgWrap);
+  }
+
   // Otázka
   const questionEl = document.createElement('div');
   questionEl.className = 'quiz-question';
@@ -1474,7 +1482,27 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-section-b').addEventListener('click', openSectionB);
   document.getElementById('btn-section-c').addEventListener('click', openSectionC);
   document.getElementById('btn-section-d').addEventListener('click', openSectionD);
+  document.getElementById('btn-section-e').addEventListener('click', openSectionE);
   document.getElementById('d-back').addEventListener('click', () => goBack());
+
+  // === Sekce E – Značky ===
+  document.getElementById('e-back').addEventListener('click', () => goBack());
+  document.getElementById('e-select-all').addEventListener('click', () => {
+    const allIds = ZNACKY_DATA.categories.map(c => c.id);
+    const allSelected = ZnackyState.selectedCategories.length === allIds.length;
+    ZnackyState.selectedCategories = allSelected ? [] : [...allIds];
+    document.getElementById('e-select-all').textContent = allSelected ? 'Vybrat vše' : 'Zrušit výběr';
+    renderZnackyCategories();
+    updateZnackyButtons();
+  });
+  document.getElementById('e-start-cards').addEventListener('click', startZnackyCards);
+  document.getElementById('e-start-quiz').addEventListener('click', startZnackyQuiz);
+
+  // === Kartičky – Značky ===
+  document.getElementById('znacky-cards-back').addEventListener('click', () => goBack());
+  document.getElementById('znacky-card').addEventListener('click', flipZnackyCard);
+  document.getElementById('znacky-prev').addEventListener('click', prevZnackyCard);
+  document.getElementById('znacky-next').addEventListener('click', nextZnackyCard);
   document.getElementById('d-start-quiz').addEventListener('click', startHubQuiz);
   document.getElementById('d-select-all').addEventListener('click', () => {
     const allSelected = HubState.selectedHubs.length === HUB_DATA.length;
@@ -1600,6 +1628,182 @@ document.addEventListener('DOMContentLoaded', () => {
   // Inicializuj domovskou obrazovku
   showScreen('home');
 });
+
+/* ========================================================
+   SEKCE E – ZNAČKY
+======================================================== */
+
+const ZnackyState = {
+  selectedCategories: [],  // id kategorií
+};
+
+function openSectionE() {
+  ZnackyState.selectedCategories = [];
+  renderZnackyCategories();
+  updateZnackyButtons();
+  showScreen('section-e');
+}
+
+function renderZnackyCategories() {
+  const container = document.getElementById('znacky-cat-filter');
+  container.innerHTML = '';
+  ZNACKY_DATA.categories.forEach(cat => {
+    const btn = document.createElement('button');
+    const active = ZnackyState.selectedCategories.includes(cat.id);
+    btn.className = 'znacky-cat-btn' + (active ? ' active' : '');
+    btn.style.setProperty('--cat-color', cat.color);
+    btn.innerHTML = `<span class="znacky-cat-icon">${cat.icon}</span>
+      <span class="znacky-cat-label">
+        <span class="znacky-cat-num">${cat.number}</span>
+        <span class="znacky-cat-name">${cat.name}</span>
+        <span class="znacky-cat-count">${cat.signs.length} značek</span>
+      </span>`;
+    btn.onclick = () => {
+      if (ZnackyState.selectedCategories.includes(cat.id)) {
+        ZnackyState.selectedCategories = ZnackyState.selectedCategories.filter(id => id !== cat.id);
+      } else {
+        ZnackyState.selectedCategories.push(cat.id);
+      }
+      btn.classList.toggle('active', ZnackyState.selectedCategories.includes(cat.id));
+      updateZnackyButtons();
+      updateZnackyCatSummary();
+    };
+    container.appendChild(btn);
+  });
+  updateZnackyCatSummary();
+}
+
+function updateZnackyCatSummary() {
+  const el = document.getElementById('znacky-cat-summary');
+  if (!el) return;
+  const n = ZnackyState.selectedCategories.length;
+  if (n === 0) {
+    el.textContent = 'Nic nevybráno';
+    el.className = 'hub-selection-summary empty';
+  } else {
+    const totalSigns = getSignsByCategories(ZnackyState.selectedCategories).length;
+    el.textContent = `Vybráno: ${n} ${n === 1 ? 'kategorie' : n < 5 ? 'kategorie' : 'kategorií'} (${totalSigns} značek)`;
+    el.className = 'hub-selection-summary';
+  }
+}
+
+function updateZnackyButtons() {
+  const ok = ZnackyState.selectedCategories.length > 0;
+  const cardsBtn = document.getElementById('e-start-cards');
+  const quizBtn = document.getElementById('e-start-quiz');
+  const hint = document.getElementById('znacky-start-hint');
+  if (cardsBtn) { cardsBtn.disabled = !ok; cardsBtn.style.opacity = ok ? '1' : '0.4'; }
+  if (quizBtn) { quizBtn.disabled = !ok; quizBtn.style.opacity = ok ? '1' : '0.4'; }
+  if (hint) hint.style.display = ok ? 'none' : 'block';
+}
+
+/* ── Kartičky se značkami ─────────────────────────────── */
+
+let znackyCardList = [];
+let znackyCardIndex = 0;
+let znackyCardFlipped = false;
+
+function startZnackyCards() {
+  const signs = getSignsByCategories(ZnackyState.selectedCategories);
+  if (signs.length === 0) return;
+  znackyCardList = shuffle([...signs]);
+  znackyCardIndex = 0;
+  znackyCardFlipped = false;
+  showZnackyCard();
+  showScreen('znacky-cards');
+}
+
+function showZnackyCard() {
+  const sign = znackyCardList[znackyCardIndex];
+  const cat = ZNACKY_DATA.categories.find(c => c.id === sign.categoryId);
+
+  document.getElementById('znacky-counter').textContent =
+    `${znackyCardIndex + 1} / ${znackyCardList.length}`;
+
+  // Přední strana
+  document.getElementById('znacky-card-svg').innerHTML = sign.svg;
+  document.getElementById('znacky-card-num').textContent =
+    `${cat.number} – č. ${sign.number}`;
+
+  // Zadní strana
+  document.getElementById('znacky-back-num').textContent =
+    `${cat.number} – č. ${sign.number}`;
+  document.getElementById('znacky-back-name').textContent = sign.name;
+  document.getElementById('znacky-back-desc').textContent = sign.description;
+  document.getElementById('znacky-back-cat').textContent = `Kategorie: ${cat.name}`;
+
+  // Resetuj otočení
+  const card = document.getElementById('znacky-card');
+  card.classList.remove('flipped');
+  znackyCardFlipped = false;
+}
+
+function flipZnackyCard() {
+  znackyCardFlipped = !znackyCardFlipped;
+  document.getElementById('znacky-card').classList.toggle('flipped', znackyCardFlipped);
+}
+
+function nextZnackyCard() {
+  if (znackyCardIndex < znackyCardList.length - 1) {
+    znackyCardIndex++;
+    showZnackyCard();
+  } else {
+    goBack();
+  }
+}
+
+function prevZnackyCard() {
+  if (znackyCardIndex > 0) {
+    znackyCardIndex--;
+    showZnackyCard();
+  }
+}
+
+/* ── Kvíz se značkami ─────────────────────────────────── */
+
+function startZnackyQuiz() {
+  const signs = getSignsByCategories(ZnackyState.selectedCategories);
+  if (signs.length < 2) { alert('Vyber alespoň jednu kategorii s více značkami!'); return; }
+  const count = AppState.settings.sessionLength;
+  const questions = generateZnackyQuestions(signs, count);
+  if (questions.length === 0) { alert('Nepodařilo se vygenerovat otázky.'); return; }
+  AppState.quiz = new QuizState(questions);
+  AppState.lastQuizQuestions = questions;
+  AppState.quizSource = 'section-e';
+  renderQuizQuestion();
+  showScreen('quiz');
+}
+
+function generateZnackyQuestions(signs, count) {
+  const questions = [];
+
+  signs.forEach(sign => {
+    const others = signs.filter(s => s.id !== sign.id);
+    if (others.length < 3) return;
+
+    // Typ 1: Ukáž obrázek → vyber název
+    const wrongNames = shuffle([...others]).slice(0, 3).map(s => s.name);
+    questions.push({
+      question: 'Jak se jmenuje tato značka?',
+      svgContent: `<div class="quiz-sign-svg-wrapper">${sign.svg}</div>`,
+      options: shuffle([sign.name, ...wrongNames]),
+      correct: sign.name,
+      explanation: `Značka č. ${sign.number} – ${sign.name}: ${sign.description}`,
+    });
+
+    // Typ 2: Ukáž název → vyber popis
+    const wrongDescs = shuffle([...others]).slice(0, 3).map(s => s.description);
+    questions.push({
+      question: `Co znamená značka č. ${sign.number} – „${sign.name}"?`,
+      options: shuffle([sign.description, ...wrongDescs]),
+      correct: sign.description,
+      explanation: `Značka č. ${sign.number} – ${sign.name}: ${sign.description}`,
+    });
+  });
+
+  const shuffled = shuffle(questions);
+  return count === 0 ? shuffled : shuffled.slice(0, Math.min(count, shuffled.length));
+}
 
 /* ========================================================
    NAHLÁSIT CHYBU – MODAL + FORMSPREE

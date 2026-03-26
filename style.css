@@ -2391,3 +2391,233 @@ button:active {
   color: var(--blue);
   margin-bottom: 4px;
 }
+
+/* ============================================================
+   SEKCE E – ZNAČKY
+   ============================================================ */
+
+/* Karta sekce E na domovské obrazovce */
+.card-e .section-card-icon { background: #fce4e4; }
+.card-e .section-card-icon .icon { stroke: #c0392b; }
+
+/* Kategorie – výběrová tlačítka */
+.znacky-cat-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.znacky-cat-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--gray-light);
+  border: 2px solid var(--gray-mid);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: var(--transition);
+  width: 100%;
+}
+
+.znacky-cat-btn.active {
+  background: white;
+  border-color: var(--cat-color);
+  border-width: 3px;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+}
+
+.znacky-cat-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  width: 32px;
+  text-align: center;
+}
+
+.znacky-cat-label {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.znacky-cat-num {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--gray-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.znacky-cat-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--blue-dark);
+}
+
+.znacky-cat-count {
+  font-size: 0.78rem;
+  color: var(--gray-dark);
+}
+
+/* ── Kartičky se značkami ──────────────────────────────── */
+
+.znacky-cards-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 20px 32px;
+  flex: 1;
+}
+
+.znacky-counter-row {
+  font-size: 1rem;
+  color: var(--gray-dark);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* Scéna pro 3D flip */
+.znacky-card-scene {
+  width: 100%;
+  max-width: 360px;
+  height: 340px;
+  perspective: 1200px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.znacky-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.znacky-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.znacky-card-front,
+.znacky-card-back {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 18px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Přední strana: světlá s obrázkem */
+.znacky-card-front {
+  background: #f8f9fc;
+  border: 2px solid var(--gray-mid);
+  gap: 12px;
+}
+
+/* Zadní strana: tmavě modrá s textem */
+.znacky-card-back {
+  background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 100%);
+  color: white;
+  transform: rotateY(180deg);
+  gap: 8px;
+  text-align: center;
+}
+
+/* SVG oblast na přední straně */
+.znacky-card-svg-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+}
+
+.znacky-card-svg-area svg {
+  max-width: 160px;
+  max-height: 180px;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+}
+
+.znacky-card-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gray-dark);
+  letter-spacing: 0.04em;
+}
+
+.znacky-card-flip-hint {
+  font-size: 0.72rem;
+  color: var(--gray-dark);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.znacky-card-flip-hint .icon {
+  width: 13px;
+  height: 13px;
+}
+
+/* Zadní strana – text */
+.znacky-back-number {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  font-weight: 600;
+}
+
+.znacky-back-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: #FFD100;
+}
+
+.znacky-back-desc {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  opacity: 0.92;
+  text-align: center;
+}
+
+.znacky-back-cat {
+  font-size: 0.72rem;
+  opacity: 0.6;
+  margin-top: 4px;
+}
+
+/* Navigační tlačítka kartiček */
+.znacky-nav {
+  margin-top: 16px;
+}
+
+/* ── SVG v kvízu ──────────────────────────────────────── */
+
+.quiz-sign-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 12px;
+  background: #f8f9fc;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-mid);
+}
+
+.quiz-sign-svg-wrapper svg,
+.quiz-sign-display svg {
+  max-width: 130px;
+  max-height: 150px;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.12));
+}
