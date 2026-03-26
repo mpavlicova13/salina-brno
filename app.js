@@ -1306,32 +1306,40 @@ function getLevelForXP(xp) {
   return cur;
 }
 function updateGamUI() {
+  const panel = document.getElementById('panel-profile');
+  if (panel && panel.classList.contains('active')) renderProfileTab();
+}
+function renderProfileTab() {
   const profile = getCurrentProfile();
-  if (!profile) return;
-  const el = document.getElementById('gam-avatar');
-  if (el) el.textContent = profile.avatar;
-
   const g = loadGamState();
   const lv = getLevelForXP(g.xp);
   const next = LEVELS.find(l => l.level === lv.level + 1) || null;
   const xpInLv = g.xp - lv.xpRequired;
   const xpNeeded = next ? next.xpRequired - lv.xpRequired : 1;
   const pct = next ? Math.min(100, Math.round(xpInLv / xpNeeded * 100)) : 100;
-
   const setText = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
-  setText('home-level-name', lv.name);
-  setText('home-level-num', lv.level);
-  setText('home-quizzes', g.stats?.totalQuizzes || 0);
-  setText('home-xp-text', `${g.xp} XP`);
-  const fill = document.getElementById('home-xp-fill');
+  if (profile) {
+    setText('profile-tab-avatar', profile.avatar);
+    setText('profile-tab-name', profile.name);
+  }
+  setText('profile-tab-level-num', lv.level);
+  setText('profile-tab-level-name', lv.name);
+  setText('profile-tab-xp-total', g.xp + ' XP celkem');
+  const fill = document.getElementById('profile-tab-xp-fill');
   if (fill) fill.style.width = pct + '%';
+  setText('profile-tab-xp-progress', next ? `${xpInLv} / ${xpNeeded} XP` : 'MAX LEVEL!');
+  setText('profile-tab-next-level', next ? `→ Level ${next.level}: ${next.name}` : '🏆 Nejvyšší level!');
 }
 function switchHomeTab(tab) {
-  document.getElementById('panel-home').classList.toggle('active', tab === 'home');
-  document.getElementById('panel-stats').classList.toggle('active', tab === 'stats');
-  document.getElementById('tab-btn-home').classList.toggle('active', tab === 'home');
-  document.getElementById('tab-btn-stats').classList.toggle('active', tab === 'stats');
+  ['home', 'stats', 'profile'].forEach(t => {
+    const panel = document.getElementById('panel-' + t);
+    const btn = document.getElementById('tab-btn-' + t);
+    if (panel) panel.classList.toggle('active', t === tab);
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  document.getElementById('tab-btn-settings').classList.remove('active');
   if (tab === 'stats') renderStatsScreen();
+  if (tab === 'profile') renderProfileTab();
 }
 function renderStatsScreen() {
   const g = loadGamState();
@@ -1466,17 +1474,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('tab-btn-home').addEventListener('click', () => switchHomeTab('home'));
   document.getElementById('tab-btn-stats').addEventListener('click', () => switchHomeTab('stats'));
-  document.getElementById('stats-panel-back').addEventListener('click', () => switchHomeTab('home'));
-  const profileDropdown = document.getElementById('profile-dropdown');
-  document.getElementById('btn-switch-profile').addEventListener('click', (e) => {
-    e.stopPropagation();
-    const visible = profileDropdown.style.display !== 'none';
-    profileDropdown.style.display = visible ? 'none' : 'block';
+  document.getElementById('tab-btn-profile').addEventListener('click', () => switchHomeTab('profile'));
+  document.getElementById('tab-btn-settings').addEventListener('click', () => {
+    ['home','stats','profile'].forEach(t => document.getElementById('tab-btn-' + t)?.classList.remove('active'));
+    document.getElementById('tab-btn-settings').classList.add('active');
+    showScreen('settings');
   });
-  document.addEventListener('click', () => { profileDropdown.style.display = 'none'; });
-  document.getElementById('dropdown-switch').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
-  document.getElementById('dropdown-settings').addEventListener('click', () => { profileDropdown.style.display = 'none'; openSettings(); });
   document.getElementById('stats-switch-btn').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
+  document.getElementById('profile-tab-switch-btn').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
 
   // === Domovská obrazovka ===
   document.getElementById('btn-section-a').addEventListener('click', openSectionA);
@@ -1514,7 +1519,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (chosen) TTS.czechVoice = chosen;
     TTS.speak('Příští zastávka Náměstí Svobody. Přestupní stanice.', 1.0);
   });
-  document.getElementById('settings-back').addEventListener('click', () => showScreen('home'));
+  document.getElementById('settings-back').addEventListener('click', () => {
+    showScreen('home');
+    switchHomeTab('home');
+  });
   document.querySelectorAll('.session-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const val = parseInt(btn.dataset.val);
