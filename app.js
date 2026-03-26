@@ -122,6 +122,61 @@ const TTS = {
 };
 
 /* ========================================================
+   BACKGROUND AUDIO KEEPALIVE + MEDIA SESSION
+======================================================== */
+
+const BackgroundAudio = {
+  _ctx: null,
+  _timer: null,
+
+  start(line) {
+    this.stop();
+    // AudioContext keepalive — udržuje audio session aktivní v pozadí
+    try {
+      this._ctx = new (window.AudioContext || window.webkitAudioContext)();
+      this._tick();
+    } catch (e) {}
+    // iOS workaround: speechSynthesis se po ~10 s v pozadí pozastaví —
+    // periodické pause+resume ho udrží běžícím
+    this._timer = setInterval(() => {
+      if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      }
+    }, 10000);
+    // MediaSession — zobrazí ovládání na zamčené obrazovce
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: line ? `Linka ${line.number}` : 'Šalina Brno',
+        artist: line ? `${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}` : 'Procvičování zastávek',
+        album: 'DPMB Brno'
+      });
+      navigator.mediaSession.playbackState = 'playing';
+      navigator.mediaSession.setActionHandler('play',  () => { if (AudioPlayer.paused)  AudioPlayer.togglePause(); });
+      navigator.mediaSession.setActionHandler('pause', () => { if (!AudioPlayer.paused) AudioPlayer.togglePause(); });
+      navigator.mediaSession.setActionHandler('stop',  () => AudioPlayer.stop());
+    }
+  },
+
+  _tick() {
+    if (!this._ctx) return;
+    // Přehraje prázdný 0.5s buffer — udrží AudioContext aktivní
+    const buf = this._ctx.createBuffer(1, Math.floor(this._ctx.sampleRate * 0.5), this._ctx.sampleRate);
+    const src = this._ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(this._ctx.destination);
+    src.start(0);
+    src.onended = () => setTimeout(() => this._tick(), 500);
+  },
+
+  stop() {
+    if (this._timer) { clearInterval(this._timer); this._timer = null; }
+    if (this._ctx)   { this._ctx.close().catch(() => {}); this._ctx = null; }
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
+  }
+};
+
+/* ========================================================
    AUDIO PŘEHRÁVAČ LINEK
 ======================================================== */
 
@@ -145,6 +200,7 @@ const AudioPlayer = {
     this.paused = false;
     this.speed = speed;
     TTS.stop();
+    BackgroundAudio.start(line);
     updateAudioPlayBtn();
 
     // Oznámení linky
@@ -172,6 +228,7 @@ const AudioPlayer = {
     }
 
     this.playing = false;
+    BackgroundAudio.stop();
     renderAudioHighlight(-1);
     updateAudioPlayBtn();
     onAudioFinished();
@@ -182,6 +239,7 @@ const AudioPlayer = {
     this.playing = false;
     this.paused = false;
     TTS.stop();
+    BackgroundAudio.stop();
     updateAudioPlayBtn();
   },
 
@@ -1380,6 +1438,15 @@ function launchConfetti() {
 /* ========================================================
    INICIALIZACE APLIKACE
 ======================================================== */
+
+// Při odemknutí telefonu/návratu z pozadí obnoví přehrávání
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  if (AudioPlayer.playing && !AudioPlayer.paused) {
+    if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+  }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   TTS.init();
