@@ -978,15 +978,15 @@ button:active {
   box-shadow: 0 4px 16px rgba(218,33,39,0.3);
 }
 
-/* Dopravní uzly */
-.hub-filter-header {
+/* Krokové hlavičky – sdílené pro všechny sekce */
+.step-header {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 10px;
 }
-.hub-filter-header h3 { margin: 0; font-size: 0.95rem; }
-.hub-step-num {
+.step-header h3 { margin: 0; font-size: 0.95rem; }
+.step-num {
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -999,7 +999,7 @@ button:active {
   justify-content: center;
   flex-shrink: 0;
 }
-.hub-filter-hint {
+.step-hint {
   font-size: 0.75rem;
   color: var(--gray-dark);
   margin: 1px 0 0;
