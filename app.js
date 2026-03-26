@@ -48,7 +48,24 @@ const AppState = {
   totalAnswered: 0,
 
   // Ze které sekce byl kvíz spuštěn (pro správný návrat)
-  quizSource: 'home'
+  quizSource: 'home',
+
+  // Aktivní tab na home screenu
+  activeTab: 'home'
+};
+
+/* ========================================================
+   NAVIGAČNÍ HISTORIE
+======================================================== */
+const NavHistory = {
+  _stack: [],
+  push(screenId, tabId) {
+    this._stack.push({ screen: screenId, tab: tabId || null });
+    if (this._stack.length > 50) this._stack.shift();
+  },
+  pop() {
+    return this._stack.pop() || null;
+  }
 };
 
 /* ========================================================
@@ -261,7 +278,10 @@ const AudioPlayer = {
 ======================================================== */
 
 /** Zobrazí zadanou obrazovku, skryje ostatní. */
-function showScreen(id) {
+function showScreen(id, skipHistory = false) {
+  if (!skipHistory && AppState.screen && AppState.screen !== id) {
+    NavHistory.push(AppState.screen, AppState.screen === 'home' ? AppState.activeTab : null);
+  }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById(`screen-${id}`);
   if (el) {
@@ -1333,6 +1353,7 @@ function renderProfileTab() {
   setText('profile-tab-next-level', next ? `→ Level ${next.level}: ${next.name}` : '🏆 Nejvyšší level!');
 }
 function switchHomeTab(tab) {
+  AppState.activeTab = tab;
   ['home', 'stats', 'profile'].forEach(t => {
     const panel = document.getElementById('panel-' + t);
     const btn = document.getElementById('tab-btn-' + t);
@@ -1342,6 +1363,17 @@ function switchHomeTab(tab) {
   document.getElementById('tab-btn-settings').classList.remove('active');
   if (tab === 'stats') renderStatsScreen();
   if (tab === 'profile') renderProfileTab();
+}
+
+function goBack() {
+  const prev = NavHistory.pop();
+  if (!prev) { showScreen('home', true); switchHomeTab('home'); return; }
+  if (prev.screen === 'home') {
+    showScreen('home', true);
+    switchHomeTab(prev.tab || 'home');
+  } else {
+    showScreen(prev.screen, true);
+  }
 }
 function renderStatsScreen() {
   const g = loadGamState();
@@ -1484,16 +1516,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('stats-switch-btn').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
   document.getElementById('profile-tab-switch-btn').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
-  document.getElementById('profiles-back').addEventListener('click', () => { showScreen('home'); switchHomeTab('home'); });
-  document.getElementById('stats-tab-back').addEventListener('click', () => switchHomeTab('home'));
-  document.getElementById('profile-tab-back').addEventListener('click', () => switchHomeTab('home'));
+  document.getElementById('profiles-back').addEventListener('click', () => goBack());
+  document.getElementById('stats-tab-back').addEventListener('click', () => goBack());
+  document.getElementById('profile-tab-back').addEventListener('click', () => goBack());
 
   // === Domovská obrazovka ===
   document.getElementById('btn-section-a').addEventListener('click', openSectionA);
   document.getElementById('btn-section-b').addEventListener('click', openSectionB);
   document.getElementById('btn-section-c').addEventListener('click', openSectionC);
   document.getElementById('btn-section-d').addEventListener('click', openSectionD);
-  document.getElementById('d-back').addEventListener('click', () => showScreen('home'));
+  document.getElementById('d-back').addEventListener('click', () => goBack());
   document.getElementById('d-start-quiz').addEventListener('click', startHubQuiz);
   document.getElementById('d-select-all').addEventListener('click', () => {
     const allSelected = HubState.selectedHubs.length === HUB_DATA.length;
@@ -1524,10 +1556,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (chosen) TTS.czechVoice = chosen;
     TTS.speak('Příští zastávka Náměstí Svobody. Přestupní stanice.', 1.0);
   });
-  document.getElementById('settings-back').addEventListener('click', () => {
-    showScreen('home');
-    switchHomeTab('home');
-  });
+  document.getElementById('settings-back').addEventListener('click', () => goBack());
   document.querySelectorAll('.session-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const val = parseInt(btn.dataset.val);
@@ -1539,7 +1568,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // === Sekce A ===
-  document.getElementById('a-back').addEventListener('click', () => showScreen('home'));
+  document.getElementById('a-back').addEventListener('click', () => goBack());
   document.getElementById('a-start-flashcards').addEventListener('click', startFlashcards);
   document.getElementById('a-start-quiz').addEventListener('click', startQuizA);
   document.getElementById('a-select-all').addEventListener('click', () => {
@@ -1549,21 +1578,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // === Flashkarty ===
   document.getElementById('fc-back').addEventListener('click', () => {
     AudioPlayer.stop();
-    showScreen('section-a');
+    goBack();
   });
   document.getElementById('fc-card').addEventListener('click', flipFlashcard);
   document.getElementById('fc-prev').addEventListener('click', prevFlashcard);
   document.getElementById('fc-next').addEventListener('click', nextFlashcard);
 
   // === Sekce B ===
-  document.getElementById('b-back').addEventListener('click', () => showScreen('home'));
+  document.getElementById('b-back').addEventListener('click', () => goBack());
   document.getElementById('b-start-quiz').addEventListener('click', startQuizB);
   document.getElementById('b-select-all').addEventListener('click', () => {
     toggleAllLines(AppState.selectedLinesB, TRAM_DATA.lines.map(l => l.number), '#filter-b', 'b-select-all');
   });
 
   // === Sekce C ===
-  document.getElementById('c-back').addEventListener('click', () => showScreen('home'));
+  document.getElementById('c-back').addEventListener('click', () => goBack());
   document.getElementById('practice-mode-audio').addEventListener('click', () => startPracticeMode('audio'));
   document.getElementById('practice-mode-quiz').addEventListener('click', () => startPracticeMode('quiz'));
 
@@ -1573,7 +1602,7 @@ document.addEventListener('DOMContentLoaded', () => {
     AppState.audio.loop = false;
     const loopBtn = document.getElementById('audio-loop-btn');
     if (loopBtn) loopBtn.classList.remove('active');
-    showScreen('section-c');
+    goBack();
   });
   document.getElementById('audio-play-btn').addEventListener('click', toggleAudioPlayback);
   document.getElementById('audio-loop-btn').addEventListener('click', toggleAudioLoop);
@@ -1593,11 +1622,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('quiz-back').addEventListener('click', () => {
     if (!confirm('Opravdu chceš odejít? Postup v kvízu se ztratí.')) return;
     AudioPlayer.stop();
-    showScreen(AppState.quizSource || 'home');
+    goBack();
   });
 
   // === Výsledky ===
-  document.getElementById('results-back').addEventListener('click', () => showScreen(AppState.quizSource || 'home'));
+  document.getElementById('results-back').addEventListener('click', () => goBack());
   document.getElementById('result-retry').addEventListener('click', () => {
     retryQuiz();
   });
