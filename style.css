@@ -2029,6 +2029,10 @@ button:active {
 #screen-settings > .screen-content { padding-bottom: 72px; }
 #panel-stats, #panel-profile {
   background: var(--gray-light);
+  padding: 0 0 72px;
+}
+.panel-body {
+  padding: 16px;
 }
 .tab-panel-header {
   display: flex;
