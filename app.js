@@ -142,25 +142,52 @@ const TTS = {
    BACKGROUND AUDIO KEEPALIVE + MEDIA SESSION
 ======================================================== */
 
+/**
+ * Vygeneruje blob s tichým WAV souborem (3 sekundy, 8kHz mono).
+ * Slouží jako keepalive — iOS nezabíjí nativní <audio> element při zamčení.
+ */
+function createSilentWavBlob() {
+  const sampleRate = 8000;
+  const numSamples = sampleRate * 3; // 3 sekundy
+  const buffer = new ArrayBuffer(44 + numSamples * 2);
+  const v = new DataView(buffer);
+  const str = (off, s) => { for (let i = 0; i < s.length; i++) v.setUint8(off + i, s.charCodeAt(i)); };
+  str(0,  'RIFF'); v.setUint32(4,  36 + numSamples * 2, true);
+  str(8,  'WAVE'); str(12, 'fmt '); v.setUint32(16, 16, true);
+  v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, sampleRate, true); v.setUint32(28, sampleRate * 2, true);
+  v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  str(36, 'data'); v.setUint32(40, numSamples * 2, true);
+  // vzorky jsou 0 = ticho
+  return new Blob([buffer], { type: 'audio/wav' });
+}
+
 const BackgroundAudio = {
-  _ctx: null,
+  _audioEl: null,
+  _blobUrl: null,
   _timer: null,
 
   start(line) {
     this.stop();
-    // AudioContext keepalive — udržuje audio session aktivní v pozadí
-    try {
-      this._ctx = new (window.AudioContext || window.webkitAudioContext)();
-      this._tick();
-    } catch (e) {}
-    // iOS workaround: speechSynthesis se po ~10 s v pozadí pozastaví —
-    // periodické pause+resume ho udrží běžícím
+
+    // Nativní <audio> ve smyčce — iOS ho nezastaví při zamčení obrazovky.
+    // AudioContext empty buffery iOS při zamčení zabíjí, proto je nepoužíváme.
+    if (!this._blobUrl) {
+      this._blobUrl = URL.createObjectURL(createSilentWavBlob());
+    }
+    this._audioEl = new Audio(this._blobUrl);
+    this._audioEl.loop = true;
+    this._audioEl.volume = 0.001; // téměř neslyšitelné, ale ne 0 (iOS muted session může zabít)
+    this._audioEl.play().catch(() => {});
+
+    // Záloha: speechSynthesis se po ~5 s v pozadí může pozastavit — krátký nudge
     this._timer = setInterval(() => {
       if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
         window.speechSynthesis.pause();
         window.speechSynthesis.resume();
       }
-    }, 10000);
+    }, 5000);
+
     // MediaSession — zobrazí ovládání na zamčené obrazovce
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
@@ -175,20 +202,9 @@ const BackgroundAudio = {
     }
   },
 
-  _tick() {
-    if (!this._ctx) return;
-    // Přehraje prázdný 0.5s buffer — udrží AudioContext aktivní
-    const buf = this._ctx.createBuffer(1, Math.floor(this._ctx.sampleRate * 0.5), this._ctx.sampleRate);
-    const src = this._ctx.createBufferSource();
-    src.buffer = buf;
-    src.connect(this._ctx.destination);
-    src.start(0);
-    src.onended = () => setTimeout(() => this._tick(), 500);
-  },
-
   stop() {
-    if (this._timer) { clearInterval(this._timer); this._timer = null; }
-    if (this._ctx)   { this._ctx.close().catch(() => {}); this._ctx = null; }
+    if (this._timer)   { clearInterval(this._timer); this._timer = null; }
+    if (this._audioEl) { this._audioEl.pause(); this._audioEl = null; }
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
   }
 };
