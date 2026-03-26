@@ -1034,7 +1034,7 @@ button:active {
 }
 .hub-type-btn::before {
   content: '☐';
-  font-size: 1rem;
+  font-size: 1.35rem;
   line-height: 1;
 }
 .hub-type-btn.active {
@@ -1074,7 +1074,7 @@ button:active {
   gap: 10px;
 }
 .hub-node-btn .hub-node-check {
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   flex-shrink: 0;
   color: var(--gray-dark);
 }
