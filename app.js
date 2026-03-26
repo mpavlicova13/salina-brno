@@ -1485,6 +1485,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('stats-switch-btn').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
   document.getElementById('profile-tab-switch-btn').addEventListener('click', () => { renderProfilesScreen(); showScreen('profiles'); });
   document.getElementById('profiles-back').addEventListener('click', () => { showScreen('home'); switchHomeTab('home'); });
+  document.getElementById('stats-tab-back').addEventListener('click', () => switchHomeTab('home'));
+  document.getElementById('profile-tab-back').addEventListener('click', () => switchHomeTab('home'));
 
   // === Domovská obrazovka ===
   document.getElementById('btn-section-a').addEventListener('click', openSectionA);

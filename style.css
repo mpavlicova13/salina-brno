@@ -2030,11 +2030,17 @@ button:active {
 #panel-stats, #panel-profile {
   background: var(--gray-light);
 }
+.tab-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
 .tab-panel-title {
   font-size: 1.4rem;
   font-weight: 800;
   color: var(--blue);
-  margin: 0 0 16px;
+  margin: 0;
 }
 
 /* Bottom nav */
