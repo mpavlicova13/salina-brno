@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="DPMB_favicona_2.png">
-  <link rel="stylesheet" href="style.css?v=5" />
+  <link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
 
@@ -209,6 +209,7 @@
 
     <!-- Panel: Statistiky -->
     <div id="panel-stats" class="tab-panel">
+      <h2 class="tab-panel-title">Statistiky</h2>
       <div class="stats-profile-row">
         <span class="stats-profile-avatar" id="stats-avatar">❓</span>
         <div class="stats-profile-info">
@@ -275,25 +276,6 @@
       </div>
     </div>
 
-    <!-- Bottom tab bar -->
-    <nav class="bottom-nav">
-      <button class="bottom-nav-btn active" id="tab-btn-home">
-        <svg class="icon" aria-hidden="true"><use href="#icon-home"/></svg>
-        <span>Domů</span>
-      </button>
-      <button class="bottom-nav-btn" id="tab-btn-stats">
-        <svg class="icon" aria-hidden="true"><use href="#icon-bar-chart"/></svg>
-        <span>Statistiky</span>
-      </button>
-      <button class="bottom-nav-btn" id="tab-btn-profile">
-        <svg class="icon" aria-hidden="true"><use href="#icon-user"/></svg>
-        <span>Profil</span>
-      </button>
-      <button class="bottom-nav-btn" id="tab-btn-settings">
-        <svg class="icon" aria-hidden="true"><use href="#icon-settings"/></svg>
-        <span>Nastavení</span>
-      </button>
-    </nav>
   </div>
 
   <!-- ====================================================
@@ -806,6 +788,24 @@
     </div>
   </div>
 
+  <nav class="bottom-nav" id="bottom-nav" style="display:none">
+    <button class="bottom-nav-btn active" id="tab-btn-home">
+      <svg class="icon" aria-hidden="true"><use href="#icon-home"/></svg>
+      <span>Domů</span>
+    </button>
+    <button class="bottom-nav-btn" id="tab-btn-stats">
+      <svg class="icon" aria-hidden="true"><use href="#icon-bar-chart"/></svg>
+      <span>Statistiky</span>
+    </button>
+    <button class="bottom-nav-btn" id="tab-btn-profile">
+      <svg class="icon" aria-hidden="true"><use href="#icon-user"/></svg>
+      <span>Profil</span>
+    </button>
+    <button class="bottom-nav-btn" id="tab-btn-settings">
+      <svg class="icon" aria-hidden="true"><use href="#icon-settings"/></svg>
+      <span>Nastavení</span>
+    </button>
+  </nav>
 </div><!-- /#app -->
 
 <!-- ====================================================
@@ -922,6 +922,6 @@
 <!-- Skripty (pořadí záleží!) -->
 <script src="data.js?v=2"></script>
 <script src="engine.js?v=4"></script>
-<script src="app.js?v=5"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>

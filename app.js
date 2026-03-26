@@ -269,6 +269,8 @@ function showScreen(id) {
     AppState.screen = id;
     window.scrollTo(0, 0);
   }
+  const nav = document.getElementById('bottom-nav');
+  if (nav) nav.style.display = (id === 'home' || id === 'settings') ? 'flex' : 'none';
 }
 
 /* ========================================================
