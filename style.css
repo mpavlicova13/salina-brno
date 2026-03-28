@@ -2546,11 +2546,13 @@ button:active {
   width: 100%;
 }
 
-.znacky-card-svg-area svg {
+.znacky-card-svg-area svg,
+.znacky-card-svg-area img {
   max-width: 160px;
   max-height: 180px;
   width: 100%;
   height: auto;
+  object-fit: contain;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
 }
 
@@ -2620,10 +2622,13 @@ button:active {
 }
 
 .quiz-sign-svg-wrapper svg,
-.quiz-sign-display svg {
+.quiz-sign-svg-wrapper img,
+.quiz-sign-display svg,
+.quiz-sign-display img {
   max-width: 130px;
   max-height: 150px;
   width: 100%;
   height: auto;
+  object-fit: contain;
   filter: drop-shadow(0 1px 3px rgba(0,0,0,0.12));
 }
