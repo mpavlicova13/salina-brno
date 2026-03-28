@@ -2621,6 +2621,7 @@ button:active {
   background: #f8f9fc;
   border-radius: var(--radius-sm);
   border: 1px solid var(--gray-mid);
+  overflow: hidden;
 }
 
 .quiz-sign-svg-wrapper svg,
