@@ -2429,17 +2429,23 @@ button:active {
 }
 
 .znacky-cat-btn.active {
-  background: white;
-  border-color: var(--cat-color);
-  border-width: 3px;
-  box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+  border-color: var(--blue);
+  background: var(--blue-pale);
+  color: var(--blue);
 }
 
-.znacky-cat-icon {
-  font-size: 1.6rem;
+.znacky-cat-btn.active .znacky-cat-name {
+  color: var(--blue);
+}
+
+.znacky-cat-check {
+  font-size: 1.4rem;
   flex-shrink: 0;
-  width: 32px;
-  text-align: center;
+  color: var(--gray-dark);
+}
+
+.znacky-cat-btn.active .znacky-cat-check {
+  color: var(--blue);
 }
 
 .znacky-cat-label {
