@@ -577,7 +577,6 @@ function openSectionD() {
   HubState.selectedHubs = [];
   HubState.activeTypes = [];
   document.querySelectorAll('.hub-type-btn').forEach(btn => btn.classList.remove('active'));
-  document.getElementById('d-select-all').textContent = 'Vybrat vše';
   renderHubButtons();
   updateHubQuizBtn();
   showScreen('section-d');
