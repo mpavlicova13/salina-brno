@@ -22,8 +22,8 @@ const AppState = {
   },
 
   // Vybrané linky (pro sekce A a B)
-  selectedLinesA: TRAM_DATA.lines.map(l => l.number),
-  selectedLinesB: TRAM_DATA.lines.map(l => l.number),
+  selectedLinesA: [],
+  selectedLinesB: [],
 
   // Procvič linku
   practiceLineNum: null,
@@ -415,7 +415,7 @@ function renderLineFilterA() {
   selectAll.className = 'line-filter-select-all' + (allSelected ? ' selected' : '');
   selectAll.innerHTML = `${allSelected ? '☑' : '☐'} Vybrat vše`;
   selectAll.onclick = () => {
-    AppState.selectedLinesA = allSelected ? [allNums[0]] : [...allNums];
+    AppState.selectedLinesA = allSelected ? [] : [...allNums];
     renderLineFilterA();
   };
   container.appendChild(selectAll);
@@ -527,7 +527,7 @@ function renderLineFilterB() {
   selectAll.className = 'line-filter-select-all' + (allSelected ? ' selected' : '');
   selectAll.innerHTML = `${allSelected ? '☑' : '☐'} Vybrat vše`;
   selectAll.onclick = () => {
-    AppState.selectedLinesB = allSelected ? [allNums[0]] : [...allNums];
+    AppState.selectedLinesB = allSelected ? [] : [...allNums];
     renderLineFilterB();
   };
   container.appendChild(selectAll);
@@ -1190,7 +1190,7 @@ function retryQuiz() {
 function toggleLineSelection(arr, num) {
   const idx = arr.indexOf(num);
   if (idx >= 0) {
-    if (arr.length > 1) arr.splice(idx, 1); // Nech aspoň 1
+    arr.splice(idx, 1);
   } else {
     arr.push(num);
     arr.sort((a, b) => a - b);
