@@ -420,10 +420,10 @@ function renderLineFilterA() {
   };
   container.appendChild(selectAll);
   TRAM_DATA.lines.forEach(line => {
+    const active = AppState.selectedLinesA.includes(line.number);
     const btn = document.createElement('button');
-    btn.className = 'line-big-btn' + (AppState.selectedLinesA.includes(line.number) ? ' filter-active' : '');
-    btn.innerHTML = `<span class="line-num">${line.number}</span>`;
-    btn.title = `${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}`;
+    btn.className = 'line-big-btn' + (active ? ' filter-active' : '');
+    btn.innerHTML = `<span class="line-check">${active ? '☑' : '☐'}</span><span class="line-num">${line.number}</span><span class="line-route">${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}</span>`;
     btn.onclick = () => {
       toggleLineSelection(AppState.selectedLinesA, line.number);
       renderLineFilterA();
@@ -532,10 +532,10 @@ function renderLineFilterB() {
   };
   container.appendChild(selectAll);
   TRAM_DATA.lines.forEach(line => {
+    const active = AppState.selectedLinesB.includes(line.number);
     const btn = document.createElement('button');
-    btn.className = 'line-big-btn' + (AppState.selectedLinesB.includes(line.number) ? ' filter-active' : '');
-    btn.innerHTML = `<span class="line-num">${line.number}</span>`;
-    btn.title = `${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}`;
+    btn.className = 'line-big-btn' + (active ? ' filter-active' : '');
+    btn.innerHTML = `<span class="line-check">${active ? '☑' : '☐'}</span><span class="line-num">${line.number}</span><span class="line-route">${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}</span>`;
     btn.onclick = () => {
       toggleLineSelection(AppState.selectedLinesB, line.number);
       renderLineFilterB();
@@ -669,9 +669,10 @@ function renderLineButtons() {
   const container = document.getElementById('line-buttons');
   container.innerHTML = '';
   TRAM_DATA.lines.forEach(line => {
+    const active = AppState.practiceLineNum === line.number;
     const btn = document.createElement('button');
-    btn.className = 'line-big-btn' + (AppState.practiceLineNum === line.number ? ' filter-active' : '');
-    btn.innerHTML = `<span class="line-num">${line.number}</span>`;
+    btn.className = 'line-big-btn' + (active ? ' filter-active' : '');
+    btn.innerHTML = `<span class="line-check">${active ? '☑' : '☐'}</span><span class="line-num">${line.number}</span><span class="line-route">${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}</span>`;
     btn.onclick = () => selectPracticeLine(line.number);
     container.appendChild(btn);
   });
