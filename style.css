@@ -930,6 +930,16 @@ button:active {
   color: #b8860b;
 }
 
+.line-big-btn.filter-active {
+  border-color: var(--blue);
+  background: var(--blue-pale);
+  box-shadow: 0 4px 20px rgba(58,113,178,0.2);
+}
+
+.line-big-btn.filter-active .line-num {
+  color: var(--blue-dark);
+}
+
 .line-big-btn .line-info {
   font-size: 1rem;
   color: var(--gray-dark);
