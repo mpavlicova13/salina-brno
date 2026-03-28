@@ -421,8 +421,8 @@ function renderLineFilterA() {
   container.appendChild(selectAll);
   TRAM_DATA.lines.forEach(line => {
     const btn = document.createElement('button');
-    btn.className = 'line-filter-btn' + (AppState.selectedLinesA.includes(line.number) ? ' selected' : '');
-    btn.textContent = line.number;
+    btn.className = 'line-big-btn' + (AppState.selectedLinesA.includes(line.number) ? ' active' : '');
+    btn.innerHTML = `<span class="line-num">${line.number}</span>`;
     btn.title = `${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}`;
     btn.onclick = () => {
       toggleLineSelection(AppState.selectedLinesA, line.number);
@@ -533,8 +533,8 @@ function renderLineFilterB() {
   container.appendChild(selectAll);
   TRAM_DATA.lines.forEach(line => {
     const btn = document.createElement('button');
-    btn.className = 'line-filter-btn' + (AppState.selectedLinesB.includes(line.number) ? ' selected' : '');
-    btn.textContent = line.number;
+    btn.className = 'line-big-btn' + (AppState.selectedLinesB.includes(line.number) ? ' active' : '');
+    btn.innerHTML = `<span class="line-num">${line.number}</span>`;
     btn.title = `${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}`;
     btn.onclick = () => {
       toggleLineSelection(AppState.selectedLinesB, line.number);
