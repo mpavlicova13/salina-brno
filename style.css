@@ -321,13 +321,14 @@ button:active {
 }
 
 .line-filter-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 8px;
   margin-bottom: 4px;
 }
 
 .line-filter-select-all {
+  grid-column: 1 / -1;
   padding: 11px 16px;
   border-radius: var(--radius-sm);
   border: 2px solid var(--gray-mid);
@@ -883,49 +884,33 @@ button:active {
    SECTION C – PROCVIČ LINKU
    ============================================================ */
 #line-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 8px;
   margin-bottom: 20px;
 }
 
 .line-big-btn {
-  padding: 11px 16px;
+  padding: 14px 8px;
   border-radius: var(--radius-sm);
   border: 2px solid var(--gray-mid);
   background: var(--white);
-  text-align: left;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--blue);
+  text-align: center;
   cursor: pointer;
   transition: all var(--transition);
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
 }
 
 .line-big-btn:hover {
   border-color: var(--blue);
 }
 
-.line-big-btn .line-check {
-  font-size: 1.4rem;
-  flex-shrink: 0;
-  color: var(--gray-dark);
-}
-
 .line-big-btn .line-num {
-  font-size: 1.1rem;
+  font-size: 1.6rem;
   font-weight: 900;
   color: var(--blue);
-  min-width: 24px;
-}
-
-.line-big-btn .line-route {
-  font-size: 0.9rem;
-  color: var(--gray-dark);
-  font-weight: 400;
 }
 
 .line-big-btn.filter-active {
@@ -933,16 +918,8 @@ button:active {
   background: var(--blue-pale);
 }
 
-.line-big-btn.filter-active .line-check {
-  color: var(--blue);
-}
-
 .line-big-btn.filter-active .line-num {
   color: var(--blue-dark);
-}
-
-.line-big-btn.filter-active .line-route {
-  color: var(--blue);
 }
 
 #practice-line-info {
@@ -1720,7 +1697,7 @@ button:active {
 
   .quiz-question { font-size: 1rem; padding: 14px; }
   .quiz-option-btn { padding: 14px 16px; font-size: 1rem; }
-  #line-buttons, .line-filter-row { gap: 4px; }
+  #line-buttons, .line-filter-row { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 6px; }
   .fc-card-wrapper { height: 240px; }
   .fc-line-num { font-size: 4rem; }
 
