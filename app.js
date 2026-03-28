@@ -306,7 +306,8 @@ function showScreen(id, skipHistory = false) {
     window.scrollTo(0, 0);
   }
   const nav = document.getElementById('bottom-nav');
-  if (nav) nav.style.display = (id === 'home' || id === 'settings') ? 'flex' : 'none';
+  const navScreens = ['home', 'settings', 'section-a', 'section-b', 'section-c', 'section-d', 'section-e'];
+  if (nav) nav.style.display = navScreens.includes(id) ? 'flex' : 'none';
 }
 
 /* ========================================================
