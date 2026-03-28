@@ -1732,10 +1732,13 @@ function showZnackyCard() {
   document.getElementById('znacky-back-desc').textContent = sign.description;
   document.getElementById('znacky-back-cat').textContent = `Kategorie: ${cat.name}`;
 
-  // Resetuj otočení
+  // Resetuj otočení okamžitě (bez animace)
   const card = document.getElementById('znacky-card');
+  card.style.transition = 'none';
   card.classList.remove('flipped');
   znackyCardFlipped = false;
+  card.offsetHeight; // force reflow
+  card.style.transition = '';
 }
 
 function flipZnackyCard() {
