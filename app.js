@@ -82,17 +82,22 @@ const TTS = {
   init() {
     const load = () => {
       const voices = this.synth.getVoices();
-      const czech = voices.filter(v => v.lang === 'cs-CZ' || v.lang.startsWith('cs'));
+      if (voices.length === 0) return; // ještě není připraveno
+
+      // Android může hlásit češtinu jako "cs_CZ" (podtržítko) nebo jen "cs"
+      const czech = voices.filter(v =>
+        v.lang === 'cs-CZ' ||
+        v.lang === 'cs_CZ' ||
+        v.lang.toLowerCase().startsWith('cs')
+      );
       this.czechVoices = czech;
 
       if (czech.length > 0) {
-        // Preferuj kvalitnější hlasy: nejdřív podle názvu, pak lokální (device-installed = enhanced na Apple)
         const quality = ['enhanced', 'neural', 'natural', 'premium'];
         const best = czech.find(v =>
           quality.some(k => v.name.toLowerCase().includes(k))
         ) || czech.find(v => v.localService) || czech[0];
 
-        // Pokud má uživatel uloženou preferenci, použij ji
         const savedName = AppState.settings.selectedVoiceName;
         const saved = savedName ? czech.find(v => v.name === savedName) : null;
         this.czechVoice = saved || best;
@@ -102,8 +107,12 @@ const TTS = {
       }
       renderVoiceSelector();
     };
+
     load();
     this.synth.onvoiceschanged = load;
+    // Android načítá hlasy se zpožděním a onvoiceschanged není spolehlivý
+    setTimeout(load, 500);
+    setTimeout(load, 2000);
   },
 
   /** Přečte text. Vrátí Promise, který se vyřeší po dokončení. */
