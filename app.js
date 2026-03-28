@@ -1482,7 +1482,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-section-b').addEventListener('click', openSectionB);
   document.getElementById('btn-section-c').addEventListener('click', openSectionC);
   document.getElementById('btn-section-d').addEventListener('click', openSectionD);
-  document.getElementById('btn-section-e').addEventListener('click', openSectionE);
+  // btn-section-e: dočasně skryto – Značky se připravují
+  // document.getElementById('btn-section-e').addEventListener('click', openSectionE);
   document.getElementById('d-back').addEventListener('click', () => goBack());
 
   // === Sekce E – Značky ===
