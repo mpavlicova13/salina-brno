@@ -447,13 +447,13 @@ const ZNACKY_DATA = {
           id: 'rj_34', number: '34',
           name: 'Práce na trati',
           description: '',
-          svg: `<img src="Značky2/fotky/34.png" style="max-width:100%;max-height:100%;object-fit:contain;">`
+          svg: `<img src="Značky2/fotky/34.png">`
         },
         {
           id: 'rj_35', number: '35',
           name: 'Konec práce na trati',
           description: '',
-          svg: `<img src="Značky2/fotky/35.png" style="max-width:100%;max-height:100%;object-fit:contain;">`
+          svg: `<img src="Značky2/fotky/35.png">`
         },
       ]
     },
@@ -472,43 +472,43 @@ const ZNACKY_DATA = {
           id: 'rn_1r', number: '01',
           name: 'Stůj!',
           description: '',
-          svg: `<img src="Značky2/fotky/1r.png" style="max-width:100%;max-height:100%;object-fit:contain;">`
+          svg: `<img src="Značky2/fotky/1r.png">`
         },
         {
           id: 'rn_2r', number: '02',
           name: 'Přiblížit!',
           description: '',
-          svg: `<img src="Značky2/fotky/2r.png" style="max-width:100%;max-height:100%;object-fit:contain;">`
+          svg: `<img src="Značky2/fotky/2r.png">`
         },
         {
           id: 'rn_3r', number: '04',
           name: 'Vzdálit!',
           description: '',
-          svg: `<img src="Značky2/fotky/3r.png" style="max-width:100%;max-height:100%;object-fit:contain;">`
+          svg: `<img src="Značky2/fotky/3r.png">`
         },
         {
           id: 'rn_4r', number: '08',
           name: 'Nebezpečí – Zastavte všemi prostředky!',
           description: '',
-          svg: `<img src="Značky2/fotky/4r.png" style="max-width:100%;max-height:100%;object-fit:contain;">`
+          svg: `<img src="Značky2/fotky/4r.png">`
         },
         {
           id: 'rn_5r', number: '010',
           name: 'Pomalu!',
           description: '',
-          svg: `<img src="Značky2/fotky/5r.png" style="max-width:100%;max-height:100%;object-fit:contain;">`
+          svg: `<img src="Značky2/fotky/5r.png">`
         },
         {
           id: 'rn_6r', number: '031A',
           name: 'Stáhni sběrač! – Začátek úseku',
           description: '',
-          svg: `<img src="Značky2/fotky/6r.png" style="max-width:100%;max-height:100%;object-fit:contain;">`
+          svg: `<img src="Značky2/fotky/6r.png">`
         },
         {
           id: 'rn_7r', number: '031B',
           name: 'Stáhni sběrač! – Konec úseku',
           description: '',
-          svg: `<img src="Značky2/fotky/7r.png" style="max-width:100%;max-height:100%;object-fit:contain;">`
+          svg: `<img src="Značky2/fotky/7r.png">`
         },
       ]
     },
@@ -688,13 +688,13 @@ const ZNACKY_DATA = {
           id: 'tv_55', number: '55',
           name: 'Začátek snížené výšky trolejového drátu',
           description: '',
-          svg: `<img src="Značky2/fotky/55.png" style="max-width:100%;max-height:100%;object-fit:contain;">`
+          svg: `<img src="Značky2/fotky/55.png">`
         },
         {
           id: 'tv_56', number: '56',
           name: 'Konec snížené výšky trolejového drátu',
           description: '',
-          svg: `<img src="Značky2/fotky/56.png" style="max-width:100%;max-height:100%;object-fit:contain;">`
+          svg: `<img src="Značky2/fotky/56.png">`
         },
         {
           id: 'tv_59', number: '59',
@@ -1261,7 +1261,7 @@ const ZNACKY_DATA = {
           id: 'in_97', number: '97',
           name: 'Zúžený průjezdný průřez',
           description: '',
-          svg: `<img src="Značky2/fotky/97.png" style="max-width:100%;max-height:100%;object-fit:contain;">`
+          svg: `<img src="Značky2/fotky/97.png">`
         },
         {
           id: 'in_98a', number: '98a',

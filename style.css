@@ -2544,6 +2544,8 @@ button:active {
   justify-content: center;
   flex: 1;
   width: 100%;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .znacky-card-svg-area svg,
