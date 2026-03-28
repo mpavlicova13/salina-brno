@@ -409,6 +409,16 @@ function openSectionA() {
 function renderLineFilterA() {
   const container = document.getElementById('filter-a');
   container.innerHTML = '';
+  const allNums = TRAM_DATA.lines.map(l => l.number);
+  const allSelected = allNums.every(n => AppState.selectedLinesA.includes(n));
+  const selectAll = document.createElement('button');
+  selectAll.className = 'line-filter-select-all' + (allSelected ? ' selected' : '');
+  selectAll.innerHTML = `${allSelected ? '☑' : '☐'} Vybrat vše`;
+  selectAll.onclick = () => {
+    AppState.selectedLinesA = allSelected ? [allNums[0]] : [...allNums];
+    renderLineFilterA();
+  };
+  container.appendChild(selectAll);
   TRAM_DATA.lines.forEach(line => {
     const btn = document.createElement('button');
     btn.className = 'line-filter-btn' + (AppState.selectedLinesA.includes(line.number) ? ' selected' : '');
@@ -416,7 +426,7 @@ function renderLineFilterA() {
     btn.title = `${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}`;
     btn.onclick = () => {
       toggleLineSelection(AppState.selectedLinesA, line.number);
-      btn.classList.toggle('selected');
+      renderLineFilterA();
     };
     container.appendChild(btn);
   });
@@ -511,6 +521,16 @@ function openSectionB() {
 function renderLineFilterB() {
   const container = document.getElementById('filter-b');
   container.innerHTML = '';
+  const allNums = TRAM_DATA.lines.map(l => l.number);
+  const allSelected = allNums.every(n => AppState.selectedLinesB.includes(n));
+  const selectAll = document.createElement('button');
+  selectAll.className = 'line-filter-select-all' + (allSelected ? ' selected' : '');
+  selectAll.innerHTML = `${allSelected ? '☑' : '☐'} Vybrat vše`;
+  selectAll.onclick = () => {
+    AppState.selectedLinesB = allSelected ? [allNums[0]] : [...allNums];
+    renderLineFilterB();
+  };
+  container.appendChild(selectAll);
   TRAM_DATA.lines.forEach(line => {
     const btn = document.createElement('button');
     btn.className = 'line-filter-btn' + (AppState.selectedLinesB.includes(line.number) ? ' selected' : '');
@@ -518,7 +538,7 @@ function renderLineFilterB() {
     btn.title = `${line.stops[0]} ↔ ${line.stops[line.stops.length - 1]}`;
     btn.onclick = () => {
       toggleLineSelection(AppState.selectedLinesB, line.number);
-      btn.classList.toggle('selected');
+      renderLineFilterB();
     };
     container.appendChild(btn);
   });
@@ -566,6 +586,16 @@ function openSectionD() {
 function renderHubButtons() {
   const container = document.getElementById('hub-buttons');
   container.innerHTML = '';
+  const allSelected = HubState.selectedHubs.length === HUB_DATA.length;
+  const selectAll = document.createElement('button');
+  selectAll.className = 'hub-node-btn' + (allSelected ? ' active' : '');
+  selectAll.innerHTML = `<span class="hub-node-check">${allSelected ? '☑' : '☐'}</span>Vybrat vše`;
+  selectAll.onclick = () => {
+    HubState.selectedHubs = allSelected ? [] : HUB_DATA.map(h => h.name);
+    renderHubButtons();
+    updateHubQuizBtn();
+  };
+  container.appendChild(selectAll);
   HUB_DATA.forEach(hub => {
     const btn = document.createElement('button');
     const active = HubState.selectedHubs.includes(hub.name);
@@ -1487,14 +1517,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // === Sekce E – Značky ===
   document.getElementById('e-back').addEventListener('click', () => goBack());
-  document.getElementById('e-select-all').addEventListener('click', () => {
-    const allIds = ZNACKY_DATA.categories.map(c => c.id);
-    const allSelected = ZnackyState.selectedCategories.length === allIds.length;
-    ZnackyState.selectedCategories = allSelected ? [] : [...allIds];
-    document.getElementById('e-select-all').textContent = allSelected ? 'Vybrat vše' : 'Zrušit výběr';
-    renderZnackyCategories();
-    updateZnackyButtons();
-  });
   document.getElementById('e-start-cards').addEventListener('click', startZnackyCards);
   document.getElementById('e-start-quiz').addEventListener('click', startZnackyQuiz);
 
@@ -1504,13 +1526,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('znacky-prev').addEventListener('click', prevZnackyCard);
   document.getElementById('znacky-next').addEventListener('click', nextZnackyCard);
   document.getElementById('d-start-quiz').addEventListener('click', startHubQuiz);
-  document.getElementById('d-select-all').addEventListener('click', () => {
-    const allSelected = HubState.selectedHubs.length === HUB_DATA.length;
-    HubState.selectedHubs = allSelected ? [] : HUB_DATA.map(h => h.name);
-    document.getElementById('d-select-all').textContent = allSelected ? 'Vybrat vše' : 'Zrušit výběr';
-    renderHubButtons();
-    updateHubQuizBtn();
-  });
   document.querySelector('.hub-type-filter').addEventListener('click', (e) => {
     const btn = e.target.closest('.hub-type-btn');
     if (!btn) return;
@@ -1548,9 +1563,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('a-back').addEventListener('click', () => goBack());
   document.getElementById('a-start-flashcards').addEventListener('click', startFlashcards);
   document.getElementById('a-start-quiz').addEventListener('click', startQuizA);
-  document.getElementById('a-select-all').addEventListener('click', () => {
-    toggleAllLines(AppState.selectedLinesA, TRAM_DATA.lines.map(l => l.number), '#filter-a', 'a-select-all');
-  });
 
   // === Flashkarty ===
   document.getElementById('fc-back').addEventListener('click', () => {
@@ -1564,9 +1576,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // === Sekce B ===
   document.getElementById('b-back').addEventListener('click', () => goBack());
   document.getElementById('b-start-quiz').addEventListener('click', startQuizB);
-  document.getElementById('b-select-all').addEventListener('click', () => {
-    toggleAllLines(AppState.selectedLinesB, TRAM_DATA.lines.map(l => l.number), '#filter-b', 'b-select-all');
-  });
 
   // === Sekce C ===
   document.getElementById('c-back').addEventListener('click', () => goBack());
@@ -1647,6 +1656,18 @@ function openSectionE() {
 function renderZnackyCategories() {
   const container = document.getElementById('znacky-cat-filter');
   container.innerHTML = '';
+  const allIds = ZNACKY_DATA.categories.map(c => c.id);
+  const allSelected = allIds.every(id => ZnackyState.selectedCategories.includes(id));
+  const selectAll = document.createElement('button');
+  selectAll.className = 'znacky-cat-btn' + (allSelected ? ' active' : '');
+  selectAll.innerHTML = `<span class="znacky-cat-check">${allSelected ? '☑' : '☐'}</span>
+    <span class="znacky-cat-label"><span class="znacky-cat-name">Vybrat vše</span></span>`;
+  selectAll.onclick = () => {
+    ZnackyState.selectedCategories = allSelected ? [] : [...allIds];
+    renderZnackyCategories();
+    updateZnackyButtons();
+  };
+  container.appendChild(selectAll);
   ZNACKY_DATA.categories.forEach(cat => {
     const btn = document.createElement('button');
     const active = ZnackyState.selectedCategories.includes(cat.id);

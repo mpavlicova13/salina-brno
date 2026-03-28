@@ -326,6 +326,29 @@ button:active {
   gap: 8px;
 }
 
+.line-filter-select-all {
+  width: 100%;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--gray-mid);
+  background: var(--white);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--blue-dark);
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--transition);
+}
+
+.line-filter-select-all.selected {
+  border-color: var(--blue);
+  background: var(--blue-pale);
+  color: var(--blue);
+}
+
 .line-filter-btn {
   width: 44px;
   height: 44px;
