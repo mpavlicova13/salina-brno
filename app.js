@@ -1482,8 +1482,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-section-b').addEventListener('click', openSectionB);
   document.getElementById('btn-section-c').addEventListener('click', openSectionC);
   document.getElementById('btn-section-d').addEventListener('click', openSectionD);
-  // btn-section-e: dočasně skryto – Značky se připravují
-  // document.getElementById('btn-section-e').addEventListener('click', openSectionE);
+  document.getElementById('btn-section-e').addEventListener('click', openSectionE);
   document.getElementById('d-back').addEventListener('click', () => goBack());
 
   // === Sekce E – Značky ===
@@ -1792,14 +1791,17 @@ function generateZnackyQuestions(signs, count) {
       explanation: `Značka č. ${sign.number} – ${sign.name}: ${sign.description}`,
     });
 
-    // Typ 2: Ukáž název → vyber popis
-    const wrongDescs = shuffle([...others]).slice(0, 3).map(s => s.description);
-    questions.push({
-      question: `Co znamená značka č. ${sign.number} – „${sign.name}"?`,
-      options: shuffle([sign.description, ...wrongDescs]),
-      correct: sign.description,
-      explanation: `Značka č. ${sign.number} – ${sign.name}: ${sign.description}`,
-    });
+    // Typ 2: Ukáž název → vyber popis (jen pro značky s popisem)
+    const othersWithDesc = others.filter(s => s.description);
+    if (sign.description && othersWithDesc.length >= 3) {
+      const wrongDescs = shuffle([...othersWithDesc]).slice(0, 3).map(s => s.description);
+      questions.push({
+        question: `Co znamená značka č. ${sign.number} – „${sign.name}"?`,
+        options: shuffle([sign.description, ...wrongDescs]),
+        correct: sign.description,
+        explanation: `Značka č. ${sign.number} – ${sign.name}: ${sign.description}`,
+      });
+    }
   });
 
   const shuffled = shuffle(questions);
