@@ -670,7 +670,7 @@ function renderLineButtons() {
   container.innerHTML = '';
   TRAM_DATA.lines.forEach(line => {
     const btn = document.createElement('button');
-    btn.className = 'line-big-btn';
+    btn.className = 'line-big-btn' + (AppState.practiceLineNum === line.number ? ' filter-active' : '');
     btn.innerHTML = `<span class="line-num">${line.number}</span>`;
     btn.onclick = () => selectPracticeLine(line.number);
     container.appendChild(btn);
@@ -680,16 +680,12 @@ function renderLineButtons() {
 function selectPracticeLine(lineNum) {
   AppState.practiceLineNum = lineNum;
   const line = getLineByNumber(lineNum);
-  // Zobraz info o lince
   document.getElementById('practice-line-num').textContent = `Linka ${lineNum}`;
   document.getElementById('practice-line-from').textContent = line.stops[0];
   document.getElementById('practice-line-to').textContent = line.stops[line.stops.length - 1];
   document.getElementById('practice-line-stops').textContent = `${line.stops.length} zastávek`;
   document.getElementById('practice-line-info').style.display = 'block';
-  // Označ aktivní
-  document.querySelectorAll('.line-big-btn').forEach((btn, i) => {
-    btn.classList.toggle('active', TRAM_DATA.lines[i].number === lineNum);
-  });
+  renderLineButtons();
 }
 
 function startPracticeMode(mode) {
