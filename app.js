@@ -1784,27 +1784,14 @@ function generateZnackyQuestions(signs, count) {
     const others = signs.filter(s => s.id !== sign.id);
     if (others.length < 3) return;
 
-    // Typ 1: Ukáž obrázek → vyber název
     const wrongNames = shuffle([...others]).slice(0, 3).map(s => s.name);
     questions.push({
       question: 'Jak se jmenuje tato značka?',
       svgContent: `<div class="quiz-sign-svg-wrapper">${sign.svg}</div>`,
       options: shuffle([sign.name, ...wrongNames]),
       correct: sign.name,
-      explanation: `Značka č. ${sign.number} – ${sign.name}: ${sign.description}`,
+      explanation: sign.description ? `${sign.name}: ${sign.description}` : sign.name,
     });
-
-    // Typ 2: Ukáž název → vyber popis (jen pro značky s popisem)
-    const othersWithDesc = others.filter(s => s.description);
-    if (sign.description && othersWithDesc.length >= 3) {
-      const wrongDescs = shuffle([...othersWithDesc]).slice(0, 3).map(s => s.description);
-      questions.push({
-        question: `Co znamená značka č. ${sign.number} – „${sign.name}"?`,
-        options: shuffle([sign.description, ...wrongDescs]),
-        correct: sign.description,
-        explanation: `Značka č. ${sign.number} – ${sign.name}: ${sign.description}`,
-      });
-    }
   });
 
   const shuffled = shuffle(questions);
