@@ -1651,8 +1651,7 @@ function renderZnackyCategories() {
     const btn = document.createElement('button');
     const active = ZnackyState.selectedCategories.includes(cat.id);
     btn.className = 'znacky-cat-btn' + (active ? ' active' : '');
-    btn.style.setProperty('--cat-color', cat.color);
-    btn.innerHTML = `<span class="znacky-cat-icon">${cat.icon}</span>
+    btn.innerHTML = `<span class="znacky-cat-check">${active ? '☑' : '☐'}</span>
       <span class="znacky-cat-label">
         <span class="znacky-cat-num">${cat.number}</span>
         <span class="znacky-cat-name">${cat.name}</span>
@@ -1664,7 +1663,9 @@ function renderZnackyCategories() {
       } else {
         ZnackyState.selectedCategories.push(cat.id);
       }
-      btn.classList.toggle('active', ZnackyState.selectedCategories.includes(cat.id));
+      const isActive = ZnackyState.selectedCategories.includes(cat.id);
+      btn.classList.toggle('active', isActive);
+      btn.querySelector('.znacky-cat-check').textContent = isActive ? '☑' : '☐';
       updateZnackyButtons();
       updateZnackyCatSummary();
     };
