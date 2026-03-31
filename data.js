@@ -129,10 +129,9 @@ const TRAM_DATA = {
     {
       number: 10,
       from: "Vozovna Komín / Bystrc, Rakovecká",
-      to: "Stránská skála / Novolíšeňská",
+      to: "Stránská skála",
       stops: [
-        "Stránská skála smyčka", "Stránská skála", "Podstránská", "Novolíšeňská",
-        "Líšeňská", "Bílá hora", "Bělohorská", "Krásného", "Židovský hřbitov",
+        "Stránská skála smyčka", "Stránská skála", "Podstránská", "Krásného", "Židovský hřbitov",
         "Geislerova", "Životského", "Masná (Křenová)", "Vlhká",
         "Hlavní nádraží (spojka u Grandu)", "Malinovského náměstí (Rooseveltova)",
         "Česká (Česká)", "Grohova", "Konečného náměstí", "Rybkova", "Tábor (Veveří)",
