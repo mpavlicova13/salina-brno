@@ -30,8 +30,20 @@
       })(window, document, "clarity", "script", "yrupmet8lu");
     };
 
-    if (localStorage.getItem('cookie-consent') === 'granted') {
-      window.__loadAnalytics();
+    function __maybeStartAnalytics() {
+      if (localStorage.getItem('cookie-consent') === 'granted') {
+        window.__loadAnalytics();
+      }
+    }
+
+    // Nahrát analytiku až PO plném načtení appky (ne hned v <head>),
+    // ať nesoupeří o výkon s prvním vykreslením appky.
+    if (document.readyState === 'complete') {
+      setTimeout(__maybeStartAnalytics, 1000);
+    } else {
+      window.addEventListener('load', function () {
+        setTimeout(__maybeStartAnalytics, 1000);
+      });
     }
   </script>
 
