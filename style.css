@@ -2662,3 +2662,52 @@ button:active {
   object-fit: contain;
   filter: drop-shadow(0 1px 3px rgba(0,0,0,0.12));
 }
+
+/* ── Cookie souhlas (GA4 + Clarity) ─────────────────────── */
+
+.cookie-consent-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: #0d1b2a;
+  color: #fff;
+  padding: 16px 20px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.cookie-consent-banner p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.cookie-consent-btns {
+  display: flex;
+  gap: 10px;
+}
+
+.cookie-consent-btns button {
+  flex: 1;
+}
+
+@media (min-width: 600px) {
+  .cookie-consent-banner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .cookie-consent-btns {
+    flex-shrink: 0;
+  }
+
+  .cookie-consent-btns button {
+    flex: none;
+  }
+}
