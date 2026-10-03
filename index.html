@@ -4,12 +4,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <meta name="theme-color" content="#0d1b2a" />
+
+  <!-- Analytika (GA4 + Clarity) – nastartuje se až po souhlasu s cookies, viz konec body -->
+  <script>
+    window.__loadAnalytics = function () {
+      if (window.__analyticsLoaded) return;
+      window.__analyticsLoaded = true;
+
+      // Google tag (gtag.js)
+      var gaScript = document.createElement('script');
+      gaScript.async = true;
+      gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-7XC327SP5B';
+      document.head.appendChild(gaScript);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      window.gtag = gtag;
+      gtag('js', new Date());
+      gtag('config', 'G-7XC327SP5B');
+
+      // Microsoft Clarity
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "yrupmet8lu");
+    };
+
+    if (localStorage.getItem('cookie-consent') === 'granted') {
+      window.__loadAnalytics();
+    }
+  </script>
+
   <title>Šalina Brno – Procvičuj tramvaje DPMB</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="DPMB_favicona_2.png">
-  <link rel="stylesheet" href="style.css?v=12" />
+  <link rel="stylesheet" href="style.css?v=13" />
 </head>
 <body>
 
@@ -891,6 +922,41 @@
     </button>
   </nav>
 </div><!-- /#app -->
+
+<!-- ====================================================
+     COOKIE SOUHLAS (GA4 + Clarity)
+==================================================== -->
+<div id="cookie-consent-banner" class="cookie-consent-banner" style="display:none">
+  <p>Appka používá cookies pro analytiku (Google Analytics, Microsoft Clarity), abychom věděli, co v appce zlepšit. Souhlasíš se sběrem anonymních statistik používání?</p>
+  <div class="cookie-consent-btns">
+    <button class="btn-secondary" id="cookie-consent-decline">Odmítnout</button>
+    <button class="btn-primary" id="cookie-consent-accept">Souhlasím</button>
+  </div>
+</div>
+<script>
+  (function () {
+    var consent = localStorage.getItem('cookie-consent');
+    var banner = document.getElementById('cookie-consent-banner');
+    if (!consent && banner) {
+      banner.style.display = 'flex';
+    }
+    var acceptBtn = document.getElementById('cookie-consent-accept');
+    var declineBtn = document.getElementById('cookie-consent-decline');
+    if (acceptBtn) {
+      acceptBtn.addEventListener('click', function () {
+        localStorage.setItem('cookie-consent', 'granted');
+        banner.style.display = 'none';
+        if (window.__loadAnalytics) window.__loadAnalytics();
+      });
+    }
+    if (declineBtn) {
+      declineBtn.addEventListener('click', function () {
+        localStorage.setItem('cookie-consent', 'denied');
+        banner.style.display = 'none';
+      });
+    }
+  })();
+</script>
 
 <!-- ====================================================
      MODAL: Nahlásit chybu
