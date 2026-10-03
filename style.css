@@ -2693,21 +2693,29 @@ button:active {
 
 .cookie-consent-btns button {
   flex: 1;
+  width: auto;
+  white-space: nowrap;
 }
 
 @media (min-width: 600px) {
   .cookie-consent-banner {
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 20px;
   }
 
+  .cookie-consent-banner p {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
   .cookie-consent-btns {
-    flex-shrink: 0;
+    flex: 0 0 auto;
   }
 
   .cookie-consent-btns button {
     flex: none;
+    width: auto;
   }
 }
