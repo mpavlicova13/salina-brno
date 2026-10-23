@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Náhled značek – DPMB</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 24px; }
+    h1 { font-size: 1.4rem; margin-bottom: 24px; color: #1a1a2e; }
+
+    .category {
+      margin-bottom: 40px;
+    }
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .category-header .cat-num {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    .category-header .cat-count {
+      margin-left: auto;
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .signs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .sign-card {
+      background: white;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid #e0e4ea;
+    }
+    .sign-svg-box {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 90px;
+      background: #f8f9fc;
+      border-radius: 6px;
+      padding: 8px;
+    }
+    .sign-svg-box svg {
+      max-width: 100%;
+      max-height: 80px;
+      width: auto;
+      height: auto;
+    }
+    .sign-num {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .sign-name {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #222;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .sign-card:hover { border-color: #aac; }
+  </style>
+</head>
+<body>
+
+<h1>Náhled značek – DPMB návěstní soustava (najetím myší zobrazíš popis)</h1>
+<div id="preview"></div>
+
+<script src="znacky_data.js"></script>
+<script>
+  const container = document.getElementById('preview');
+
+  ZNACKY_DATA.categories.forEach(cat => {
+    const section = document.createElement('div');
+    section.className = 'category';
+
+    const header = document.createElement('div');
+    header.className = 'category-header';
+    header.style.background = cat.color;
+    header.innerHTML = `
+      <span>${cat.icon}</span>
+      <span class="cat-num">${cat.number}</span>
+      <strong>${cat.name}</strong>
+      <span class="cat-count">${cat.signs.length} značek</span>
+    `;
+    section.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.className = 'signs-grid';
+
+    cat.signs.forEach(sign => {
+      const card = document.createElement('div');
+      card.className = 'sign-card';
+      card.innerHTML = `
+        <div class="sign-svg-box">${sign.svg}</div>
+        <div class="sign-num">${cat.number} – č. ${sign.number}</div>
+        <div class="sign-name">${sign.name}</div>
+      `;
+      grid.appendChild(card);
+    });
+
+    section.appendChild(grid);
+    container.appendChild(section);
+  });
+</script>
+</body>
+</html>

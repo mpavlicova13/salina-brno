@@ -1,0 +1,7 @@
+name = "salina-brno"
+pages_build_output_dir = "app"
+compatibility_date = "2026-10-01"
+
+[[kv_namespaces]]
+binding = "CODES"
+id = "SEM_PRIJDE_ID_Z_KROKU_3"

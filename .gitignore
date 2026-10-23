@@ -1,0 +1,19 @@
+# Repozitář je veřejný. Nic z tohohle do něj nesmí.
+
+# Přístupové kódy k appce
+kody.json
+kody-pro-kv.json
+
+# Výzkumná data — nahrávky a přepisy rozhovorů, osobní údaje respondentů
+rozhovory/
+
+# Podklady k diplomce
+DIPLOMKA-KONTEXT.md
+Posudky Šula/
+*.pdf
+
+# Pracovní poznámky
+.claude/
+
+# macOS
+.DS_Store
